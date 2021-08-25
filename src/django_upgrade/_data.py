@@ -93,7 +93,6 @@ def visit(
 
 class Plugin:
     def __init__(self, name: str, min_version: Tuple[int, int]) -> None:
-        global PLUGINS
         self.name = name
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)

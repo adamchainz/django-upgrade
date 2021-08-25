@@ -3,6 +3,7 @@ import pkgutil
 from collections import defaultdict
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     Iterable,
@@ -40,6 +41,9 @@ else:
 
 class ASTCallbackMapping(Protocol):
     def __getitem__(self, tp: Type[AST_T]) -> List[ASTFunc[AST_T]]:  # pragma: no cover
+        ...
+
+    def items(self) -> Iterable[Tuple[Any, Any]]:  # pragma: no cover
         ...
 
 
@@ -88,8 +92,9 @@ def visit(
 
 
 class Plugin:
-    def __init__(self, min_version: Tuple[int, int]) -> None:
+    def __init__(self, name: str, min_version: Tuple[int, int]) -> None:
         global PLUGINS
+        self.name = name
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
 
@@ -123,5 +128,6 @@ def get_ast_funcs(target_version: Tuple[int, int]) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
     for plugin in PLUGINS:
         if target_version >= plugin.min_version:
-            ast_funcs.update(plugin.ast_funcs)  # type: ignore [attr-defined]
+            for type_, type_funcs in plugin.ast_funcs.items():
+                ast_funcs[type_].extend(type_funcs)
     return ast_funcs

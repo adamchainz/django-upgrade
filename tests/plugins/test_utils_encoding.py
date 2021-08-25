@@ -56,6 +56,22 @@ def test_fix_unittest_aliases_noop(s):
                 """
             ),
         ),
+        (
+            dedent(
+                """\
+                from django.utils.encoding import force_text as ft
+
+                ft("yada")
+                """
+            ),
+            dedent(
+                """\
+                from django.utils.encoding import force_str as ft
+
+                ft("yada")
+                """
+            ),
+        ),
     ),
 )
 def test_fix_old_names(s, expected):

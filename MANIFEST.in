@@ -7,6 +7,7 @@ include LICENSE
 include README.rst
 include src/django_upgrade/py.typed
 exclude .editorconfig
+exclude .pre-commit-hooks.yaml
 exclude .pre-commit-config.yaml
 include pyproject.toml
 exclude pytest.ini

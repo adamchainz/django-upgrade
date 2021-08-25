@@ -12,7 +12,7 @@ from tokenize_rt import (
 )
 
 from django_upgrade._ast_helpers import ast_parse
-from django_upgrade._data import FUNCS, Settings, visit
+from django_upgrade._data import Settings, visit
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -87,7 +87,7 @@ def _fix_plugins(contents_text: str, settings: Settings) -> str:
     except SyntaxError:
         return contents_text
 
-    callbacks = visit(FUNCS, ast_obj, settings)
+    callbacks = visit(ast_obj, settings)
 
     if not callbacks:
         return contents_text

@@ -2,6 +2,7 @@ from textwrap import dedent
 
 import pytest
 
+from django_upgrade._data import Settings
 from django_upgrade._main import _fix_plugins
 
 
@@ -21,7 +22,7 @@ from django_upgrade._main import _fix_plugins
     ),
 )
 def test_fix_unittest_aliases_noop(s):
-    assert _fix_plugins(s) == s
+    assert _fix_plugins(s, settings=Settings(target_version=(3, 0))) == s
 
 
 @pytest.mark.parametrize(
@@ -48,5 +49,5 @@ def test_fix_unittest_aliases_noop(s):
     ),
 )
 def test_fix_old_names(s, expected):
-    ret = _fix_plugins(s)
+    ret = _fix_plugins(s, settings=Settings(target_version=(3, 0)))
     assert ret == expected

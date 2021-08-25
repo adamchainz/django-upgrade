@@ -8,7 +8,10 @@ from django_upgrade._ast_helpers import ast_to_offset
 from django_upgrade._data import State, TokenFunc, register
 from django_upgrade._token_helpers import find_and_replace_name, replace_name
 
-NAMES = {"force_text": "force_str", "smart_text": "smart_str"}
+NAMES = {
+    "force_text": "force_str",
+    "smart_text": "smart_str",
+}
 
 
 @register(ast.ImportFrom)
@@ -17,6 +20,9 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
+    if state.settings.target_version < (3, 0):
+        return
+
     if node.level == 0 and node.module == "django.utils.encoding":
         for alias in node.names:
             name = alias.name
@@ -32,6 +38,9 @@ def visit_Name(
     node: ast.Name,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
+    if state.settings.target_version < (3, 0):
+        return
+
     name = node.id
     if name in NAMES and name in state.from_imports["django.utils.encoding"]:
         new = NAMES[name]

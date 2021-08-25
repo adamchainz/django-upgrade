@@ -19,7 +19,12 @@ from tokenize_rt import Offset, Token
 from django_upgrade import _plugins
 
 
+class Settings(NamedTuple):
+    target_version: Tuple[int, int]
+
+
 class State(NamedTuple):
+    settings: Settings
     from_imports: Dict[str, Set[str]]
 
 
@@ -41,8 +46,10 @@ class ASTCallbackMapping(Protocol):
 def visit(
     funcs: ASTCallbackMapping,
     tree: ast.Module,
+    settings: Settings,
 ) -> Dict[Offset, List[TokenFunc]]:
     initial_state = State(
+        settings=settings,
         from_imports=collections.defaultdict(set),
     )
 

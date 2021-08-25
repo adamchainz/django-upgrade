@@ -19,6 +19,16 @@ from django_upgrade._main import _fix_plugins
             ),
             id="no deprecated aliases",
         ),
+        pytest.param(
+            dedent(
+                """\
+                from django.utils import encoding
+
+                encoding.force_text("yada")
+                """
+            ),
+            id="not right import format",
+        ),
     ),
 )
 def test_fix_unittest_aliases_noop(s):

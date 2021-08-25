@@ -32,14 +32,14 @@ AST_T = TypeVar("AST_T", bound=ast.AST)
 TokenFunc = Callable[[int, List[Token]], None]
 ASTFunc = Callable[[State, AST_T, ast.AST], Iterable[Tuple[Offset, TokenFunc]]]
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
 else:
     Protocol = object
 
 
 class ASTCallbackMapping(Protocol):
-    def __getitem__(self, tp: Type[AST_T]) -> List[ASTFunc[AST_T]]:
+    def __getitem__(self, tp: Type[AST_T]) -> List[ASTFunc[AST_T]]:  # pragma: no cover
         ...
 
 
@@ -48,15 +48,12 @@ def visit(
     settings: Settings,
 ) -> Dict[Offset, List[TokenFunc]]:
     ast_funcs = get_ast_funcs(settings.target_version)
-    print(ast_funcs)
-
     initial_state = State(
         settings=settings,
         from_imports=defaultdict(set),
     )
 
     nodes: List[Tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
-
     ret = defaultdict(list)
     while nodes:
         state, node, parent = nodes.pop()

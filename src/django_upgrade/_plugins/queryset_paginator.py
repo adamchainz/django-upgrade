@@ -8,7 +8,7 @@ from typing import Iterable, Tuple
 
 from tokenize_rt import Offset
 
-from django_upgrade._ast_helpers import ast_to_offset
+from django_upgrade._ast_helpers import ast_start_offset
 from django_upgrade._data import Plugin, State, TokenFunc
 from django_upgrade._token_helpers import find_and_replace_name
 
@@ -32,7 +32,7 @@ def visit_ImportFrom(
         for alias in node.names:
             name = alias.name
             if name == OLD_NAME:
-                yield ast_to_offset(node), partial(
+                yield ast_start_offset(node), partial(
                     find_and_replace_name, name=OLD_NAME, new=NEW_NAME
                 )
 
@@ -45,6 +45,6 @@ def visit_Name(
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     name = node.id
     if name == OLD_NAME and name in state.from_imports[MODULE]:
-        yield ast_to_offset(node), partial(
+        yield ast_start_offset(node), partial(
             find_and_replace_name, name=OLD_NAME, new=NEW_NAME
         )

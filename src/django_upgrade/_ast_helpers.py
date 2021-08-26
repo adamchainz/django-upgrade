@@ -12,5 +12,9 @@ def ast_parse(contents_text: str) -> ast.Module:
         return ast.parse(contents_text.encode())
 
 
-def ast_to_offset(node: Union[ast.expr, ast.stmt]) -> Offset:
+def ast_start_offset(node: Union[ast.expr, ast.keyword, ast.stmt]) -> Offset:
     return Offset(node.lineno, node.col_offset)
+
+
+def ast_end_offset(node: Union[ast.expr, ast.keyword, ast.stmt]) -> Offset:
+    return Offset(node.end_lineno, node.end_col_offset)

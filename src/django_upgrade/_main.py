@@ -105,7 +105,7 @@ def _fix_plugins(contents_text: str, settings: Settings) -> str:
         # though this is a defaultdict, by using `.get()` this function's
         # self time is almost 50% faster
         for callback in callbacks.get(token.offset, ()):
-            callback(i, tokens)
+            callback(tokens, i)
 
     return tokens_to_src(tokens)
 

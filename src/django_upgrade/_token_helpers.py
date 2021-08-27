@@ -29,13 +29,18 @@ def find_and_replace_name(tokens: List[Token], i: int, *, name: str, new: str) -
     tokens[j] = tokens[j]._replace(name="CODE", src=new)
 
 
-def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
+def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
     j = i
     while (tokens[j].line is None or tokens[j].line <= node.end_lineno) and (
         tokens[j].utf8_byte_offset is None
         or tokens[j].utf8_byte_offset < node.end_col_offset
     ):
         j += 1
+    return j
+
+
+def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
+    j = find_final_token(tokens, i, node=node)
     if tokens[j].name == "NEWLINE":
         j += 1
     del tokens[i:j]

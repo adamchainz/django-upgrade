@@ -26,6 +26,7 @@ class Settings(NamedTuple):
 
 class State(NamedTuple):
     settings: Settings
+    filename: str
     from_imports: Dict[str, Set[str]]
 
 
@@ -50,10 +51,12 @@ class ASTCallbackMapping(Protocol):
 def visit(
     tree: ast.Module,
     settings: Settings,
+    filename: str,
 ) -> Dict[Offset, List[TokenFunc]]:
     ast_funcs = get_ast_funcs(settings.target_version)
     initial_state = State(
         settings=settings,
+        filename=filename,
         from_imports=defaultdict(set),
     )
 

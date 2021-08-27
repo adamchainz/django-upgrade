@@ -98,6 +98,22 @@ Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/re
     +force_str("yada")
     +smart_str("yada")
 
+Django 3.1
+----------
+
+Based on the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-1>`__.
+
+``PASSWORD_RESET_TIMEOUT_DAYS``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Rewrites the setting ``PASSWORD_RESET_TIMEOUT_DAYS`` → ``PASSWORD_RESET_TIMEOUT``, including multiplication by the number of seconds in a day.
+* Settings files are heuristically detected as modules with the word “settings” somewhere in their path.
+
+.. code-block:: diff
+
+    -PASSWORD_RESET_TIMEOUT_DAYS = 4
+    +PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
+
 Django 3.2
 ----------
 

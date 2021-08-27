@@ -67,7 +67,7 @@ def _fix_file(
         print(f"{filename} is non-utf-8 (not supported)")
         return 1
 
-    contents_text = _fix_plugins(contents_text, settings)
+    contents_text = _fix_plugins(contents_text, settings, filename)
 
     if filename == "-":
         print(contents_text, end="")
@@ -81,13 +81,13 @@ def _fix_file(
     return contents_text != contents_text_orig
 
 
-def _fix_plugins(contents_text: str, settings: Settings) -> str:
+def _fix_plugins(contents_text: str, settings: Settings, filename: str) -> str:
     try:
         ast_obj = ast_parse(contents_text)
     except SyntaxError:
         return contents_text
 
-    callbacks = visit(ast_obj, settings)
+    callbacks = visit(ast_obj, settings, filename)
 
     if not callbacks:
         return contents_text

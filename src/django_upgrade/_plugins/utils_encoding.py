@@ -17,6 +17,7 @@ plugin = Plugin(
     min_version=(3, 0),
 )
 
+MODULE = "django.utils.encoding"
 NAMES = {
     "force_text": "force_str",
     "smart_text": "smart_str",
@@ -29,13 +30,15 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    if node.level == 0 and node.module == "django.utils.encoding":
-        for alias in node.names:
-            name = alias.name
-            if name in NAMES:
-                yield ast_start_offset(node), partial(
-                    find_and_replace_name, name=name, new=NAMES[name]
-                )
+    if node.level != 0 or node.module != MODULE:
+        return
+
+    for alias in node.names:
+        name = alias.name
+        if name in NAMES:
+            yield ast_start_offset(node), partial(
+                find_and_replace_name, name=name, new=NAMES[name]
+            )
 
 
 @plugin.register(ast.Name)
@@ -45,7 +48,7 @@ def visit_Name(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     name = node.id
-    if name in NAMES and name in state.from_imports["django.utils.encoding"]:
+    if name in NAMES and name in state.from_imports[MODULE]:
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAMES[name]
         )

@@ -10,7 +10,7 @@ from tokenize_rt import Offset
 
 from django_upgrade._ast_helpers import ast_start_offset
 from django_upgrade._data import Plugin, State, TokenFunc
-from django_upgrade._token_helpers import find_and_replace_name
+from django_upgrade._token_helpers import find_and_replace_name, update_imports
 
 plugin = Plugin(
     __name__,
@@ -33,12 +33,7 @@ def visit_ImportFrom(
     if node.level != 0 or node.module != MODULE:
         return
 
-    for alias in node.names:
-        name = alias.name
-        if name in NAMES:
-            yield ast_start_offset(node), partial(
-                find_and_replace_name, name=name, new=NAMES[name]
-            )
+    yield ast_start_offset(node), partial(update_imports, node=node, name_map=NAMES)
 
 
 @plugin.register(ast.Name)

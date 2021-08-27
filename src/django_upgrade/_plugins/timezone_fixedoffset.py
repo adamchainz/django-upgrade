@@ -12,11 +12,10 @@ from django_upgrade._ast_helpers import ast_end_offset, ast_start_offset
 from django_upgrade._data import Plugin, State, TokenFunc
 from django_upgrade._token_helpers import (
     OP,
-    erase_from_import_name,
-    erase_node,
     insert,
     insert_after,
     replace,
+    update_imports,
 )
 
 plugin = Plugin(
@@ -38,15 +37,9 @@ def visit_ImportFrom(
         return
 
     if any(alias.name == OLD_NAME for alias in node.names):
-        if len(node.names) == 1:
-            yield ast_start_offset(node), partial(erase_node, node=node)
-        else:
-            yield ast_start_offset(node), partial(
-                erase_from_import_name,
-                names=node.names,
-                to_erase=OLD_NAME,
-            )
-
+        yield ast_start_offset(node), partial(
+            update_imports, node=node, name_map={"FixedOffset": ""}
+        )
         yield ast_start_offset(node), partial(
             insert,
             new_src="from datetime import timedelta, timezone\n",

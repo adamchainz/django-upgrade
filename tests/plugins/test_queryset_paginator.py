@@ -38,3 +38,27 @@ def test_success():
         """,
         settings,
     )
+
+
+def test_success_other_names():
+    check_transformed(
+        """\
+        from django.core.paginator import QuerySetPaginator, foo
+        """,
+        """\
+        from django.core.paginator import Paginator, foo
+        """,
+        settings,
+    )
+
+
+def test_success_aliased():
+    check_transformed(
+        """\
+        from django.core.paginator import QuerySetPaginator as P
+        """,
+        """\
+        from django.core.paginator import Paginator as P
+        """,
+        settings,
+    )

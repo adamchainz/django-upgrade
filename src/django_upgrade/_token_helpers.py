@@ -1,5 +1,5 @@
 import ast
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from tokenize_rt import UNIMPORTANT_WS, Token
 
@@ -74,46 +74,69 @@ def replace(tokens: List[Token], i: int, *, src: str) -> None:
     tokens[i] = Token(CODE, src)
 
 
-def erase_from_import_name(
+def update_imports(
     tokens: List[Token],
     i: int,
     *,
-    names: List[ast.alias],
-    to_erase: str,
+    node: ast.ImportFrom,
+    name_map: Dict[str, str],
 ) -> None:
-    i = find(tokens, i, name=NAME, src="from")
-    i = find(tokens, i, name=NAME, src="import")
+    replacements: List[Tuple[int, int, List[Token]]] = []  # start, end, new tokens
 
-    found_index: int
-    found_alias: ast.alias
-    for alias_idx, alias in enumerate(names):
-        if alias.name == to_erase:
-            found_index = alias_idx
-            found_alias = alias
-            break
+    j = find(tokens, i, name=NAME, src="from")
+    j = find(tokens, j, name=NAME, src="import")
 
-        i = find(tokens, i, name=NAME, src=alias.name)
-        if alias.asname is not None:
-            i = find(tokens, i, name=NAME, src="as")
-            i = find(tokens, i, name=NAME, src=alias.asname)
+    remove_all = True
+    for alias_idx, alias in enumerate(node.names):
+        if alias.name not in name_map:
+            # Skip over
+            remove_all = False
+            j = find(tokens, j, name=NAME, src=alias.name)
+            if alias.asname is not None:
+                j = find(tokens, j, name=NAME, src="as")
+                j = find(tokens, j, name=NAME, src=alias.asname)
+            continue
 
-    start_idx = find(tokens, i, name=NAME, src=to_erase)
+        new_name = name_map[alias.name]
+        if new_name == "":
+            # Erase
+            start_idx = find(tokens, j, name=NAME, src=alias.name)
 
-    end_idx = start_idx
-    if found_alias.asname is not None:
-        end_idx = find(tokens, end_idx, name=NAME, src="as")
-        end_idx = find(tokens, end_idx, name=NAME, src=found_alias.asname)
+            end_idx = start_idx
+            if alias.asname is not None:
+                end_idx = find(tokens, end_idx, name=NAME, src="as")
+                end_idx = find(tokens, end_idx, name=NAME, src=alias.asname)
 
-    if found_index < len(names) - 1:
-        end_idx = find(tokens, end_idx, name=OP, src=",")
+            if len(node.names) > 1:
+                if alias_idx < len(node.names) - 1:
+                    end_idx = find(tokens, end_idx, name=OP, src=",")
+                else:
+                    start_idx = reverse_find(tokens, start_idx, name=OP, src=",")
+
+            end_idx = consume(tokens, end_idx, name=UNIMPORTANT_WS)
+            end_idx = consume(tokens, end_idx, name=COMMENT)
+
+            if alone_on_line(tokens, start_idx, end_idx):
+                start_idx -= 1
+                end_idx += 1
+
+            replacements.append((start_idx, end_idx, []))
+            j = end_idx
+        else:
+            # Replace
+            remove_all = False
+            start_idx = find(tokens, j, name=NAME, src=alias.name)
+            replacements.append(
+                (
+                    start_idx,
+                    start_idx,
+                    [tokens[start_idx]._replace(name="CODE", src=new_name)],
+                )
+            )
+            j = start_idx
+
+    if remove_all:
+        erase_node(tokens, i, node=node)
     else:
-        start_idx = reverse_find(tokens, start_idx, name=OP, src=",")
-
-    end_idx = consume(tokens, end_idx, name=UNIMPORTANT_WS)
-    end_idx = consume(tokens, end_idx, name=COMMENT)
-
-    if alone_on_line(tokens, start_idx, end_idx):
-        start_idx -= 1
-        end_idx += 1
-
-    tokens[start_idx : end_idx + 1] = []
+        for start_idx, end_idx, replacement in reversed(replacements):
+            tokens[start_idx : end_idx + 1] = replacement

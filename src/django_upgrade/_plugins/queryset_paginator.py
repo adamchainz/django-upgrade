@@ -10,7 +10,7 @@ from tokenize_rt import Offset
 
 from django_upgrade._ast_helpers import ast_start_offset
 from django_upgrade._data import Plugin, State, TokenFunc
-from django_upgrade._token_helpers import find_and_replace_name
+from django_upgrade._token_helpers import find_and_replace_name, update_imports
 
 plugin = Plugin(
     __name__,
@@ -18,8 +18,9 @@ plugin = Plugin(
 )
 
 MODULE = "django.core.paginator"
-OLD_NAME = "QuerySetPaginator"
-NEW_NAME = "Paginator"
+NAMES = {
+    "QuerySetPaginator": "Paginator",
+}
 
 
 @plugin.register(ast.ImportFrom)
@@ -28,13 +29,10 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    if node.level == 0 and node.module == MODULE:
-        for alias in node.names:
-            name = alias.name
-            if name == OLD_NAME:
-                yield ast_start_offset(node), partial(
-                    find_and_replace_name, name=OLD_NAME, new=NEW_NAME
-                )
+    if node.level != 0 or node.module != MODULE:
+        return
+
+    yield ast_start_offset(node), partial(update_imports, node=node, name_map=NAMES)
 
 
 @plugin.register(ast.Name)
@@ -44,7 +42,7 @@ def visit_Name(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     name = node.id
-    if name == OLD_NAME and name in state.from_imports[MODULE]:
+    if name in NAMES and name in state.from_imports[MODULE]:
         yield ast_start_offset(node), partial(
-            find_and_replace_name, name=OLD_NAME, new=NEW_NAME
+            find_and_replace_name, name=name, new=NAMES[name]
         )

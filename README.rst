@@ -31,7 +31,7 @@ Use **pip**:
 
 Python 3.6 to 3.9 supported.
 
-Or with pre-commit in the ``repos`` section of your ``.pre-commit-config.yaml`` file:
+Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
 
 .. code-block:: yaml
 
@@ -39,6 +39,9 @@ Or with pre-commit in the ``repos`` section of your ``.pre-commit-config.yaml`` 
         rev: ''  # replace with latest tag on GitHub
         hooks:
         -   id: django-upgrade
+            args: [--target-version, "3.2"]   # Replace with Django version
+
+Works best before any reformatters such as `isort <https://isort.readthedocs.io/>`__ or `Black <https://black.readthedocs.io/en/stable/>`__.
 
 ----
 
@@ -47,13 +50,33 @@ Check out my book `Speed Up Your Django Tests <https://gumroad.com/l/suydt>`__ w
 
 ----
 
-Currently an experimental alternative to `django-codemod <https://django-codemod.readthedocs.io/en/latest/>`__, whose underlying library `LibCST <https://pypi.org/project/libcst/>`__ is relatively slow.
-Based on the fantastic `pyupgrade <https://github.com/asottile/pyupgrade>`__.
-
 Usage
 =====
 
-Run ``django-upgrade --help`` on the commandline for information.
+``django-upgrade`` is a commandline tool that rewrites files in place.
+Pass your Django version as ``<major>.<minor>`` with ``--target-version`` and the fixers will rewrite code not to trigger ``DeprecationWarning`` on that version of Django.
+For example:
+
+.. code-block:: sh
+
+    django-upgrade --target-version 3.2 example/core/models.py example/settings.py
+
+For more on usage run ``django-upgrade --help``.
+The full list of fixers is below.
+
+History
+=======
+
+`django-codemod <https://django-codemod.readthedocs.io/en/latest/>`__ is a pre-existing, more complete Django auto-upgrade tool, written by Bruno Alla.
+Unfortunately its underlying library `LibCST <https://pypi.org/project/libcst/>`__ is particularly slow, making it annoying to run django-codemod on every commit and in CI.
+Additionally LibCST only advertises support up to Python 3.8 (at time of writing).
+
+django-upgrade is an experiment in reimplementing such a tool using the same techniques as the fantastic `pyupgrade <https://github.com/asottile/pyupgrade>`__.
+The tool leans on the standard library’s `ast <https://docs.python.org/3/library/ast.html>`__ and `tokenize <https://docs.python.org/3/library/tokenize.html>`__ modules, the latter via the `tokenize-rt wrapper <https://github.com/asottile/tokenize-rt>`__.
+This means it will always be fast and support the latest versions of Python.
+
+For a quick benchmark: running django-codemod against a medium Django repository with 153k lines of Python takes 133 seconds.
+pyupgrade and django-upgrade both take less than 0.5 seconds.
 
 Fixers
 ======

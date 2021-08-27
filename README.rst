@@ -84,7 +84,7 @@ Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/re
 ``django.utils.encoding``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ``smart_text()`` → ``smart_str()`` , ``force_text()`` -> ``force_str()``
+* ``smart_text()`` → ``smart_str()`` , ``force_text()`` → ``force_str()``
 * django-upgrade does not support Python 2 so these names are always replaced.
 
 .. code-block:: diff
@@ -97,3 +97,22 @@ Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/re
     -smart_text("yada")
     +force_str("yada")
     +smart_str("yada")
+
+Django 3.2
+----------
+
+Based on the `Django 3.2 release notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2>`__.
+
+``django.core.validators.EmailValidator``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Rewrites keyword arguments ``whitelist`` → ``allowlist`` and ``domain_whitelist`` → ``domain_allowlist``.
+
+.. code-block:: diff
+
+     from django.core.validators import EmailValidator
+
+    -EmailValidator(whitelist=["example.com"])
+    +EmailValidator(allowlist=["example.com"])
+    -EmailValidator(domain_whitelist=["example.org"])
+    +EmailValidator(domain_allowlist=["example.org"])

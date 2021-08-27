@@ -71,7 +71,7 @@ def insert_after(
 
 
 def replace(tokens: List[Token], i: int, *, src: str) -> None:
-    tokens[i] = Token(CODE, src)
+    tokens[i] = tokens[i]._replace(name=CODE, src=src)
 
 
 def update_imports(

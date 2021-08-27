@@ -48,6 +48,7 @@ Check out my book `Speed Up Your Django Tests <https://gumroad.com/l/suydt>`__ w
 ----
 
 Currently an experimental alternative to `django-codemod <https://django-codemod.readthedocs.io/en/latest/>`__, whose underlying library `LibCST <https://pypi.org/project/libcst/>`__ is relatively slow.
+Based on the fantastic `pyupgrade <https://github.com/asottile/pyupgrade>`__.
 
 Usage
 =====

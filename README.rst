@@ -39,3 +39,61 @@ Check out my book `Speed Up Your Django Tests <https://gumroad.com/l/suydt>`__ w
 ----
 
 Currently an experimental alternative to `django-codemod <https://django-codemod.readthedocs.io/en/latest/>`__, whose underlying library `LibCST <https://pypi.org/project/libcst/>`__ is relatively slow.
+
+Fixers
+======
+
+Django 2.2
+----------
+
+Based on the `Django 2.2 release notes <https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2>`__.
+
+``django.core.paginator``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ``QuerySetPaginator`` → ``Paginator``
+
+.. code-block:: diff
+
+    -from django.core.paginator import QuerySetPaginator
+    +from django.core.paginator import Paginator
+
+    -QuerySetPaginator(...)
+    +Paginator(...)
+
+
+``django.utils.timezone``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ``FixedOffset(x, y)`` → ``timezone(timedelta(minutes=x), y)``
+* Will leave code broken with an ``ImportError`` if ``FixedOffset`` is called with (only) ``*args`` or ``**kwargs``.
+
+.. code-block:: diff
+
+    -from django.utils.timezone import FixedOffset
+    -FixedOffset(120, "Super time")
+    +from datetime import timedelta, timezone
+    +timezone(timedelta(minutes=120), "Super time")
+
+
+Django 3.0
+----------
+
+Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0>`__.
+
+``django.utils.encoding``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ``smart_text()`` → ``smart_str()`` , ``force_text()`` -> ``force_str()``
+* django-upgrade does not support Python 2 so these names are always replaced.
+
+.. code-block:: diff
+
+    -from django.utils.encoding import force_text, smart_text
+    +from django.utils.encoding import force_str, smart_str
+
+
+    -force_text("yada")
+    -smart_text("yada")
+    +force_str("yada")
+    +smart_str("yada")

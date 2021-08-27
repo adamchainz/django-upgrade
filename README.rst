@@ -31,6 +31,15 @@ Use **pip**:
 
 Python 3.6 to 3.9 supported.
 
+Or with pre-commit in the ``repos`` section of your ``.pre-commit-config.yaml`` file:
+
+.. code-block:: yaml
+
+    -   repo: https://github.com/adamchainz/django-upgrade
+        rev: ''  # replace with latest tag on GitHub
+        hooks:
+        -   id: django-upgrade
+
 ----
 
 **Are your tests slow?**
@@ -39,6 +48,11 @@ Check out my book `Speed Up Your Django Tests <https://gumroad.com/l/suydt>`__ w
 ----
 
 Currently an experimental alternative to `django-codemod <https://django-codemod.readthedocs.io/en/latest/>`__, whose underlying library `LibCST <https://pypi.org/project/libcst/>`__ is relatively slow.
+
+Usage
+=====
+
+Run ``django-upgrade --help`` on the commandline for information.
 
 Fixers
 ======

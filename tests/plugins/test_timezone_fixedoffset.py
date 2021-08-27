@@ -153,6 +153,36 @@ def test_call_with_extra_arg_rewritten():
     )
 
 
+def test_call_with_star_args_not_rewritten():
+    # Leave *args form broken with ImportError
+    check_transformed(
+        """\
+        from django.utils.timezone import FixedOffset
+        FixedOffset(*(120,))
+        """,
+        """\
+        from datetime import timedelta, timezone
+        FixedOffset(*(120,))
+        """,
+        settings,
+    )
+
+
+def test_call_with_star_star_args_not_rewritten():
+    # Leave **kwargs form broken with ImportError
+    check_transformed(
+        """\
+        from django.utils.timezone import FixedOffset
+        FixedOffset(**{'offset': 120})
+        """,
+        """\
+        from datetime import timedelta, timezone
+        FixedOffset(**{'offset': 120})
+        """,
+        settings,
+    )
+
+
 def test_call_with_keyword_arguments_rewritten():
     check_transformed(
         """\

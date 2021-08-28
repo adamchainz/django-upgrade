@@ -61,28 +61,6 @@ def visit_Call(
     ):
         yield ast_start_offset(node), partial(fix_offset_arg, node=node)
 
-        # rewriting_offset_arg = False
-        # if len(node.args) >= 1 and not isinstance(node.args[0], ast.Starred):
-        #     yield ast_start_offset(node.args[0]), partial(
-        #         insert, new_src="timedelta(minutes="
-        #     )
-        #     yield ast_end_offset(node.args[0]), partial(insert, new_src=")")
-        #     rewriting_offset_arg = True
-        # else:
-        #     for keyword in node.keywords:
-        #         if keyword.arg == "offset":
-        #             yield ast_start_offset(keyword), partial(
-        #                 insert_after,
-        #                 name=OP,
-        #                 src="=",
-        #                 new_src="timedelta(minutes=",
-        #             )
-        #             yield ast_end_offset(keyword), partial(insert, new_src=")")
-        #             rewriting_offset_arg = True
-
-        # if rewriting_offset_arg:
-        #     yield ast_start_offset(node), partial(replace, src="timezone")
-
 
 def fix_offset_arg(tokens: List[Token], i: int, *, node: ast.Call) -> None:
     j = find(tokens, i, name=OP, src="(")

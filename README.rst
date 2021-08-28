@@ -165,6 +165,28 @@ Rewrites:
     -PASSWORD_RESET_TIMEOUT_DAYS = 4
     +PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
 
+``Signal``
+~~~~~~~~~~
+
+Removes the deprecated documentation-only ``providing_args`` argument.
+
+.. code-block:: diff
+
+     from django.dispatch import Signal
+    -my_cool_signal = Signal(providing_args=["documented", "arg"])
+    +my_cool_signal = Signal()
+
+``get_random_string``
+~~~~~~~~~~~~~~~~~~~~~
+
+Injects the now-required ``length`` argument, with its previous default ``12``.
+
+.. code-block:: diff
+
+     from django.utils.crypto import get_random_string
+    -key = get_random_string(allowed_chars="01234567899abcdef")
+    +key = get_random_string(length=12, allowed_chars="01234567899abcdef")
+
 Django 3.2
 ----------
 

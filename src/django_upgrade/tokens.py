@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Tuple
 from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
 
 # Token name aliases
+INDENT = "INDENT"
 DEDENT = "DEDENT"
 NAME = "NAME"
 OP = "OP"
@@ -59,6 +60,14 @@ def consume(
 ) -> int:
     while tokens[i + 1].name == name and (src is None or tokens[i + 1].src == src):
         i += 1
+    return i
+
+
+def reverse_consume(
+    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
+) -> int:
+    while tokens[i - 1].name == name and (src is None or tokens[i - 1].src == src):
+        i -= 1
     return i
 
 
@@ -127,7 +136,6 @@ def replace_arguments(
     for n, keyword in reversed(list(enumerate(node.keywords))):
         if keyword.arg in arg_map:
             x, y = kwarg_func_args[n]
-            print(tokens[x:y])
             for k in range(*kwarg_func_args[n]):
                 if tokens[k].src == keyword.arg:
                     tokens[k] = tokens[k]._replace(src=arg_map[keyword.arg])

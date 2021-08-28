@@ -5,7 +5,8 @@ from tokenize_rt import UNIMPORTANT_WS, Token
 
 NAME = "NAME"
 OP = "OP"
-NL = "NL"
+LOGICAL_NEWLINE = "NEWLINE"
+PHYSICAL_NEWLINE = "NL"
 COMMENT = "COMMENT"
 CODE = "CODE"  # Token name meaning 'replaced by us'
 
@@ -31,7 +32,9 @@ def find_and_replace_name(tokens: List[Token], i: int, *, name: str, new: str) -
 
 def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
     j = i
-    while (tokens[j].line is None or tokens[j].line <= node.end_lineno) and (
+    while tokens[j].line is None or tokens[j].line < node.end_lineno:
+        j += 1
+    while (
         tokens[j].utf8_byte_offset is None
         or tokens[j].utf8_byte_offset < node.end_col_offset
     ):
@@ -41,7 +44,7 @@ def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
 
 def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
     j = find_final_token(tokens, i, node=node)
-    if tokens[j].name == "NEWLINE":
+    if tokens[j].name == LOGICAL_NEWLINE:
         j += 1
     del tokens[i:j]
 
@@ -56,9 +59,9 @@ def consume(
 
 def alone_on_line(tokens: List[Token], start_idx: int, end_idx: int) -> bool:
     return (
-        tokens[start_idx - 2].name == NL
+        tokens[start_idx - 2].name == PHYSICAL_NEWLINE
         and tokens[start_idx - 1].name == UNIMPORTANT_WS
-        and tokens[end_idx + 1].name == NL
+        and tokens[end_idx + 1].name == PHYSICAL_NEWLINE
     )
 
 
@@ -70,9 +73,7 @@ def insert_after(
     tokens: List[Token], i: int, *, name: str, src: Optional[str] = None, new_src: str
 ) -> None:
     j = find(tokens, i, name=name, src=src)
-    print(j)
     tokens.insert(j + 1, Token(CODE, new_src))
-    print(tokens[j + 1])
 
 
 def replace(tokens: List[Token], i: int, *, src: str) -> None:

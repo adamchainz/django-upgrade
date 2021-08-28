@@ -17,7 +17,7 @@ from typing import (
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade import plugins
+from django_upgrade import fixers
 
 
 class Settings(NamedTuple):
@@ -94,13 +94,13 @@ def visit(
     return ret
 
 
-class Plugin:
+class Fixer:
     def __init__(self, name: str, min_version: Tuple[int, int]) -> None:
         self.name = name
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
 
-        PLUGINS.append(self)
+        FIXERS.append(self)
 
     def register(
         self, type_: Type[AST_T]
@@ -112,24 +112,24 @@ class Plugin:
         return decorator
 
 
-PLUGINS: List[Plugin] = []
+FIXERS: List[Fixer] = []
 
 
-def _import_plugins() -> None:
+def _import_fixers() -> None:
     # https://github.com/python/mypy/issues/1422
-    plugins_path: str = plugins.__path__  # type: ignore
-    mod_infos = pkgutil.walk_packages(plugins_path, f"{plugins.__name__}.")
+    fixers_path: str = fixers.__path__  # type: ignore
+    mod_infos = pkgutil.walk_packages(fixers_path, f"{fixers.__name__}.")
     for _, name, _ in mod_infos:
         __import__(name, fromlist=["_trash"])
 
 
-_import_plugins()
+_import_fixers()
 
 
 def get_ast_funcs(target_version: Tuple[int, int]) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
-    for plugin in PLUGINS:
-        if target_version >= plugin.min_version:
-            for type_, type_funcs in plugin.ast_funcs.items():
+    for fixer in FIXERS:
+        if target_version >= fixer.min_version:
+            for type_, type_funcs in fixer.ast_funcs.items():
                 ast_funcs[type_].extend(type_funcs)
     return ast_funcs

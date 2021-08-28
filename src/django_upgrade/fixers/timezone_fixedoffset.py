@@ -9,7 +9,7 @@ from typing import Iterable, List, Tuple
 from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Plugin, State, TokenFunc
+from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     OP,
     find,
@@ -20,7 +20,7 @@ from django_upgrade.tokens import (
     update_imports,
 )
 
-plugin = Plugin(
+fixer = Fixer(
     __name__,
     min_version=(2, 2),
 )
@@ -29,7 +29,7 @@ MODULE = "django.utils.timezone"
 OLD_NAME = "FixedOffset"
 
 
-@plugin.register(ast.ImportFrom)
+@fixer.register(ast.ImportFrom)
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
@@ -48,7 +48,7 @@ def visit_ImportFrom(
         )
 
 
-@plugin.register(ast.Call)
+@fixer.register(ast.Call)
 def visit_Call(
     state: State,
     node: ast.Call,

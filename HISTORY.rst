@@ -2,6 +2,9 @@
 History
 =======
 
+1.1.0 (2021-08-28)
+------------------
+
 * Add fixer for Django 3.1 ``JSONField`` moves.
 
 * Add fixer for Django 3.1 removal of ``Signal``\’s argument ``providing_args``.

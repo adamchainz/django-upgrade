@@ -7,7 +7,7 @@ settings = Settings(target_version=(3, 2))
 def test_incorrect_import():
     check_noop(
         """\
-        from anywhere import EmailValidator
+        from example import EmailValidator
         EmailValidator(whitelist=["example.org"])
         """,
         settings,

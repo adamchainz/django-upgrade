@@ -43,10 +43,10 @@ def test_success():
 def test_success_other_names():
     check_transformed(
         """\
-        from django.core.paginator import QuerySetPaginator, foo
+        from django.core.paginator import QuerySetPaginator, foo, bar as baz
         """,
         """\
-        from django.core.paginator import Paginator, foo
+        from django.core.paginator import Paginator, foo, bar as baz
         """,
         settings,
     )

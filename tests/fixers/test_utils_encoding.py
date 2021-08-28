@@ -31,14 +31,20 @@ def test_success():
         """\
         from django.utils.encoding import force_text, smart_text
 
-        force_text("yada")
-        smart_text("yada")
+        def main(*, argv):
+            print(
+                force_text("yada"),
+                smart_text("yada"),
+            )
         """,
         """\
         from django.utils.encoding import force_str, smart_str
 
-        force_str("yada")
-        smart_str("yada")
+        def main(*, argv):
+            print(
+                force_str("yada"),
+                smart_str("yada"),
+            )
         """,
         settings,
     )

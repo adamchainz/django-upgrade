@@ -139,7 +139,7 @@ Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/re
 Django 3.1
 ----------
 
-Based on the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-1>`__.
+Based on the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1>`__.
 
 ``JSONField``
 ~~~~~~~~~~~~~

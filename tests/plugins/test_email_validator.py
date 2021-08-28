@@ -1,4 +1,4 @@
-from django_upgrade._data import Settings
+from django_upgrade.data import Settings
 from tests.plugins.tools import check_noop, check_transformed
 
 settings = Settings(target_version=(3, 2))

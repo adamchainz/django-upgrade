@@ -1,7 +1,7 @@
 from textwrap import dedent
 
-from django_upgrade._data import Settings
-from django_upgrade._main import _fix_plugins
+from django_upgrade.data import Settings
+from django_upgrade.main import _fix_plugins
 
 settings = Settings(target_version=(3, 0))
 

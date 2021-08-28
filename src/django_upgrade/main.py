@@ -11,8 +11,8 @@ from tokenize_rt import (
     tokens_to_src,
 )
 
-from django_upgrade._ast_helpers import ast_parse
-from django_upgrade._data import Settings, visit
+from django_upgrade.ast import ast_parse
+from django_upgrade.data import Settings, visit
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

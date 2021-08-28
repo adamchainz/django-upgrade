@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 
 from django_upgrade import __main__  # noqa: F401
-from django_upgrade._main import main
+from django_upgrade.main import main
 
 
 def test_main_trivial():

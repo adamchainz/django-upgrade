@@ -13,6 +13,7 @@ from tokenize_rt import (
 
 from django_upgrade.ast import ast_parse
 from django_upgrade.data import Settings, visit
+from django_upgrade.tokens import DEDENT
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -121,5 +122,5 @@ def fixup_dedent_tokens(tokens: List[Token]) -> None:
     |+----UNIMPORTANT_WS
     """
     for i, token in enumerate(tokens):
-        if token.name == UNIMPORTANT_WS and tokens[i + 1].name == "DEDENT":
+        if token.name == UNIMPORTANT_WS and tokens[i + 1].name == DEDENT:
             tokens[i], tokens[i + 1] = tokens[i + 1], tokens[i]

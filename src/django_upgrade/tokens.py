@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Tuple
 from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
 
 # Token name aliases
+DEDENT = "DEDENT"
 NAME = "NAME"
 OP = "OP"
 LOGICAL_NEWLINE = "NEWLINE"
@@ -48,7 +49,7 @@ def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
 
 def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
     j = find_final_token(tokens, i, node=node)
-    if tokens[j].name == LOGICAL_NEWLINE:
+    if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
         j += 1
     del tokens[i:j]
 
@@ -131,7 +132,7 @@ def replace_arguments(
                 if tokens[k].src == keyword.arg:
                     tokens[k] = tokens[k]._replace(src=arg_map[keyword.arg])
                     break
-            else:
+            else:  # pragma: no cover
                 raise AssertionError(f"{keyword.arg} argument not found")
 
 
@@ -153,7 +154,7 @@ def update_imports(
             # Skip over
             remove_all = False
             j = find(tokens, j, name=NAME, src=alias.name)
-            if alias.asname is not None:
+            if alias.asname is not None:  # pragma: no branch
                 j = find(tokens, j, name=NAME, src="as")
                 j = find(tokens, j, name=NAME, src=alias.asname)
             continue
@@ -164,7 +165,7 @@ def update_imports(
             start_idx = find(tokens, j, name=NAME, src=alias.name)
 
             end_idx = start_idx
-            if alias.asname is not None:
+            if alias.asname is not None:  # pragma: no cover
                 end_idx = find(tokens, end_idx, name=NAME, src="as")
                 end_idx = find(tokens, end_idx, name=NAME, src=alias.asname)
 

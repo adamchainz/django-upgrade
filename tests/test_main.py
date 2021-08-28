@@ -1,11 +1,14 @@
 import io
 import sys
+from textwrap import dedent
 from unittest import mock
 
 import pytest
+from tokenize_rt import UNIMPORTANT_WS, src_to_tokens
 
 from django_upgrade import __main__  # noqa: F401
-from django_upgrade.main import main
+from django_upgrade.main import fixup_dedent_tokens, main
+from django_upgrade.tokens import DEDENT
 
 
 def test_main_trivial():
@@ -87,3 +90,24 @@ def test_main_stdin_with_changes(capsys):
     out, err = capsys.readouterr()
     assert out == "from django.core.paginator import Paginator\n"
     assert err == ""
+
+
+def test_fixup_dedent_tokens():
+    code = dedent(
+        """\
+        if True:
+            if True:
+                pass
+            else:
+                pass
+        """
+    )
+    tokens = src_to_tokens(code)
+
+    assert tokens[14].name == UNIMPORTANT_WS
+    assert tokens[15].name == DEDENT
+
+    fixup_dedent_tokens(tokens)
+
+    assert tokens[14].name == DEDENT
+    assert tokens[15].name == UNIMPORTANT_WS

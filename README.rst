@@ -141,6 +141,19 @@ Django 3.1
 
 Based on the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-1>`__.
 
+``JSONField``
+~~~~~~~~~~~~~
+
+Rewrites:
+
+* ``django.contrib.postgres.fields.JSONField`` → ``django.db.models.JSONField``
+* ``django.contrib.postgres.forms.JSONField`` → ``django.forms.JSONField``
+
+.. code-block:: diff
+
+    -from django.contrib.postgres.fields import JSONField
+    +from django.db.models import JSONField
+
 ``PASSWORD_RESET_TIMEOUT_DAYS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

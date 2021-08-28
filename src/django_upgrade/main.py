@@ -41,7 +41,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     ret = 0
     for filename in args.filenames:
-        ret |= _fix_file(
+        ret |= fix_file(
             filename,
             settings,
             exit_zero_even_if_changed=args.exit_zero_even_if_changed,
@@ -50,7 +50,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     return ret
 
 
-def _fix_file(
+def fix_file(
     filename: str,
     settings: Settings,
     exit_zero_even_if_changed: bool,
@@ -67,7 +67,7 @@ def _fix_file(
         print(f"{filename} is non-utf-8 (not supported)")
         return 1
 
-    contents_text = _fix_plugins(contents_text, settings, filename)
+    contents_text = apply_fixers(contents_text, settings, filename)
 
     if filename == "-":
         print(contents_text, end="")
@@ -81,7 +81,7 @@ def _fix_file(
     return contents_text != contents_text_orig
 
 
-def _fix_plugins(contents_text: str, settings: Settings, filename: str) -> str:
+def apply_fixers(contents_text: str, settings: Settings, filename: str) -> str:
     try:
         ast_obj = ast_parse(contents_text)
     except SyntaxError:
@@ -97,7 +97,7 @@ def _fix_plugins(contents_text: str, settings: Settings, filename: str) -> str:
     except tokenize.TokenError:  # pragma: no cover (bpo-2180)
         return contents_text
 
-    _fixup_dedent_tokens(tokens)
+    fixup_dedent_tokens(tokens)
 
     for i, token in reversed_enumerate(tokens):
         if not token.src:
@@ -110,7 +110,7 @@ def _fix_plugins(contents_text: str, settings: Settings, filename: str) -> str:
     return tokens_to_src(tokens)
 
 
-def _fixup_dedent_tokens(tokens: List[Token]) -> None:
+def fixup_dedent_tokens(tokens: List[Token]) -> None:
     """For whatever reason the DEDENT / UNIMPORTANT_WS tokens are misordered
 
     | if True:

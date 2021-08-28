@@ -10,10 +10,10 @@ from typing import Iterable, List, Tuple
 from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Plugin, State, TokenFunc
+from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import CODE, OP, find
 
-plugin = Plugin(
+fixer = Fixer(
     __name__,
     min_version=(3, 1),
 )
@@ -28,7 +28,7 @@ def looks_like_settings_file(filename: str) -> bool:
     return settings_re.search(filename) is not None
 
 
-@plugin.register(ast.Assign)
+@fixer.register(ast.Assign)
 def visit_Assign(
     state: State,
     node: ast.Assign,

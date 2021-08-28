@@ -197,6 +197,22 @@ def test_call_with_keyword_arguments_rewritten():
     )
 
 
+def test_call_with_keyword_arguments_reordered_rewritten():
+    check_transformed(
+        """\
+        from django.utils.timezone import FixedOffset
+        FixedOffset(name="Super time",
+            offset=120)
+        """,
+        """\
+        from datetime import timedelta, timezone
+        timezone(name="Super time",
+            offset=timedelta(minutes=120))
+        """,
+        settings,
+    )
+
+
 def test_call_different_class_not_rewritten():
     check_transformed(
         """\

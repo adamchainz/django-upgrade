@@ -1,14 +1,18 @@
 import ast
 from typing import Dict, List, Optional, Tuple
 
-from tokenize_rt import UNIMPORTANT_WS, Token
+from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
 
+# Token name aliases
 NAME = "NAME"
 OP = "OP"
 LOGICAL_NEWLINE = "NEWLINE"
 PHYSICAL_NEWLINE = "NL"
 COMMENT = "COMMENT"
 CODE = "CODE"  # Token name meaning 'replaced by us'
+
+
+BRACES = {"(": ")", "[": "]", "{": "}"}
 
 
 def find(tokens: List[Token], i: int, *, name: str, src: Optional[str] = None) -> int:
@@ -78,6 +82,57 @@ def insert_after(
 
 def replace(tokens: List[Token], i: int, *, src: str) -> None:
     tokens[i] = tokens[i]._replace(name=CODE, src=src)
+
+
+def parse_call_args(
+    tokens: List[Token],
+    i: int,
+) -> Tuple[List[Tuple[int, int]], int]:
+    args = []
+    stack = [i]
+    i += 1
+    arg_start = i
+
+    while stack:
+        token = tokens[i]
+
+        if len(stack) == 1 and token.src == ",":
+            args.append((arg_start, i))
+            arg_start = i + 1
+        elif token.src in BRACES:
+            stack.append(i)
+        elif token.src == BRACES[tokens[stack[-1]].src]:
+            stack.pop()
+            # if we're at the end, append that argument
+            if not stack and tokens_to_src(tokens[arg_start:i]).strip():
+                args.append((arg_start, i))
+
+        i += 1
+
+    return args, i
+
+
+def replace_arguments(
+    tokens: List[Token],
+    i: int,
+    *,
+    node: ast.Call,
+    arg_map: Dict[str, str],
+) -> None:
+    j = find(tokens, i, name=OP, src="(")
+    func_args, _ = parse_call_args(tokens, j)
+    kwarg_func_args = func_args[len(node.args) :]
+
+    for n, keyword in reversed(list(enumerate(node.keywords))):
+        if keyword.arg in arg_map:
+            x, y = kwarg_func_args[n]
+            print(tokens[x:y])
+            for k in range(*kwarg_func_args[n]):
+                if tokens[k].src == keyword.arg:
+                    tokens[k] = tokens[k]._replace(src=arg_map[keyword.arg])
+                    break
+            else:
+                raise AssertionError(f"{keyword.arg} argument not found")
 
 
 def update_imports(

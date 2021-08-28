@@ -99,6 +99,10 @@ pytest-randomly==3.10.1 \
     --hash=sha256:d28d490e3a743bdd64c5bc87c5fc182eac966ba6432c6bb6b224e32e76527e9e \
     --hash=sha256:d4ef5dbf27e542e6a4e4cec7a20ef3f1b906bce21fa340ca5657b5326ef23a64
     # via -r requirements.in
+tokenize-rt==4.1.0 \
+    --hash=sha256:ab339b5ff829eb5e198590477f9c03c84e762b3e455e74c018956e7e326cbc70 \
+    --hash=sha256:b37251fa28c21e8cce2e42f7769a35fba2dd2ecafb297208f9a9a8add3ca7793
+    # via -r requirements.in
 toml==0.10.2 \
     --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
     --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f

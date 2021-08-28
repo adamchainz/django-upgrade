@@ -86,10 +86,10 @@ Django 2.2
 
 Based on the `Django 2.2 release notes <https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2>`__.
 
-``django.core.paginator``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+``QuerySetPaginator``
+~~~~~~~~~~~~~~~~~~~~~
 
-* ``QuerySetPaginator`` → ``Paginator``
+Rewrites depreceated alias ``django.core.paginator.QuerySetPaginator`` to ``Paginator``.
 
 .. code-block:: diff
 
@@ -100,11 +100,12 @@ Based on the `Django 2.2 release notes <https://docs.djangoproject.com/en/2.2/re
     +Paginator(...)
 
 
-``django.utils.timezone``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+``FixedOffset``
+~~~~~~~~~~~~~~~
 
-* ``FixedOffset(x, y)`` → ``timezone(timedelta(minutes=x), y)``
-* Will leave code broken with an ``ImportError`` if ``FixedOffset`` is called with (only) ``*args`` or ``**kwargs``.
+Rewrites deprecated class ``FixedOffset(x, y))`` to ``timezone(timedelta(minutes=x), y)``
+
+Known limitation: this fixer will leave code broken with an ``ImportError`` if ``FixedOffset`` is called with only ``*args`` or ``**kwargs``.
 
 .. code-block:: diff
 
@@ -119,11 +120,10 @@ Django 3.0
 
 Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0>`__.
 
-``django.utils.encoding``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.utils.encoding`` aliases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ``smart_text()`` → ``smart_str()`` , ``force_text()`` → ``force_str()``
-* django-upgrade does not support Python 2 so these names are always replaced.
+Rewrites ``smart_text()`` to ``smart_str()``, and ``force_text()`` to ``force_str()``.
 
 .. code-block:: diff
 
@@ -144,10 +144,7 @@ Based on the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/re
 ``JSONField``
 ~~~~~~~~~~~~~
 
-Rewrites:
-
-* ``django.contrib.postgres.fields.JSONField`` → ``django.db.models.JSONField``
-* ``django.contrib.postgres.forms.JSONField`` → ``django.forms.JSONField``
+Rewrites imports of ``JSONField`` and related transform classes from those in ``django.contrib.postgres`` to the new all-database versions.
 
 .. code-block:: diff
 
@@ -157,8 +154,10 @@ Rewrites:
 ``PASSWORD_RESET_TIMEOUT_DAYS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Rewrites the setting ``PASSWORD_RESET_TIMEOUT_DAYS`` → ``PASSWORD_RESET_TIMEOUT``, including multiplication by the number of seconds in a day.
-* Settings files are heuristically detected as modules with the word “settings” somewhere in their path.
+Rewrites the setting ``PASSWORD_RESET_TIMEOUT_DAYS`` to ``PASSWORD_RESET_TIMEOUT``, adding the multiplication by the number of seconds in a day.
+
+Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
 .. code-block:: diff
 
@@ -192,10 +191,10 @@ Django 3.2
 
 Based on the `Django 3.2 release notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2>`__.
 
-``django.core.validators.EmailValidator``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``EmailValidator``
+~~~~~~~~~~~~~~~~~~
 
-* Rewrites keyword arguments ``whitelist`` → ``allowlist`` and ``domain_whitelist`` → ``domain_allowlist``.
+Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``, and ``domain_whitelist`` to ``domain_allowlist``.
 
 .. code-block:: diff
 

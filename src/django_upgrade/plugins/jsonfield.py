@@ -9,9 +9,9 @@ from typing import Iterable, Tuple
 
 from tokenize_rt import Offset
 
-from django_upgrade._ast_helpers import ast_start_offset
-from django_upgrade._data import Plugin, State, TokenFunc
-from django_upgrade._token_helpers import insert, update_imports
+from django_upgrade.ast import ast_start_offset
+from django_upgrade.data import Plugin, State, TokenFunc
+from django_upgrade.tokens import insert, update_imports
 
 plugin = Plugin(
     __name__,

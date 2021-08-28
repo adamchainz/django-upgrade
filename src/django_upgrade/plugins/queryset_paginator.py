@@ -1,6 +1,6 @@
 """
-Replace imports from django.utils.encoding:
-https://docs.djangoproject.com/en/3.0/releases/3.0/#django-utils-encoding-force-text-and-smart-text  # noqa: B950
+Rewrite django.core.paginator’s alias QuerySetPaginator of Paginator:
+https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 """
 import ast
 from functools import partial
@@ -8,19 +8,18 @@ from typing import Iterable, Tuple
 
 from tokenize_rt import Offset
 
-from django_upgrade._ast_helpers import ast_start_offset
-from django_upgrade._data import Plugin, State, TokenFunc
-from django_upgrade._token_helpers import find_and_replace_name, update_imports
+from django_upgrade.ast import ast_start_offset
+from django_upgrade.data import Plugin, State, TokenFunc
+from django_upgrade.tokens import find_and_replace_name, update_imports
 
 plugin = Plugin(
     __name__,
-    min_version=(3, 0),
+    min_version=(2, 2),
 )
 
-MODULE = "django.utils.encoding"
+MODULE = "django.core.paginator"
 NAMES = {
-    "force_text": "force_str",
-    "smart_text": "smart_str",
+    "QuerySetPaginator": "Paginator",
 }
 
 

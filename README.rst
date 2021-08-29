@@ -41,8 +41,6 @@ Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of you
         -   id: django-upgrade
             args: [--target-version, "3.2"]   # Replace with Django version
 
-Works best before any reformatters such as `isort <https://isort.readthedocs.io/>`__ or `Black <https://black.readthedocs.io/en/stable/>`__.
-
 ----
 
 **Are your tests slow?**
@@ -54,15 +52,20 @@ Usage
 =====
 
 ``django-upgrade`` is a commandline tool that rewrites files in place.
-Pass your Django version as ``<major>.<minor>`` with ``--target-version`` and the fixers will rewrite code not to trigger ``DeprecationWarning`` on that version of Django.
+Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag and the fixers will rewrite code to avoid ``DeprecationWarning``\s on that version of Django.
 For example:
 
 .. code-block:: sh
 
     django-upgrade --target-version 3.2 example/core/models.py example/settings.py
 
+The `--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
 For more on usage run ``django-upgrade --help``.
-The full list of fixers is below.
+
+``django-upgrade`` focuses on upgrading your code for the “99% case” and not on making it look nice.
+Run django-upgrade before your reformatters, such as `isort <https://isort.readthedocs.io/>`__ or `Black <https://black.readthedocs.io/en/stable/>`__.
+
+The full list of fixers is documented below.
 
 History
 =======
@@ -185,6 +188,20 @@ Injects the now-required ``length`` argument, with its previous default ``12``.
      from django.utils.crypto import get_random_string
     -key = get_random_string(allowed_chars="01234567899abcdef")
     +key = get_random_string(length=12, allowed_chars="01234567899abcdef")
+
+``NullBooleanField``
+~~~~~~~~~~~~~~~~~~~~
+
+Transforms the ``NullBooleanField()`` model field to ``BooleanField(null=True)``.
+
+.. code-block:: diff
+
+    -from django.db.models import Model, NullBooleanField
+    +from django.db.models import Model, BooleanField
+
+     class Book(Model):
+    -    valuable = NullBooleanField("Valuable")
+    +    valuable = BooleanField("Valuable", null=True)
 
 Django 3.2
 ----------

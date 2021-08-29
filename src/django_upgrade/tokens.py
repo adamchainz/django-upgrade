@@ -151,11 +151,14 @@ def update_imports(
     node: ast.ImportFrom,
     name_map: Dict[str, str],
 ) -> None:
-    replacements: List[Tuple[int, int, List[Token]]] = []  # start, end, new tokens
-
     j = find(tokens, i, name=NAME, src="from")
     j = find(tokens, j, name=NAME, src="import")
 
+    existing_unaliased_names = {
+        alias.name for alias in node.names if alias.asname is None
+    }
+
+    replacements: List[Tuple[int, int, List[Token]]] = []  # start, end, new tokens
     remove_all = True
     for alias_idx, alias in enumerate(node.names):
         if alias.name not in name_map:
@@ -168,7 +171,7 @@ def update_imports(
             continue
 
         new_name = name_map[alias.name]
-        if new_name == "":
+        if new_name == "" or new_name in existing_unaliased_names:
             # Erase
             start_idx = find(tokens, j, name=NAME, src=alias.name)
 

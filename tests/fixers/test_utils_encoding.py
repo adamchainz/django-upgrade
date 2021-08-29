@@ -15,18 +15,25 @@ def test_no_deprecated_alias():
     )
 
 
-def test_unrecognized_import_format():
-    check_noop(
+def test_encoding_module_imported():
+    check_transformed(
         """\
         from django.utils import encoding
 
         encoding.force_text("yada")
+        encoding.smart_text("yada")
+        """,
+        """\
+        from django.utils import encoding
+
+        encoding.force_str("yada")
+        encoding.smart_str("yada")
         """,
         settings,
     )
 
 
-def test_success():
+def test_direct_import():
     check_transformed(
         """\
         from django.utils.encoding import force_text, smart_text

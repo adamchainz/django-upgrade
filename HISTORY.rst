@@ -2,6 +2,9 @@
 History
 =======
 
+* Support single level module imports of names too, such as using o
+  ``from django.utils import crypto`` with ``crypto.get_random_string()``.
+
 1.1.0 (2021-08-28)
 ------------------
 

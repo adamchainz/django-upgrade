@@ -38,6 +38,20 @@ def test_no_pos_arg():
     )
 
 
+def test_no_pos_arg_module_imported():
+    check_transformed(
+        """\
+        from django.utils import crypto
+        my_password = crypto.get_random_string() + "!"
+        """,
+        """\
+        from django.utils import crypto
+        my_password = crypto.get_random_string(length=12) + "!"
+        """,
+        settings,
+    )
+
+
 def test_no_pos_arg_with_allowed_chars():
     check_transformed(
         """\

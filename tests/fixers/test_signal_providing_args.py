@@ -28,6 +28,20 @@ def test_pos_arg_alone():
     )
 
 
+def test_pos_arg_alone_module_imported():
+    check_transformed(
+        """\
+        from django import dispatch
+        dispatch.Signal(["documented", "arg"])
+        """,
+        """\
+        from django import dispatch
+        dispatch.Signal()
+        """,
+        settings,
+    )
+
+
 def test_pos_arg_alone_multiline():
     check_transformed(
         """\

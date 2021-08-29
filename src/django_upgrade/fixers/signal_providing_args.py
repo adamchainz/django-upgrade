@@ -37,17 +37,21 @@ def visit_Call(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
-        NAME in state.from_imports[MODULE]
-        and isinstance(node.func, ast.Name)
+        isinstance(node.func, ast.Name)
+        and NAME in state.from_imports[MODULE]
         and node.func.id == NAME
-        and (
-            len(node.args) > 0 or any(k.arg == "providing_args" for k in node.keywords)
-        )
+    ) or (
+        isinstance(node.func, ast.Attribute)
+        and node.func.attr == NAME
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "dispatch"
+        and "dispatch" in state.from_imports["django"]
     ):
-        yield ast_start_offset(node), partial(
-            remove_providing_args,
-            node=node,
-        )
+        if len(node.args) > 0 or any(k.arg == "providing_args" for k in node.keywords):
+            yield ast_start_offset(node), partial(
+                remove_providing_args,
+                node=node,
+            )
 
 
 def remove_providing_args(tokens: List[Token], i: int, *, node: ast.Call) -> None:

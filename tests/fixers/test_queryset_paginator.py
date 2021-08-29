@@ -13,12 +13,17 @@ def test_no_deprecated_alias():
     )
 
 
-def test_unrecognized_import_format():
-    check_noop(
+def test_paginator_module_imported():
+    check_transformed(
         """\
         from django.core import paginator
 
         paginator.QuerySetPaginator
+        """,
+        """\
+        from django.core import paginator
+
+        paginator.Paginator
         """,
         settings,
     )

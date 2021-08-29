@@ -46,3 +46,21 @@ def visit_Name(
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAMES[name]
         )
+
+
+@fixer.register(ast.Attribute)
+def visit_Attribute(
+    state: State,
+    node: ast.Attribute,
+    parent: ast.AST,
+) -> Iterable[Tuple[Offset, TokenFunc]]:
+    name = node.attr
+    if (
+        name in NAMES
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "paginator"
+        and "paginator" in state.from_imports["django.core"]
+    ):
+        yield ast_start_offset(node), partial(
+            find_and_replace_name, name=name, new=NAMES[name]
+        )

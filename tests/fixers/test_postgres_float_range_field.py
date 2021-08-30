@@ -15,10 +15,10 @@ def test_no_deprecated_alias():
     )
 
 
-def test_imported_from_elsewhere():
+def test_unmatched_import():
     check_noop(
         """\
-        from anywhere import FloatRangeField
+        from example import FloatRangeField
 
         FloatRangeField("My range of numbers")
         """,

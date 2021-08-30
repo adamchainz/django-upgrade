@@ -9,7 +9,7 @@ def test_no_deprecated_alias():
         """\
         from django.contrib.postgres.fields import ArrayField
 
-        ArrayField
+        ArrayField("My array field")
         """,
         settings,
     )

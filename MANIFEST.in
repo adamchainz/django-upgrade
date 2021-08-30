@@ -10,5 +10,4 @@ exclude .editorconfig
 exclude .pre-commit-hooks.yaml
 exclude .pre-commit-config.yaml
 include pyproject.toml
-exclude pytest.ini
 exclude tox.ini

@@ -29,10 +29,8 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    if node.level != 0 or node.module != MODULE:
-        return
-
-    yield ast_start_offset(node), partial(update_imports, node=node, name_map=NAMES)
+    if node.level == 0 and node.module == MODULE:
+        yield ast_start_offset(node), partial(update_imports, node=node, name_map=NAMES)
 
 
 @fixer.register(ast.Name)
@@ -41,8 +39,7 @@ def visit_Name(
     node: ast.Name,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    name = node.id
-    if name in NAMES and name in state.from_imports[MODULE]:
+    if (name := node.id) in NAMES and name in state.from_imports[MODULE]:
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAMES[name]
         )

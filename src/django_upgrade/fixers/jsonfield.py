@@ -54,10 +54,11 @@ def visit_ImportFrom(
                 name_map[name] = ""
                 imports_to_add[module_rewrites[name]].append(name)
 
-        offset = ast_start_offset(node)
-        yield offset, partial(update_imports, node=node, name_map=name_map)
-        for module, names in reversed(imports_to_add.items()):
-            joined_names = ", ".join(sorted(names))
-            yield offset, partial(
-                insert, new_src=f"from {module} import {joined_names}\n"
-            )
+        if name_map:
+            offset = ast_start_offset(node)
+            yield offset, partial(update_imports, node=node, name_map=name_map)
+            for module, names in reversed(imports_to_add.items()):
+                joined_names = ", ".join(sorted(names))
+                yield offset, partial(
+                    insert, new_src=f"from {module} import {joined_names}\n"
+                )

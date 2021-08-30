@@ -35,10 +35,11 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    if node.level != 0 or node.module != MODULE:
-        return
-
-    if any(alias.name == OLD_NAME for alias in node.names):
+    if (
+        node.level == 0
+        and node.module == MODULE
+        and any(alias.name == OLD_NAME for alias in node.names)
+    ):
         yield ast_start_offset(node), partial(
             update_imports, node=node, name_map={"FixedOffset": ""}
         )

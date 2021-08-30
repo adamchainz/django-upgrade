@@ -33,7 +33,9 @@ def visit_ImportFrom(
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if node.level == 0 and node.module == "django.db.models":
         yield ast_start_offset(node), partial(
-            update_imports, node=node, name_map={"NullBooleanField": "BooleanField"}
+            update_imports,
+            node=node,
+            name_map={"NullBooleanField": "BooleanField"},
         )
 
 

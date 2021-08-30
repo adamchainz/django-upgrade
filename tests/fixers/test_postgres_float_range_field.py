@@ -15,6 +15,17 @@ def test_no_deprecated_alias():
     )
 
 
+def test_imported_from_elsewhere():
+    check_noop(
+        """\
+        from anywhere import FloatRangeField
+
+        FloatRangeField("My range of numbers")
+        """,
+        settings,
+    )
+
+
 def test_direct_import():
     check_transformed(
         """\

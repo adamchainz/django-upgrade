@@ -117,6 +117,20 @@ Known limitation: this fixer will leave code broken with an ``ImportError`` if `
     +from datetime import timedelta, timezone
     +timezone(timedelta(minutes=120), "Super time")
 
+``FloatRangeField``
+~~~~~~~~~~~~~~~~~~~
+
+Rewrites model and form fields using ``FloatRangeField`` to ``DecimalRangeField``, from the relevant ``django.contrib.postgres`` modules.
+
+.. code-block:: diff
+
+     from django.db.models import Model
+    -from django.contrib.postgres.fields import FloatRangeField
+    +from django.contrib.postgres.fields import DecimalRangeField
+
+     class MyModel(Model):
+    -    my_field = FloatRangeField("My range of numbers")
+    +    my_field = DecimalRangeField("My range of numbers")
 
 Django 3.0
 ----------

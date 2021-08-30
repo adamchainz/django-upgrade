@@ -7,6 +7,8 @@ History
 
 * Add fixer for Django 3.1 ``NullBooleanField`` deprecation.
 
+* Add fixer for Django 2.2 rename of ``FloatRangeField`` to ``DecimalRangeField``.
+
 1.1.0 (2021-08-28)
 ------------------
 

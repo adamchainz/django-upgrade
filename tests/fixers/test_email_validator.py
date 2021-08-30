@@ -4,7 +4,7 @@ from tests.fixers.tools import check_noop, check_transformed
 settings = Settings(target_version=(3, 2))
 
 
-def test_incorrect_import():
+def test_unmatched_import():
     check_noop(
         """\
         from example import EmailValidator

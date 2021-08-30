@@ -9,6 +9,8 @@ History
 
 * Add fixer for Django 2.2 rename of ``FloatRangeField`` to ``DecimalRangeField``.
 
+* Add fixer for Django 2.2 test case attributes ``allow_database_queries`` and ``multi_db``.
+
 1.1.0 (2021-08-28)
 ------------------
 

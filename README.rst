@@ -132,6 +132,26 @@ Rewrites model and form fields using ``FloatRangeField`` to ``DecimalRangeField`
     -    my_field = FloatRangeField("My range of numbers")
     +    my_field = DecimalRangeField("My range of numbers")
 
+``TestCase`` class database declarations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites the ``allow_database_queries`` and ``multi_db`` attributes of Django’s ``TestCase`` classes to the new ``databases`` attribute.
+This only applies in test files, which are heuristically detected as files with either “test” or “tests” somewhere in their path.
+
+Note that this will only rewrite to ``databases = []`` or ``databases = "__all__"``.
+With multiple databases you can save some test time by limiting test cases to the databases they require (which is why Django made the change).
+
+.. code-block:: diff
+
+     from django.test import SimpleTestCase
+
+     class MyTests(SimpleTestCase):
+    -    allow_database_queries = True
+    +    databases = "__all__"
+
+         def test_something(self):
+             self.assertEqual(2 * 2, 4)
+
 Django 3.0
 ----------
 

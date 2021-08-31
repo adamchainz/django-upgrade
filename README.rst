@@ -29,7 +29,7 @@ Use **pip**:
 
     python -m pip install django-upgrade
 
-Python 3.8 to 3.9 supported.
+Python 3.8 to 3.10 supported.
 
 Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
 

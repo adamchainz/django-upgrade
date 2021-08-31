@@ -2,6 +2,8 @@
 History
 =======
 
+* Support Python 3.10.
+
 * Support single level module imports of names too, such as using o
   ``from django.utils import crypto`` with ``crypto.get_random_string()``.
 

@@ -59,7 +59,7 @@ For example:
 
     django-upgrade --target-version 3.2 example/core/models.py example/settings.py
 
-The `--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
+The ``--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
 For more on usage run ``django-upgrade --help``.
 
 ``django-upgrade`` focuses on upgrading your code for the “99% case” and not on making it look nice.

@@ -50,8 +50,9 @@ def visit_Name(
     node: ast.Name,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    name = node.id
-    if name in NAME_MAP and any(name in state.from_imports[m] for m in MODULES):
+    if (name := node.id) in NAME_MAP and any(
+        name in state.from_imports[m] for m in MODULES
+    ):
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAME_MAP[name]
         )

@@ -2,6 +2,9 @@
 History
 =======
 
+1.2.0 (2021-09-02)
+------------------
+
 * Support Python 3.10.
 
 * Support single level module imports of names too, such as using o

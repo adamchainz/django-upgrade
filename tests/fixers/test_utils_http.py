@@ -47,6 +47,21 @@ def test_one_urllib_name():
     )
 
 
+def test_one_urllib_name_indented():
+    check_transformed(
+        """\
+        if True:
+            from django.utils.http import urlquote, something
+        """,
+        """\
+        if True:
+            from urllib.parse import quote
+            from django.utils.http import something
+        """,
+        settings,
+    )
+
+
 def test_all_names():
     check_transformed(
         """\
@@ -65,7 +80,7 @@ def test_all_names():
     )
 
 
-def test_all_names_differnt_format():
+def test_all_names_different_format():
     check_transformed(
         """\
         from django.utils.http import (

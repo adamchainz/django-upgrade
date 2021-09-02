@@ -51,6 +51,21 @@ def test_model_field():
     )
 
 
+def test_model_field_indented():
+    check_transformed(
+        """\
+        def f():
+            from django.contrib.postgres.fields import JSONField, bla
+        """,
+        """\
+        def f():
+            from django.db.models import JSONField
+            from django.contrib.postgres.fields import bla
+        """,
+        settings,
+    )
+
+
 def test_model_field_submodule():
     check_transformed(
         """\

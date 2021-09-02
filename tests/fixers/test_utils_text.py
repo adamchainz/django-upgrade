@@ -46,3 +46,22 @@ def test_with_other_import():
         """,
         settings,
     )
+
+
+def test_indented():
+    check_transformed(
+        """\
+        if True:
+            from django.utils.text import unescape_entities, slugify
+
+            unescape_entities("input string")
+        """,
+        """\
+        if True:
+            import html
+            from django.utils.text import slugify
+
+            html.escape("input string")
+        """,
+        settings,
+    )

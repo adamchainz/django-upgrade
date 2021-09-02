@@ -107,6 +107,21 @@ def test_name_import_erased_multiline():
     )
 
 
+def test_added_import_matches_indentation():
+    check_transformed(
+        """\
+        if True:
+            from django.utils.timezone import FixedOffset, now
+        """,
+        """\
+        if True:
+            from datetime import timedelta, timezone
+            from django.utils.timezone import now
+        """,
+        settings,
+    )
+
+
 def test_name_import_erased_multiline_with_comments():
     check_transformed(
         """\

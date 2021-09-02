@@ -15,6 +15,8 @@ History
 
 * Add fixer for Django 2.2 deprecation of test case attributes ``allow_database_queries`` and ``multi_db``.
 
+* Fix inserted imports to match indentation of the poitn they are inserted.
+
 1.1.0 (2021-08-28)
 ------------------
 

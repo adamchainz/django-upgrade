@@ -9,7 +9,7 @@ History
 
 * Add fixer for Django 3.1 deprecation of ``NullBooleanField``.
 
-* Add fixers for Django 3.0 deprecation of functions in ``django.utils.http`` and ``django.utils.translation``.
+* Add fixers for Django 3.0 deprecation of functions in ``django.utils.http``, ``django.utils.text``, and ``django.utils.translation``.
 
 * Add fixer for Django 2.2 rename of ``FloatRangeField`` to ``DecimalRangeField``.
 

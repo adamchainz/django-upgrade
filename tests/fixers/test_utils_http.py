@@ -8,6 +8,8 @@ def test_no_deprecated_alias():
     check_noop(
         """\
         from django.utils.http import something
+
+        something
         """,
         settings,
     )

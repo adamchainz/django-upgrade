@@ -186,6 +186,19 @@ Rewrites the ``urlquote()``, ``urlquote_plus()```, ``urlunquote()``, and ``urlun
     -escaped_query_string = urlquote(query_string)
     +escaped_query_string = quote(query_string)
 
+``django.utils.translation`` deprecations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites the ``ugettext()``, ``ugettext_lazy()``, ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` functions to their non-u-prefixed versions.
+
+.. code-block:: diff
+
+    -from django.utils.translation import ugettext as _, ungettext
+    +from django.utils.translation import gettext as _, ngettext
+
+    -ungettext("octopus", "octopodes", n)
+    +ngettext("octopus", "octopodes", n)
+
 Django 3.1
 ----------
 

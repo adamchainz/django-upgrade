@@ -1,6 +1,6 @@
 """
 Replace imports from django.utils.http:
-https://docs.djangoproject.com/en/3.0/releases/3.0/#django-utils-encoding-force-text-and-smart-text  # noqa: B950
+https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
 """
 import ast
 from functools import partial

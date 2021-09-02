@@ -173,6 +173,19 @@ Rewrites ``smart_text()`` to ``smart_str()``, and ``force_text()`` to ``force_st
     +force_str("yada")
     +smart_str("yada")
 
+``django.utils.http`` deprecations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites the ``urlquote()``, ``urlquote_plus()```, ``urlunquote()``, and ``urlunquote_plus()`` functions to the ``urllib.parse`` versions.
+
+.. code-block:: diff
+
+    -from django.utils.http import urlquote
+    +from urllib.parse import quote
+
+    -escaped_query_string = urlquote(query_string)
+    +escaped_query_string = quote(query_string)
+
 Django 3.1
 ----------
 

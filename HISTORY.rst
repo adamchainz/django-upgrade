@@ -7,11 +7,13 @@ History
 * Support single level module imports of names too, such as using o
   ``from django.utils import crypto`` with ``crypto.get_random_string()``.
 
-* Add fixer for Django 3.1 ``NullBooleanField`` deprecation.
+* Add fixer for Django 3.1 deprecation of ``NullBooleanField``.
+
+* Add fixer for Django 3.0 deprecation of functions in ``django.utils.http``.
 
 * Add fixer for Django 2.2 rename of ``FloatRangeField`` to ``DecimalRangeField``.
 
-* Add fixer for Django 2.2 test case attributes ``allow_database_queries`` and ``multi_db``.
+* Add fixer for Django 2.2 deprecation of test case attributes ``allow_database_queries`` and ``multi_db``.
 
 1.1.0 (2021-08-28)
 ------------------

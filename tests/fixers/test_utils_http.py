@@ -8,12 +8,30 @@ def test_no_deprecated_alias():
     check_noop(
         """\
         from django.utils.http import something
+
+        something
         """,
         settings,
     )
 
 
-def test_one_name():
+def test_one_local_name():
+    check_transformed(
+        """\
+        from django.utils.http import is_safe_url
+
+        x = is_safe_url(y)
+        """,
+        """\
+        from django.utils.http import url_has_allowed_host_and_scheme
+
+        x = url_has_allowed_host_and_scheme(y)
+        """,
+        settings,
+    )
+
+
+def test_one_urllib_name():
     check_transformed(
         """\
         from django.utils.http import urlquote

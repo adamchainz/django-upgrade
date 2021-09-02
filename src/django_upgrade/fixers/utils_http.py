@@ -4,7 +4,7 @@ https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
 """
 import ast
 from functools import partial
-from typing import Iterable, Tuple
+from typing import Iterable, Optional, Tuple
 
 from tokenize_rt import Offset
 
@@ -18,7 +18,10 @@ fixer = Fixer(
 )
 
 MODULE = "django.utils.http"
-NAMES = {
+RENAMES = {
+    "is_safe_url": "url_has_allowed_host_and_scheme",
+}
+URLLIB_NAMES = {
     "urlquote": "quote",
     "urlquote_plus": "quote_plus",
     "urlunquote": "unquote",
@@ -33,30 +36,33 @@ def visit_ImportFrom(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if node.level == 0 and node.module == MODULE:
-        erase = {}
-        add = {}
+        name_map = {}
+        urllib_names = {}
         for alias in node.names:
-            if alias.name in NAMES:
-                erase[alias.name] = ""
-                add[alias.name] = alias.asname
+            if alias.name in RENAMES:
+                name_map[alias.name] = RENAMES[alias.name]
+            elif alias.name in URLLIB_NAMES:
+                name_map[alias.name] = ""
+                urllib_names[alias.name] = alias.asname
 
-        if erase:
+        if name_map:
             yield ast_start_offset(node), partial(
-                update_imports, node=node, name_map=erase
+                update_imports, node=node, name_map=name_map
             )
 
-            imports = []
-            for name, asname in add.items():
+            urllib_imports = []
+            for name, asname in urllib_names.items():
                 if asname is None:
-                    imports.append(NAMES[name])
+                    urllib_imports.append(URLLIB_NAMES[name])
                 else:
-                    imports.append(f"{NAMES[name]} as {asname}")
+                    urllib_imports.append(f"{URLLIB_NAMES[name]} as {asname}")
 
-            new_import = f"from urllib.parse import {', '.join(imports)}\n"
-            yield ast_start_offset(node), partial(
-                insert,
-                new_src=new_import,
-            )
+            if urllib_imports:
+                new_import = f"from urllib.parse import {', '.join(urllib_imports)}\n"
+                yield ast_start_offset(node), partial(
+                    insert,
+                    new_src=new_import,
+                )
 
 
 @fixer.register(ast.Name)
@@ -65,7 +71,16 @@ def visit_Name(
     node: ast.Name,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    if (name := node.id) in NAMES and name in state.from_imports[MODULE]:
-        yield ast_start_offset(node), partial(
-            find_and_replace_name, name=name, new=NAMES[name]
-        )
+    if (name := node.id) in state.from_imports[MODULE]:
+        new_name: Optional[str]
+        if name in RENAMES:
+            new_name = RENAMES[name]
+        elif name in URLLIB_NAMES:
+            new_name = URLLIB_NAMES[name]
+        else:
+            new_name = None
+
+        if new_name is not None:
+            yield ast_start_offset(node), partial(
+                find_and_replace_name, name=name, new=new_name
+            )

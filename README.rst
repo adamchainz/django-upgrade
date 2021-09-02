@@ -186,6 +186,19 @@ Rewrites the ``urlquote()``, ``urlquote_plus()```, ``urlunquote()``, and ``urlun
     -escaped_query_string = urlquote(query_string)
     +escaped_query_string = quote(query_string)
 
+``django.utils.text`` deprecation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites ``unescape_entities()`` with the standard library ``html.escape()``.
+
+.. code-block:: diff
+
+    -from django.utils.text import unescape_entities
+    +import html
+
+    -unescape_entities("some input string")
+    +html.escape("some input string")
+
 ``django.utils.translation`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

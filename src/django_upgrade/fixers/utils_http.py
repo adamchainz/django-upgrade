@@ -4,13 +4,13 @@ https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
 """
 import ast
 from functools import partial
-from typing import Iterable, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
-from tokenize_rt import Offset
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import find_and_replace_name, insert, update_imports
+from django_upgrade.tokens import INDENT, find_and_replace_name, insert, update_imports
 
 fixer = Fixer(
     __name__,
@@ -47,22 +47,43 @@ def visit_ImportFrom(
 
         if name_map:
             yield ast_start_offset(node), partial(
-                update_imports, node=node, name_map=name_map
+                fix_import,
+                node=node,
+                name_map=name_map,
+                urllib_names=urllib_names,
             )
 
-            urllib_imports = []
-            for name, asname in urllib_names.items():
-                if asname is None:
-                    urllib_imports.append(URLLIB_NAMES[name])
-                else:
-                    urllib_imports.append(f"{URLLIB_NAMES[name]} as {asname}")
 
-            if urllib_imports:
-                new_import = f"from urllib.parse import {', '.join(urllib_imports)}\n"
-                yield ast_start_offset(node), partial(
-                    insert,
-                    new_src=new_import,
-                )
+def fix_import(
+    tokens: List[Token],
+    i: int,
+    *,
+    node: ast.ImportFrom,
+    name_map: Dict[str, str],
+    urllib_names: Dict[str, Optional[str]],
+) -> None:
+    update_imports(tokens, i, node=node, name_map=name_map)
+
+    if urllib_names:
+        urllib_imports = []
+        for name, asname in urllib_names.items():
+            if asname is None:
+                urllib_imports.append(URLLIB_NAMES[name])
+            else:
+                urllib_imports.append(f"{URLLIB_NAMES[name]} as {asname}")
+
+        j = i
+        if j > 0 and tokens[j - 1].name == INDENT:
+            indent = tokens[j - 1].src
+            j -= 1
+        else:
+            indent = ""
+
+        insert(
+            tokens,
+            j,
+            new_src=f"{indent}from urllib.parse import {', '.join(urllib_imports)}\n",
+        )
 
 
 @fixer.register(ast.Name)

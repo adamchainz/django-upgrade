@@ -11,6 +11,7 @@ from tokenize_rt import Offset, Token
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
+    INDENT,
     OP,
     find,
     insert,
@@ -40,13 +41,18 @@ def visit_ImportFrom(
         and node.module == MODULE
         and any(alias.name == OLD_NAME for alias in node.names)
     ):
-        yield ast_start_offset(node), partial(
-            update_imports, node=node, name_map={"FixedOffset": ""}
-        )
-        yield ast_start_offset(node), partial(
-            insert,
-            new_src="from datetime import timedelta, timezone\n",
-        )
+        yield ast_start_offset(node), partial(fix_import_from, node=node)
+
+
+def fix_import_from(tokens: List[Token], i: int, *, node: ast.ImportFrom) -> None:
+    update_imports(tokens, i, node=node, name_map={OLD_NAME: ""})
+
+    new_src = "from datetime import timedelta, timezone\n"
+    j = i
+    if j > 0 and tokens[j - 1].name == INDENT:
+        new_src = tokens[j - 1].src + new_src
+        j -= 1
+    insert(tokens, j, new_src=new_src)
 
 
 @fixer.register(ast.Call)

@@ -52,6 +52,8 @@ def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
     j = find_final_token(tokens, i, node=node)
     if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
         j += 1
+    # if i > 0 and tokens[i - 1].name == INDENT:
+    #     i -= 1
     del tokens[i:j]
 
 

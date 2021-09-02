@@ -66,3 +66,37 @@ def test_all_names_differnt_format():
         """,
         settings,
     )
+
+
+def test_single_alias():
+    check_transformed(
+        """\
+        from django.utils.http import urlquote as q
+
+        v = q("x")
+        """,
+        """\
+        from urllib.parse import quote as q
+
+        v = q("x")
+        """,
+        settings,
+    )
+
+
+def test_mixed_aliases():
+    check_transformed(
+        """\
+        from django.utils.http import (
+            urlunquote, urlquote_plus as qp, urlquote as q, urlunquote_plus
+        )
+
+        v = q("x")
+        """,
+        """\
+        from urllib.parse import unquote, quote_plus as qp, quote as q, unquote_plus
+
+        v = q("x")
+        """,
+        settings,
+    )

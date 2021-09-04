@@ -51,12 +51,11 @@ def test_one_urllib_name_indented():
     check_transformed(
         """\
         if True:
-            from django.utils.http import urlquote, something
+            from django.utils.http import urlquote
         """,
         """\
         if True:
             from urllib.parse import quote
-            from django.utils.http import something
         """,
         settings,
     )

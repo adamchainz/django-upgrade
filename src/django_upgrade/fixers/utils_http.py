@@ -10,7 +10,12 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import INDENT, find_and_replace_name, insert, update_imports
+from django_upgrade.tokens import (
+    extract_indent,
+    find_and_replace_name,
+    insert,
+    update_imports,
+)
 
 fixer = Fixer(
     __name__,
@@ -62,6 +67,8 @@ def fix_import(
     name_map: Dict[str, str],
     urllib_names: Dict[str, Optional[str]],
 ) -> None:
+    j, indent = extract_indent(tokens, i)
+
     update_imports(tokens, i, node=node, name_map=name_map)
 
     if urllib_names:
@@ -71,13 +78,6 @@ def fix_import(
                 urllib_imports.append(URLLIB_NAMES[name])
             else:
                 urllib_imports.append(f"{URLLIB_NAMES[name]} as {asname}")
-
-        j = i
-        if j > 0 and tokens[j - 1].name == INDENT:
-            indent = tokens[j - 1].src
-            j -= 1
-        else:
-            indent = ""
 
         insert(
             tokens,

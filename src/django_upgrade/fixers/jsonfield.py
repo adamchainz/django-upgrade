@@ -11,7 +11,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import INDENT, insert, update_imports
+from django_upgrade.tokens import extract_indent, insert, update_imports
 
 fixer = Fixer(
     __name__,
@@ -63,15 +63,8 @@ def fix_import(tokens: List[Token], i: int, *, node: ast.ImportFrom) -> None:
             name_map[name] = ""
             imports_to_add[module_rewrites[name]].append(name)
 
+    j, indent = extract_indent(tokens, i)
     update_imports(tokens, i, node=node, name_map=name_map)
-
-    j = i
-    if j > 0 and tokens[j - 1].name == INDENT:
-        indent = tokens[j - 1].src
-        j -= 1
-    else:
-        indent = ""
-
     for module, names in reversed(imports_to_add.items()):
         joined_names = ", ".join(sorted(names))
         insert(tokens, j, new_src=f"{indent}from {module} import {joined_names}\n")

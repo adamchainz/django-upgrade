@@ -48,12 +48,22 @@ def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
     return j
 
 
+def extract_indent(tokens: List[Token], i: int) -> Tuple[int, str]:
+    j = i
+    if j > 0 and tokens[j - 1].name == INDENT:
+        j -= 1
+        indent = tokens[j].src
+    else:
+        indent = ""
+    return (j, indent)
+
+
 def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
     j = find_final_token(tokens, i, node=node)
     if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
         j += 1
-    # if i > 0 and tokens[i - 1].name == INDENT:
-    #     i -= 1
+    if i > 0 and tokens[i - 1].name == INDENT:
+        i -= 1
     del tokens[i:j]
 
 

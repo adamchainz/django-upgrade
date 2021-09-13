@@ -54,7 +54,8 @@ def fix_import(tokens: List[Token], i: int, *, node: ast.ImportFrom) -> None:
         name = alias.name
         if name in module_rewrites:
             name_map[name] = ""
-            imports_to_add[module_rewrites[name]].append(name)
+            new_name = f"{name} as {alias.asname}" if alias.asname else name
+            imports_to_add[module_rewrites[name]].append(new_name)
 
     j, indent = extract_indent(tokens, i)
     update_imports(tokens, i, node=node, name_map=name_map)

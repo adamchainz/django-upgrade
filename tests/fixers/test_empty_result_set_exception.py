@@ -39,3 +39,19 @@ def test_exception_class_imported():
         """,
         settings,
     )
+
+
+def test_exception_class_imported_as_other_name():
+    check_transformed(
+        """\
+        from django.db.models.query import EmptyResultSet as EmptyResultSetExc
+
+        EmptyResultSetExc()
+        """,
+        """\
+        from django.core.exceptions import EmptyResultSet as EmptyResultSetExc
+
+        EmptyResultSetExc()
+        """,
+        settings,
+    )

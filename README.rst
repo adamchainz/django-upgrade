@@ -92,7 +92,7 @@ Based on the `Django 2.2 release notes <https://docs.djangoproject.com/en/2.2/re
 ``QuerySetPaginator``
 ~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites depreceated alias ``django.core.paginator.QuerySetPaginator`` to ``Paginator``.
+Rewrites deprecated alias ``django.core.paginator.QuerySetPaginator`` to ``Paginator``.
 
 .. code-block:: diff
 

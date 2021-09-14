@@ -14,7 +14,7 @@ from django_upgrade.tokens import (
     extract_indent,
     find_and_replace_name,
     insert,
-    update_imports,
+    update_import_names,
 )
 
 fixer = Fixer(
@@ -47,7 +47,7 @@ def visit_ImportFrom(
 
 def fix_import(tokens: List[Token], i: int, *, node: ast.ImportFrom) -> None:
     j, indent = extract_indent(tokens, i)
-    update_imports(tokens, i, node=node, name_map={OLD_NAME: ""})
+    update_import_names(tokens, i, node=node, name_map={OLD_NAME: ""})
     insert(tokens, j, new_src=f"{indent}import html\n")
 
 

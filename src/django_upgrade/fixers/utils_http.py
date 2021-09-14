@@ -14,7 +14,7 @@ from django_upgrade.tokens import (
     extract_indent,
     find_and_replace_name,
     insert,
-    update_imports,
+    update_import_names,
 )
 
 fixer = Fixer(
@@ -69,7 +69,7 @@ def fix_import(
 ) -> None:
     j, indent = extract_indent(tokens, i)
 
-    update_imports(tokens, i, node=node, name_map=name_map)
+    update_import_names(tokens, i, node=node, name_map=name_map)
 
     if urllib_names:
         urllib_imports = []

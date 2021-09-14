@@ -10,7 +10,7 @@ from tokenize_rt import Offset
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import replace_arguments
+from django_upgrade.tokens import replace_argument_names
 
 fixer = Fixer(
     __name__,
@@ -44,7 +44,7 @@ def visit_Call(
         and node.func.value.id == "validators"
     ):
         yield ast_start_offset(node), partial(
-            replace_arguments,
+            replace_argument_names,
             node=node,
             arg_map=KWARGS,
         )

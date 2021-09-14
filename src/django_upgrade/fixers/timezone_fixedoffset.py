@@ -15,10 +15,9 @@ from django_upgrade.tokens import (
     extract_indent,
     find,
     insert,
-    insert_after,
     parse_call_args,
     replace,
-    update_imports,
+    update_import_names,
 )
 
 fixer = Fixer(
@@ -46,7 +45,7 @@ def visit_ImportFrom(
 
 def fix_import_from(tokens: List[Token], i: int, *, node: ast.ImportFrom) -> None:
     j, indent = extract_indent(tokens, i)
-    update_imports(tokens, i, node=node, name_map={OLD_NAME: ""})
+    update_import_names(tokens, i, node=node, name_map={OLD_NAME: ""})
     insert(tokens, j, new_src=f"{indent}from datetime import timedelta, timezone\n")
 
 
@@ -80,9 +79,8 @@ def fix_offset_arg(tokens: List[Token], i: int, *, node: ast.Call) -> None:
             if keyword.arg == "offset":
                 start_idx, end_idx = func_args[n]
                 insert(tokens, end_idx, new_src=")")
-                insert_after(
-                    tokens, start_idx, name=OP, src="=", new_src="timedelta(minutes="
-                )
+                equal_idx = find(tokens, start_idx, name=OP, src="=")
+                insert(tokens, equal_idx + 1, new_src="timedelta(minutes=")
                 rewrote_offset_arg = True
 
     if rewrote_offset_arg:

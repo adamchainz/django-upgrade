@@ -10,7 +10,7 @@ from tokenize_rt import Offset
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import find_and_replace_name, update_imports
+from django_upgrade.tokens import find_and_replace_name, update_import_names
 
 fixer = Fixer(
     __name__,
@@ -39,7 +39,7 @@ def visit_ImportFrom(
         and any(alias.name in NAME_MAP for alias in node.names)
     ):
         yield ast_start_offset(node), partial(
-            update_imports, node=node, name_map=NAME_MAP
+            update_import_names, node=node, name_map=NAME_MAP
         )
 
 

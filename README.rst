@@ -84,6 +84,21 @@ pyupgrade and django-upgrade both take less than 0.5 seconds.
 Fixers
 ======
 
+Django 1.11
+-----------
+
+``EmptyResultSet``
+~~~~~~~~~~~~~~~~~~
+
+Rewrites compatibility imports for ``django.core.exceptions.EmptyResultSet`` in ``django.db.models.query``, ``django.db.models.sql``, and ``django.db.models.sql.datastructures``.
+This is mentioned as removed in the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#id1>`_ although the new import is possible since Django 1.11.
+
+.. code-block:: diff
+
+    -from django.db.models.query import EmptyResultSet
+    +from django.core.exceptions import EmptyResultSet
+
+
 Django 2.2
 ----------
 

@@ -1,6 +1,6 @@
 """
-Replace JSONField imports:
-https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1
+Replace compatibility imports for django.core.exceptions.EmptyResultSet:
+https://docs.djangoproject.com/en/3.1/releases/3.1/#id1
 """
 import ast
 from functools import partial
@@ -14,25 +14,18 @@ from django_upgrade.tokens import rewrite_imports
 
 fixer = Fixer(
     __name__,
-    min_version=(3, 1),
+    min_version=(1, 11),
 )
 
 REWRITES = {
-    "django.contrib.postgres.fields": {
-        "JSONField": "django.db.models",
-        "KeyTextTransform": "django.db.models.fields.json",
-        "KeyTransform": "django.db.models.fields.json",
+    "django.db.models.query": {
+        "EmptyResultSet": "django.core.exceptions",
     },
-    "django.contrib.postgres.fields.jsonb": {
-        "JSONField": "django.db.models",
-        "KeyTextTransform": "django.db.models.fields.json",
-        "KeyTransform": "django.db.models.fields.json",
+    "django.db.models.sql": {
+        "EmptyResultSet": "django.core.exceptions",
     },
-    "django.contrib.postgres.forms": {
-        "JSONField": "django.forms",
-    },
-    "django.contrib.postgres.forms.jsonb": {
-        "JSONField": "django.forms",
+    "django.db.models.sql.datastructures": {
+        "EmptyResultSet": "django.core.exceptions",
     },
 }
 

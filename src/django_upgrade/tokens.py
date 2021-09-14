@@ -1,4 +1,5 @@
 import ast
+from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
@@ -225,3 +226,28 @@ def update_imports(
     else:
         for start_idx, end_idx, replacement in reversed(replacements):
             tokens[start_idx : end_idx + 1] = replacement
+
+
+def rewrite_imports(
+    tokens: List[Token],
+    i: int,
+    *,
+    node: ast.ImportFrom,
+    rewrites: Dict[str, Dict[str, str]],
+) -> None:
+    assert node.module is not None
+    module_rewrites = rewrites[node.module]
+    imports_to_add = defaultdict(list)
+    name_map = {}
+    for alias in node.names:
+        name = alias.name
+        if name in module_rewrites:
+            name_map[name] = ""
+            new_name = f"{name} as {alias.asname}" if alias.asname else name
+            imports_to_add[module_rewrites[name]].append(new_name)
+
+    j, indent = extract_indent(tokens, i)
+    update_imports(tokens, i, node=node, name_map=name_map)
+    for module, names in reversed(imports_to_add.items()):
+        joined_names = ", ".join(sorted(names))
+        insert(tokens, j, new_src=f"{indent}from {module} import {joined_names}\n")

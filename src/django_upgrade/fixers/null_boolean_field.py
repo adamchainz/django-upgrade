@@ -16,7 +16,7 @@ from django_upgrade.tokens import (
     find,
     find_and_replace_name,
     parse_call_args,
-    update_imports,
+    update_import_names,
 )
 
 fixer = Fixer(
@@ -33,7 +33,7 @@ def visit_ImportFrom(
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if node.level == 0 and node.module == "django.db.models":
         yield ast_start_offset(node), partial(
-            update_imports,
+            update_import_names,
             node=node,
             name_map={"NullBooleanField": "BooleanField"},
         )

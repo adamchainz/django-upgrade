@@ -15,10 +15,13 @@ COMMENT = "COMMENT"
 CODE = "CODE"  # Token name meaning 'replaced by us'
 
 
-BRACES = {"(": ")", "[": "]", "{": "}"}
+# Basic functions
 
 
 def find(tokens: List[Token], i: int, *, name: str, src: Optional[str] = None) -> int:
+    """
+    Find the next token matching name and src.
+    """
     while tokens[i].name != name or (src is not None and tokens[i].src != src):
         i += 1
     return i
@@ -27,17 +30,40 @@ def find(tokens: List[Token], i: int, *, name: str, src: Optional[str] = None) -
 def reverse_find(
     tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
 ) -> int:
+    """
+    Find the previous token matching name and src.
+    """
     while tokens[i].name != name or (src is not None and tokens[i].src != src):
         i -= 1
     return i
 
 
-def find_and_replace_name(tokens: List[Token], i: int, *, name: str, new: str) -> None:
-    j = find(tokens, i, name=NAME, src=name)
-    tokens[j] = tokens[j]._replace(name="CODE", src=new)
+def consume(
+    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
+) -> int:
+    """
+    Move past any tokens matching name and src.
+    """
+    while tokens[i + 1].name == name and (src is None or tokens[i + 1].src == src):
+        i += 1
+    return i
+
+
+def reverse_consume(
+    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
+) -> int:
+    """
+    Rewind past any tokens matching name and src.
+    """
+    while tokens[i - 1].name == name and (src is None or tokens[i - 1].src == src):
+        i -= 1
+    return i
 
 
 def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
+    """
+    Find the last token corresponding to the given ast node.
+    """
     j = i
     while tokens[j].line is None or tokens[j].line < node.end_lineno:
         j += 1
@@ -50,6 +76,10 @@ def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
 
 
 def extract_indent(tokens: List[Token], i: int) -> Tuple[int, str]:
+    """
+    If the previous token is and indent, return its position and the
+    indentation string. Otherwise return the current position and "".
+    """
     j = i
     if j > 0 and tokens[j - 1].name == INDENT:
         j -= 1
@@ -59,32 +89,10 @@ def extract_indent(tokens: List[Token], i: int) -> Tuple[int, str]:
     return (j, indent)
 
 
-def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
-    j = find_final_token(tokens, i, node=node)
-    if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
-        j += 1
-    if i > 0 and tokens[i - 1].name == INDENT:
-        i -= 1
-    del tokens[i:j]
-
-
-def consume(
-    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
-) -> int:
-    while tokens[i + 1].name == name and (src is None or tokens[i + 1].src == src):
-        i += 1
-    return i
-
-
-def reverse_consume(
-    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
-) -> int:
-    while tokens[i - 1].name == name and (src is None or tokens[i - 1].src == src):
-        i -= 1
-    return i
-
-
 def alone_on_line(tokens: List[Token], start_idx: int, end_idx: int) -> bool:
+    """
+    Return if the given set of tokens is on its own physical line.
+    """
     return (
         tokens[start_idx - 2].name == PHYSICAL_NEWLINE
         and tokens[start_idx - 1].name == UNIMPORTANT_WS
@@ -92,25 +100,21 @@ def alone_on_line(tokens: List[Token], start_idx: int, end_idx: int) -> bool:
     )
 
 
-def insert(tokens: List[Token], i: int, *, new_src: str) -> None:
-    tokens.insert(i, Token(CODE, new_src))
+# More complex mini-parser functions
 
 
-def insert_after(
-    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None, new_src: str
-) -> None:
-    j = find(tokens, i, name=name, src=src)
-    tokens.insert(j + 1, Token(CODE, new_src))
-
-
-def replace(tokens: List[Token], i: int, *, src: str) -> None:
-    tokens[i] = tokens[i]._replace(name=CODE, src=src)
+BRACES = {"(": ")", "[": "]", "{": "}"}
 
 
 def parse_call_args(
     tokens: List[Token],
     i: int,
 ) -> Tuple[List[Tuple[int, int]], int]:
+    """
+    Given the index of the opening bracket of a function call, step through
+    and parse its arguments into a list of tuples of start, end indices.
+    Return this list plus the position of the token after.
+    """
     args = []
     stack = [i]
     i += 1
@@ -135,13 +139,51 @@ def parse_call_args(
     return args, i
 
 
-def replace_arguments(
+# Rewriting functions
+
+
+def insert(tokens: List[Token], i: int, *, new_src: str) -> None:
+    """
+    Insert a generated token with the given new source.
+    """
+    tokens.insert(i, Token(CODE, new_src))
+
+
+def replace(tokens: List[Token], i: int, *, src: str) -> None:
+    """
+    Replace the token at position i with a generated token with the given new
+    source.
+    """
+    tokens[i] = tokens[i]._replace(name=CODE, src=src)
+
+
+def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
+    """
+    Erase all tokens corresponding to the given ast node.
+    """
+    j = find_final_token(tokens, i, node=node)
+    if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
+        j += 1
+    i, _ = extract_indent(tokens, i)
+    del tokens[i:j]
+
+
+def find_and_replace_name(tokens: List[Token], i: int, *, name: str, new: str) -> None:
+    j = find(tokens, i, name=NAME, src=name)
+    tokens[j] = tokens[j]._replace(name="CODE", src=new)
+
+
+def replace_argument_names(
     tokens: List[Token],
     i: int,
     *,
     node: ast.Call,
     arg_map: Dict[str, str],
 ) -> None:
+    """
+    Update an ast.Call node’s keyword argument names, where arg_map maps old to
+    new names.
+    """
     j = find(tokens, i, name=OP, src="(")
     func_args, _ = parse_call_args(tokens, j)
     kwarg_func_args = func_args[len(node.args) :]
@@ -157,13 +199,17 @@ def replace_arguments(
                 raise AssertionError(f"{keyword.arg} argument not found")
 
 
-def update_imports(
+def update_import_names(
     tokens: List[Token],
     i: int,
     *,
     node: ast.ImportFrom,
     name_map: Dict[str, str],
 ) -> None:
+    """
+    Replace an ast.ImportFrom node’s imported names, where name_map maps old to
+    new names. If a new name entry is the empty string, remove the import.
+    """
     j = find(tokens, i, name=NAME, src="from")
     j = find(tokens, j, name=NAME, src="import")
 
@@ -228,15 +274,19 @@ def update_imports(
             tokens[start_idx : end_idx + 1] = replacement
 
 
-def rewrite_imports(
+def update_import_modules(
     tokens: List[Token],
     i: int,
     *,
     node: ast.ImportFrom,
-    rewrites: Dict[str, Dict[str, str]],
+    module_rewrites: Dict[str, str],
 ) -> None:
+    """
+    Replace import names from an ast.ImportFrom with new import statements from
+    elsewhere. rewrites should map import names to the new modules they should
+    be imported from.
+    """
     assert node.module is not None
-    module_rewrites = rewrites[node.module]
     imports_to_add = defaultdict(list)
     name_map = {}
     for alias in node.names:
@@ -247,7 +297,7 @@ def rewrite_imports(
             imports_to_add[module_rewrites[name]].append(new_name)
 
     j, indent = extract_indent(tokens, i)
-    update_imports(tokens, i, node=node, name_map=name_map)
+    update_import_names(tokens, i, node=node, name_map=name_map)
     for module, names in reversed(imports_to_add.items()):
         joined_names = ", ".join(sorted(names))
         insert(tokens, j, new_src=f"{indent}from {module} import {joined_names}\n")

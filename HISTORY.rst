@@ -2,9 +2,6 @@
 History
 =======
 
-Unreleased
-----------
-
 * Add fixer for removal of compatibility imports for ``django.core.exceptions.EmptyResultSet``.
 
 1.2.0 (2021-09-02)

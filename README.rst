@@ -191,7 +191,7 @@ Rewrites ``smart_text()`` to ``smart_str()``, and ``force_text()`` to ``force_st
 ``django.utils.http`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites the ``urlquote()``, ``urlquote_plus()```, ``urlunquote()``, and ``urlunquote_plus()`` functions to the ``urllib.parse`` versions.
+Rewrites the ``urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and ``urlunquote_plus()`` functions to the ``urllib.parse`` versions.
 Also rewrites the internal function ``is_safe_url()`` to ``url_has_allowed_host_and_scheme()``.
 
 .. code-block:: diff

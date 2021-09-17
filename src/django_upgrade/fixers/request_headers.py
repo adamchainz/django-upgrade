@@ -11,7 +11,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import CODE, NAME, STRING, find
+from django_upgrade.tokens import NAME, STRING, find, replace
 
 fixer = Fixer(
     __name__,
@@ -93,9 +93,9 @@ else:
 
 def rewrite_header_access(tokens: List[Token], i: int, *, meta_name: str) -> None:
     meta_idx = find(tokens, i, name=NAME, src="META")
-    tokens[meta_idx] = Token(name=CODE, src="headers")
+    replace(tokens, meta_idx, src="headers")
 
     str_idx = find(tokens, meta_idx, name=STRING)
     raw_header_name = meta_name[len("HTTP_") :]
     header_name = "-".join(x.title() for x in raw_header_name.split("_"))
-    tokens[str_idx] = Token(name=CODE, src=repr(header_name))
+    replace(tokens, str_idx, src=repr(header_name))

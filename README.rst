@@ -84,6 +84,26 @@ pyupgrade and django-upgrade both take less than 0.5 seconds.
 Fixers
 ======
 
+Django 1.9
+-----------
+
+Based on the `Django 1.9 release notes <https://github.com/django/django/blob/main/docs/releases/1.9.txt>`__.
+
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites some compatibility imports:
+
+* ``django.forms.utils.pretty_name`` in ``django.forms.forms``
+* ``django.forms.boundfield.BoundField`` in ``django.forms.forms``
+
+Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#id1>`_, these have been possible since Django 1.9.
+
+.. code-block:: diff
+
+    -from django.forms.forms import pretty_name
+    +from django.forms.utils import pretty_name
+
 Django 1.11
 -----------
 

@@ -2,7 +2,7 @@
 History
 =======
 
-* Add fixer to remove of compatibility imports from Django 1.11 of ``EmptyResultSet`` and ``FieldDoesNotExist``.
+* Add fixers to remove of various compatibility imports removed in Django 3.1.
 
 1.2.0 (2021-09-02)
 ------------------

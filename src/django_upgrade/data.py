@@ -8,7 +8,6 @@ from typing import (
     Dict,
     Iterable,
     List,
-    NamedTuple,
     Set,
     Tuple,
     Type,
@@ -20,14 +19,21 @@ from tokenize_rt import Offset, Token
 from django_upgrade import fixers
 
 
-class Settings(NamedTuple):
-    target_version: Tuple[int, int]
+class Settings:
+    def __init__(self, target_version: Tuple[int, int]) -> None:
+        self.target_version = target_version
 
 
-class State(NamedTuple):
-    settings: Settings
-    filename: str
-    from_imports: Dict[str, Set[str]]
+class State:
+    def __init__(
+        self,
+        settings: Settings,
+        filename: str,
+        from_imports: Dict[str, Set[str]],
+    ) -> None:
+        self.settings = settings
+        self.filename = filename
+        self.from_imports = from_imports
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)

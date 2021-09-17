@@ -13,6 +13,15 @@ def test_not_header_access():
     )
 
 
+def test_not_string():
+    check_noop(
+        """\
+        request.META[123]
+        """,
+        settings,
+    )
+
+
 def test_subscript_simple():
     check_transformed(
         """\

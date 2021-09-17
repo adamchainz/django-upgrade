@@ -89,24 +89,20 @@ Django 1.11
 
 Base on the `Django 1.11 release notes <https://docs.djangoproject.com/en/1.11/releases/1.11/#features-deprecated-in-1-11>`__.
 
-``EmptyResultSet``
-~~~~~~~~~~~~~~~~~~
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites compatibility imports for ``django.core.exceptions.EmptyResultSet`` in ``django.db.models.query``, ``django.db.models.sql``, and ``django.db.models.sql.datastructures``.
-This is mentioned as removed in the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#id1>`_, but the new import is possible since Django 1.11.
+Rewrites some compatibility imports:
+
+* ``django.core.exceptions.EmptyResultSet`` in ``django.db.models.query``, ``django.db.models.sql``, and ``django.db.models.sql.datastructures``
+* ``django.core.exceptions.FieldDoesNotExist`` in ``django.db.models.fields``
+
+Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#id1>`_, these have been possible since Django 1.11.
 
 .. code-block:: diff
 
     -from django.db.models.query import EmptyResultSet
     +from django.core.exceptions import EmptyResultSet
-
-``FieldDoesNotExist``
-~~~~~~~~~~~~~~~~~~~~~
-
-Rewrites compatibility import for ``django.core.exceptions.FieldDoesNotExist`` in ``django.db.models.fields``.
-This is mentioned as removed in the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#id1>`_, but the new import is possible since Django 1.11.
-
-.. code-block:: diff
 
     -from django.db.models.fields import FieldDoesNotExist
     +from django.core.exceptions import FieldDoesNotExist

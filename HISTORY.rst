@@ -2,7 +2,7 @@
 History
 =======
 
-* Add fixers to remove of compatibility imports of ``django.core.exceptions.EmptyResultSet`` and ``django.core.exceptions.FieldDoesNotExist``.
+* Add fixer to remove of compatibility imports from Django 1.11 of ``EmptyResultSet`` and ``FieldDoesNotExist``.
 
 1.2.0 (2021-09-02)
 ------------------

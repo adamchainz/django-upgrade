@@ -5,14 +5,15 @@ from typing import Dict, List, Optional, Tuple
 from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
 
 # Token name aliases
-INDENT = "INDENT"
+CODE = "CODE"  # Token name meaning 'replaced by us'
+COMMENT = "COMMENT"
 DEDENT = "DEDENT"
+INDENT = "INDENT"
+LOGICAL_NEWLINE = "NEWLINE"
 NAME = "NAME"
 OP = "OP"
-LOGICAL_NEWLINE = "NEWLINE"
 PHYSICAL_NEWLINE = "NL"
-COMMENT = "COMMENT"
-CODE = "CODE"  # Token name meaning 'replaced by us'
+STRING = "STRING"
 
 
 # Basic functions

@@ -3,8 +3,9 @@ Update use of request.META to fetch headers to use request.headers
 https://docs.djangoproject.com/en/2.2/releases/2.2/#requests-and-responses
 """
 import ast
+import sys
 from functools import partial
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 from tokenize_rt import Offset, Token
 
@@ -26,12 +27,11 @@ def visit_Subscript(
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
         is_request_or_self_request_meta(node.value)
-        and isinstance(node.slice, ast.Constant)
-        and isinstance(node.slice.value, str)
-        and node.slice.value.startswith("HTTP_")
+        and (meta_name := extract_constant(node.slice)) is not None
+        and meta_name.startswith("HTTP_")
     ):
         yield ast_start_offset(node), partial(
-            rewrite_header_access, meta_name=node.slice.value
+            rewrite_header_access, meta_name=meta_name
         )
 
 
@@ -47,11 +47,11 @@ def visit_Call(
         and is_request_or_self_request_meta(node.func.value)
         and len(node.args) >= 1
         and isinstance(node.args[0], ast.Constant)
-        and isinstance(node.args[0].value, str)
-        and node.args[0].value.startswith("HTTP_")
+        and isinstance(meta_name := node.args[0].value, str)
+        and meta_name.startswith("HTTP_")
     ):
         yield ast_start_offset(node), partial(
-            rewrite_header_access, meta_name=node.args[0].value
+            rewrite_header_access, meta_name=meta_name
         )
 
 
@@ -69,6 +69,26 @@ def is_request_or_self_request_meta(node: ast.AST) -> bool:
             )
         )
     )
+
+
+if sys.version_info >= (3, 9):
+
+    def extract_constant(node: ast.AST) -> Optional[str]:
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        return None
+
+
+else:
+
+    def extract_constant(node: ast.AST) -> Optional[str]:
+        if (
+            isinstance(node, ast.Index)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        ):
+            return node.value.value
+        return None
 
 
 def rewrite_header_access(tokens: List[Token], i: int, *, meta_name: str) -> None:

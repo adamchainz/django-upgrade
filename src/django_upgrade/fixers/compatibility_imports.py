@@ -18,6 +18,9 @@ fixer = Fixer(
 )
 
 REWRITES = {
+    "django.db.models.fields": {
+        "FieldDoesNotExist": "django.core.exceptions",
+    },
     "django.db.models.query": {
         "EmptyResultSet": "django.core.exceptions",
     },

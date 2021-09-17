@@ -9,7 +9,6 @@ from typing import Iterable, List, Tuple
 from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import CODE, NAME, STRING, find
 
@@ -77,6 +76,6 @@ def rewrite_header_access(tokens: List[Token], i: int, *, meta_name: str) -> Non
     tokens[meta_idx] = Token(name=CODE, src="headers")
 
     str_idx = find(tokens, meta_idx, name=STRING)
-    raw_header_name = str_removeprefix(meta_name, "HTTP_")
+    raw_header_name = meta_name[len("HTTP_") :]
     header_name = "-".join(x.title() for x in raw_header_name.split("_"))
     tokens[str_idx] = Token(name=CODE, src=repr(header_name))

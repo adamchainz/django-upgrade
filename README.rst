@@ -132,6 +132,22 @@ Django 2.2
 
 Based on the `Django 2.2 release notes <https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2>`__.
 
+``HttpRequest.headers``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites use of ``request.META`` to read HTTP headers to instead use |request.headers|__.
+
+.. |request.headers| replace:: ``request.headers``
+__ https://docs.djangoproject.com/en/2.2/ref/request-response/#django.http.HttpRequest.headers
+
+.. code-block:: diff
+
+    -request.META['HTTP_ACCEPT_ENCODING']
+    +request.headers['Accept-Encoding']
+
+    -self.request.META.get('HTTP_SERVER', '')
+    +self.request.headers.get('Server', '')
+
 ``QuerySetPaginator``
 ~~~~~~~~~~~~~~~~~~~~~
 

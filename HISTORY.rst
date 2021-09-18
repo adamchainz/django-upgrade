@@ -10,6 +10,7 @@ History
   ``url()`` may be rewritten to ``path()`` or ``re_path()`` accordingly.
 
   Thanks to Bruno Alla for the original implementation of regex-to-path conversion in django-codemod.
+  Thanks to Matthias Kestenholz for an initial PR.
 
 1.2.0 (2021-09-02)
 ------------------

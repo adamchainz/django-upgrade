@@ -30,9 +30,10 @@ def visit_Call(
         and "models" in state.from_imports["django.db"]
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "models"
+        and len(node.args) < 2
+        and all(kw.arg != "on_delete" for kw in node.keywords)
     ):
-        if len(node.args) < 2 and all(kw.arg != "on_delete" for kw in node.keywords):
-            yield ast_start_offset(node), partial(add_on_delete_keyword)
+        yield ast_start_offset(node), partial(add_on_delete_keyword)
 
 
 def add_on_delete_keyword(tokens: List[Token], i: int) -> None:

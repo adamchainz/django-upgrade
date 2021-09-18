@@ -127,6 +127,36 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
     -from django.db.models.fields import FieldDoesNotExist
     +from django.core.exceptions import FieldDoesNotExist
 
+Django 2.0
+----------
+
+Based on the `Django 2.0 release notes <https://docs.djangoproject.com/en/2.0/releases/2.0/#features-deprecated-in-2-0>`__.
+
+URL’s
+~~~~~
+
+Rewrites imports of ``include()`` and ``url()`` from ``django.conf.urls`` to ``django.urls``.
+``url()`` calls using compatible regexes are rewritten to the |new path() syntax|__, otherwise they are converted to call ``re_path()``.
+
+.. |new path() syntax| replace:: new ``path()`` syntax
+__ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
+
+.. code-block:: diff
+
+    -from django.conf.urls import include, url
+    +from django.urls import include, path, re_path
+
+     urlpatterns = [
+    -    url(r'^$', views.index, name='index'),
+    +    path('', views.index, name='index'),
+    -    url(r'^about/$', views.about, name='about'),
+    +    path('about/', views.about, name='about'),
+    -    url(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
+    +    re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
+    -    url(r'^weblog/', include('blog.urls')),
+    +    path('weblog/', include('blog.urls')),
+     ]
+
 Django 2.2
 ----------
 

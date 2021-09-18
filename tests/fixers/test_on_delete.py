@@ -6,21 +6,12 @@ from tests.fixers.tools import check_noop, check_transformed
 settings = Settings(target_version=(1, 9))
 
 
-@pytest.mark.parametrize(
-    "on_delete_value",
-    [
-        "models.CASCADE",
-        "models.SET_NULL",
-        "models.SET_DEFAULT",
-        "models.PROTECT",
-    ],
-)
 @pytest.mark.parametrize("field_class", ["ForeignKey", "OneToOneField"])
-def test_argument_already_set(on_delete_value, field_class):
+def test_argument_already_set(field_class):
     check_noop(
         f"""\
         from django.db import models
-        models.{field_class}("auth.User", on_delete={on_delete_value})
+        models.{field_class}("auth.User", on_delete=models.SET_NULL)
         """,
         settings,
     )

@@ -92,7 +92,7 @@ Based on the `Django 1.9 release notes <https://github.com/django/django/blob/ma
 ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Add ``on_delete=models.CASCADE`` to ForeignKey and OneToOneField:
+Add ``on_delete=models.CASCADE`` to ``ForeignKey`` and ``OneToOneField``:
 
 .. code-block:: diff
 

@@ -3,6 +3,7 @@ Update URL definitions:
 https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 """
 import ast
+import re
 from functools import partial
 from typing import Iterable, List, MutableMapping, Optional, Set, Tuple
 from weakref import WeakKeyDictionary
@@ -10,6 +11,7 @@ from weakref import WeakKeyDictionary
 from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
+from django_upgrade.compat import str_removeprefix, str_removesuffix
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     STRING,
@@ -122,8 +124,37 @@ def fix_url_call(tokens: List[Token], i: int, *, node: ast.Call, state: State) -
     replace(tokens, i, src=new_name)
 
 
+REGEX_TO_CONVERTER = {
+    "[0-9]+": "int",
+    r"\d+": "int",
+    ".+": "path",
+    "[-a-zA-Z0-9_]+": "slug",
+    "[^/]+": "str",
+    "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}": "uuid",
+}
+
+
 def convert_path_syntax(regex_path: str) -> Optional[str]:
-    # TODO: adapt the regex -> path conversion logic from django-codemod
-    if regex_path == "^$":
-        return ""
-    return None
+    remaining = str_removesuffix(str_removeprefix(regex_path, "^"), "$")
+    path = ""
+    while "(?P<" in remaining:
+        prefix, rest = remaining.split("(?P<", 1)
+        group, remaining = rest.split(")", 1)
+        group_name, group_regex = group.split(">", 1)
+        try:
+            converter = REGEX_TO_CONVERTER[group_regex]
+        except KeyError:
+            return None
+
+        path += prefix
+        path += f"<{converter}:{group_name}>"
+
+    path += remaining
+
+    dashless_path = path.replace("-", "")
+    if re.escape(dashless_path) != dashless_path:
+        # path still contains regex special characters
+        # dashes are ignored as they only have meaning in regexes within []
+        return None
+
+    return path

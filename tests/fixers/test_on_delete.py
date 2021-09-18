@@ -75,12 +75,28 @@ def test_foreignkey_with_kwargs():
         """\
         from django.db import models
 
-        models.ForeignKey(to="auth.User")
+        models.ForeignKey(to="auth.User", null=True)
         """,
         """\
         from django.db import models
 
-        models.ForeignKey(to="auth.User", on_delete=models.CASCADE)
+        models.ForeignKey(to="auth.User", null=True, on_delete=models.CASCADE)
+        """,
+        settings,
+    )
+
+
+def test_foreignkey_with_kwargs_ending_comma():
+    check_transformed(
+        """\
+        from django.db import models
+
+        models.ForeignKey(to="auth.User", null=True,)
+        """,
+        """\
+        from django.db import models
+
+        models.ForeignKey(to="auth.User", null=True, on_delete=models.CASCADE)
         """,
         settings,
     )

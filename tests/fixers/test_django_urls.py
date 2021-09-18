@@ -15,6 +15,65 @@ def test_unrecognized_import_format():
     )
 
 
+def test_alias_not_supported():
+    check_noop(
+        """\
+        from django.conf.urls import url as u
+
+        u("hahaha")
+        """,
+        settings,
+    )
+
+
+def test_include():
+    check_transformed(
+        """\
+        from django.conf.urls import include
+
+        include('example.urls')
+        """,
+        """\
+        from django.urls import include
+
+        include('example.urls')
+        """,
+        settings,
+    )
+
+
+def test_url_not_used():
+    check_noop(
+        """\
+        from django.conf.urls import url
+        """,
+        settings,
+    )
+
+
+def test_url_translated():
+    check_noop(
+        """\
+        from django.conf.urls import url
+        from django.utils.translation import gettext_lazy as _
+
+        url(_(r'^about/$'), views.about)
+        """,
+        settings,
+    )
+
+
+def test_url_unsupported_call_format():
+    check_noop(
+        """\
+        from django.conf.urls import url
+
+        url(regex=r"^$", views.index)
+        """,
+        settings,
+    )
+
+
 def test_re_path_unconverted_regex():
     check_transformed(
         """\
@@ -26,24 +85,6 @@ def test_re_path_unconverted_regex():
         from django.urls import re_path
 
         re_path(r'^[abc]{123}$', views.example)
-        """,
-        settings,
-    )
-
-
-def test_re_path_translated():
-    check_transformed(
-        """\
-        from django.conf.urls import url
-        from django.utils.translation import gettext_lazy as _
-
-        url(_(r'^about/$'), views.about)
-        """,
-        """\
-        from django.urls import re_path
-        from django.utils.translation import gettext_lazy as _
-
-        re_path(_(r'^about/$'), views.about)
         """,
         settings,
     )
@@ -229,8 +270,7 @@ def test_path_uuid_converter():
 def test_complete():
     check_transformed(
         """\
-        from django.conf.urls import url
-        from django.urls import include
+        from django.conf.urls import include, url
 
         urlpatterns = [
             url(r'^$', views.index, name='index'),
@@ -240,8 +280,7 @@ def test_complete():
         ]
         """,
         """\
-        from django.urls import path, re_path
-        from django.urls import include
+        from django.urls import include, path, re_path
 
         urlpatterns = [
             path('', views.index, name='index'),

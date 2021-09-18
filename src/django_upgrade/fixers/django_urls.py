@@ -37,10 +37,7 @@ def visit_ImportFrom(
     if (
         node.level == 0
         and node.module == "django.conf.urls"
-        and any(
-            (alias.name in ("include", "url") and alias.asname is None)
-            for alias in node.names
-        )
+        and any(alias.name in ("include", "url") for alias in node.names)
     ):
         yield ast_start_offset(node), partial(
             update_import,

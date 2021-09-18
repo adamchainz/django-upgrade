@@ -51,18 +51,6 @@ def test_url_not_used():
     )
 
 
-def test_url_translated():
-    check_noop(
-        """\
-        from django.conf.urls import url
-        from django.utils.translation import gettext_lazy as _
-
-        url(_(r'^about/$'), views.about)
-        """,
-        settings,
-    )
-
-
 def test_url_unsupported_call_format():
     check_noop(
         """\
@@ -85,6 +73,42 @@ def test_re_path_unconverted_regex():
         from django.urls import re_path
 
         re_path(r'^[abc]{123}$', views.example)
+        """,
+        settings,
+    )
+
+
+def test_re_path_translation():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+        from django.utils.translation import gettext_lazy as _
+
+        url(_(r'^about/$'), views.about)
+        """,
+        """\
+        from django.urls import re_path
+        from django.utils.translation import gettext_lazy as _
+
+        re_path(_(r'^about/$'), views.about)
+        """,
+        settings,
+    )
+
+
+def test_re_path_variable():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+
+        path = r'^$'
+        url(path, views.index)
+        """,
+        """\
+        from django.urls import re_path
+
+        path = r'^$'
+        re_path(path, views.index)
         """,
         settings,
     )

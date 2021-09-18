@@ -96,25 +96,32 @@ def visit_Call(
         isinstance(node.func, ast.Name)
         and node.func.id == "url"
         and "url" in state.from_imports["django.conf.urls"]
+        # cannot convert where called with all kwargs as names don't align
         and len(node.args) >= 1
-        and isinstance(node.args[0], ast.Constant)
-        and isinstance(node.args[0].value, str)
     ):
+        regex_path: Optional[str] = None
+        if isinstance(node.args[0], ast.Constant) and isinstance(
+            node.args[0].value, str
+        ):
+            regex_path = node.args[0].value
+
         yield ast_start_offset(node), partial(
             fix_url_call,
-            regex_path=node.args[0].value,
+            regex_path=regex_path,
             state=state,
         )
 
 
-def fix_url_call(tokens: List[Token], i: int, *, regex_path: str, state: State) -> None:
-    path = convert_path_syntax(regex_path)
-    if path is not None:
-        string_idx = find(tokens, i, name=STRING)
-        replace(tokens, string_idx, src=repr(path))
-        new_name = "path"
-    else:
-        new_name = "re_path"
+def fix_url_call(
+    tokens: List[Token], i: int, *, regex_path: Optional[str], state: State
+) -> None:
+    new_name = "re_path"
+    if regex_path is not None:
+        path = convert_path_syntax(regex_path)
+        if path is not None:
+            string_idx = find(tokens, i, name=STRING)
+            replace(tokens, string_idx, src=repr(path))
+            new_name = "path"
     state_used_names.setdefault(state, set()).add(new_name)
     replace(tokens, i, src=new_name)
 

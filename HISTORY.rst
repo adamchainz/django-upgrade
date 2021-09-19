@@ -12,6 +12,10 @@ History
   Thanks to Bruno Alla for the original implementation of regex-to-path conversion in django-codemod.
   Thanks to Matthias Kestenholz for an initial PR.
 
+* Add fixer for Django 1.9 requirement to pass ``on_delete`` to ``ForeignKey`` and ``OneToOneField``.
+
+  Thanks to Bruno Alla in `PR #61 <https://github.com/adamchainz/django-upgrade/pull/61>`__.
+
 1.2.0 (2021-09-02)
 ------------------
 

@@ -89,6 +89,19 @@ Django 1.9
 
 Based on the `Django 1.9 release notes <https://github.com/django/django/blob/main/docs/releases/1.9.txt>`__.
 
+``on_delete`` argument
+~~~~~~~~~~~~~~~~~~~~~~
+
+Add ``on_delete=models.CASCADE`` to ``ForeignKey`` and ``OneToOneField``:
+
+.. code-block:: diff
+
+    -models.ForeignKey("auth.User")
+    +models.ForeignKey("auth.User", on_delete=models.CASCADE)
+
+    -models.OneToOneField("auth.User")
+    +models.OneToOneField("auth.User", on_delete=models.CASCADE)
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

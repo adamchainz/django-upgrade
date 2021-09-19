@@ -80,7 +80,7 @@ def test_foreignkey_with_kwargs():
         """\
         from django.db import models
 
-        models.ForeignKey(to="auth.User", null=True, on_delete=models.CASCADE)
+        models.ForeignKey(on_delete=models.CASCADE, to="auth.User", null=True)
         """,
         settings,
     )
@@ -96,7 +96,7 @@ def test_foreignkey_with_kwargs_ending_comma():
         """\
         from django.db import models
 
-        models.ForeignKey(to="auth.User", null=True, on_delete=models.CASCADE)
+        models.ForeignKey(on_delete=models.CASCADE, to="auth.User", null=True,)
         """,
         settings,
     )
@@ -118,6 +118,26 @@ def test_one_to_one_with_args():
     )
 
 
+def test_one_to_one_with_arg_whitespace():
+    check_transformed(
+        """\
+        from django.db import models
+
+        models.OneToOneField(
+            "auth.User"
+            )
+        """,
+        """\
+        from django.db import models
+
+        models.OneToOneField(
+            "auth.User"
+            , on_delete=models.CASCADE)
+        """,
+        settings,
+    )
+
+
 def test_one_to_one_with_kwargs():
     check_transformed(
         """\
@@ -128,7 +148,7 @@ def test_one_to_one_with_kwargs():
         """\
         from django.db import models
 
-        models.OneToOneField(to="auth.User", on_delete=models.CASCADE)
+        models.OneToOneField(on_delete=models.CASCADE, to="auth.User")
         """,
         settings,
     )

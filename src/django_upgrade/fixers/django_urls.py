@@ -10,7 +10,7 @@ from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.compat import str_removeprefix, str_removesuffix
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
@@ -35,8 +35,8 @@ def visit_ImportFrom(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
-        node.level == 0
-        and node.module == "django.conf.urls"
+        node.module == "django.conf.urls"
+        and is_rewritable_import_from(node)
         and any(alias.name in ("include", "url") for alias in node.names)
     ):
         yield ast_start_offset(node), partial(

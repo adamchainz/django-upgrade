@@ -8,7 +8,7 @@ from typing import Iterable, Tuple
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import update_import_modules
 
@@ -40,8 +40,8 @@ def visit_ImportFrom(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
-        node.level == 0
-        and node.module in REWRITES
+        node.module in REWRITES
+        and is_rewritable_import_from(node)
         and any(alias.name in REWRITES[node.module] for alias in node.names)
     ):
         yield ast_start_offset(node), partial(

@@ -16,5 +16,6 @@ def ast_start_offset(node: Union[ast.expr, ast.keyword, ast.stmt]) -> Offset:
     return Offset(node.lineno, node.col_offset)
 
 
-# def ast_end_offset(node: Union[ast.expr, ast.keyword, ast.stmt]) -> Offset:
-#     return Offset(node.end_lineno, node.end_col_offset)
+def is_rewritable_import_from(node: ast.ImportFrom) -> bool:
+    # Not relative import or import *
+    return node.level == 0 and not (len(node.names) == 1 and node.names[0].name == "*")

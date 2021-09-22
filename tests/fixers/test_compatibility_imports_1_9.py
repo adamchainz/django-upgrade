@@ -25,6 +25,22 @@ def test_unrecognized_import_format():
     )
 
 
+def test_import_star():
+    check_transformed(
+        """\
+        from django.forms.forms import *
+
+        pretty_name()
+        """,
+        """\
+        from django.forms.forms import *
+
+        pretty_name()
+        """,
+        settings,
+    )
+
+
 def test_name_imported():
     check_transformed(
         """\

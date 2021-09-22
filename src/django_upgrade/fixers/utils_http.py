@@ -8,7 +8,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     extract_indent,
@@ -40,7 +40,7 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
-    if node.level == 0 and node.module == MODULE:
+    if node.module == MODULE and is_rewritable_import_from(node):
         name_map = {}
         urllib_names = {}
         for alias in node.names:

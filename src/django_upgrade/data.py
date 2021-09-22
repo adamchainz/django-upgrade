@@ -84,7 +84,9 @@ def visit(
             )
         ):
             state.from_imports[node.module].update(
-                name.name for name in node.names if not name.asname
+                name.name
+                for name in node.names
+                if name.asname is None and name.name != "*"
             )
 
         for name in reversed(node._fields):

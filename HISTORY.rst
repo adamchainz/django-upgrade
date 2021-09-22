@@ -2,6 +2,9 @@
 History
 =======
 
+1.3.1 (2021-09-22)
+------------------
+
 * Fix import fixers to not crash on star imports (``from foo import *``).
 
   Thanks to Mikhail for the report in `Issue #70 <https://github.com/adamchainz/django-upgrade/issues/70>`__.

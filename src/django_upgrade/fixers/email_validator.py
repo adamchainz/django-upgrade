@@ -32,17 +32,19 @@ def visit_Call(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node.func, ast.Name)
-        and NAME in state.from_imports[MODULE]
-        and node.func.id == NAME
-        and any(k.arg in KWARGS for k in node.keywords)
-    ) or (
-        isinstance(node.func, ast.Attribute)
-        and node.func.attr == NAME
-        and "validators" in state.from_imports["django.core"]
-        and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "validators"
-    ):
+        (
+            isinstance(node.func, ast.Name)
+            and NAME in state.from_imports[MODULE]
+            and node.func.id == NAME
+        )
+        or (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr == NAME
+            and "validators" in state.from_imports["django.core"]
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "validators"
+        )
+    ) and any(k.arg in KWARGS for k in node.keywords):
         yield ast_start_offset(node), partial(
             replace_argument_names,
             node=node,

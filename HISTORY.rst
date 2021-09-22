@@ -2,6 +2,9 @@
 History
 =======
 
+1.3.0 (2021-09-22)
+------------------
+
 * Fix ``get_random_string()`` fixer to not add the argument to calls like ``crypto.get_random_string(12)``.
 
 * Add fixers to remove various compatibility imports removed in Django 3.1.

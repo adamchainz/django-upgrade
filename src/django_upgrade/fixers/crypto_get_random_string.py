@@ -28,17 +28,22 @@ def visit_Call(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node.func, ast.Name)
-        and NAME in state.from_imports[MODULE]
-        and node.func.id == NAME
+        (
+            (
+                isinstance(node.func, ast.Name)
+                and NAME in state.from_imports[MODULE]
+                and node.func.id == NAME
+            )
+            or (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr == NAME
+                and "crypto" in state.from_imports["django.utils"]
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "crypto"
+            )
+        )
         and len(node.args) == 0
         and not any(k.arg == "length" for k in node.keywords)
-    ) or (
-        isinstance(node.func, ast.Attribute)
-        and node.func.attr == NAME
-        and "crypto" in state.from_imports["django.utils"]
-        and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "crypto"
     ):
         yield ast_start_offset(node), partial(
             add_length_argument,

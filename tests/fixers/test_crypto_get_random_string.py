@@ -14,6 +14,16 @@ def test_providing_length_as_pos_arg():
     )
 
 
+def test_providing_length_as_pos_arg_module():
+    check_noop(
+        """\
+        from django.utils import crypto
+        crypto.get_random_string(12)
+        """,
+        settings,
+    )
+
+
 def test_providing_length_as_kwarg():
     check_noop(
         """\

@@ -2,6 +2,8 @@
 History
 =======
 
+* Fix ``get_random_string()`` fixer to not add the argument to calls like ``crypto.get_random_string(12)``.
+
 * Add fixers to remove of various compatibility imports removed in Django 3.1.
 
 * Add fixer for Django 2.2 to rewrite ``request.META`` access of headers to ``HttpRequest.headers``.

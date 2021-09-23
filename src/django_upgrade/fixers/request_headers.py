@@ -26,7 +26,8 @@ def visit_Subscript(
     parent: ast.AST,
 ) -> Iterable[Tuple[Offset, TokenFunc]]:
     if (
-        is_request_or_self_request_meta(node.value)
+        not isinstance(parent, ast.Assign)
+        and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
         and meta_name.startswith("HTTP_")
     ):

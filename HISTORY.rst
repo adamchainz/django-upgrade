@@ -2,6 +2,9 @@
 History
 =======
 
+1.3.2 (2021-09-23)
+------------------
+
 * Avoid rewriting ``request.META`` to ``request.headers`` in assignments.
   This pattern is used in tests, and works for ``request.META`` but not ``request.headers``.
 

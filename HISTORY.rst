@@ -2,6 +2,11 @@
 History
 =======
 
+* Avoid rewriting ``request.META`` to ``request.headers`` in assignments.
+  This pattern is used in tests, and works for ``request.META`` but not ``request.headers``.
+
+  Thanks to Bruno Alla for the report in `Issue #74 <https://github.com/adamchainz/django-upgrade/issues/74>`__.
+
 1.3.1 (2021-09-22)
 ------------------
 

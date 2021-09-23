@@ -22,6 +22,15 @@ def test_not_string():
     )
 
 
+def test_assignment():
+    check_noop(
+        """\
+        request.META['HTTP_SERVER'] = 'something'
+        """,
+        settings,
+    )
+
+
 def test_subscript_simple():
     check_transformed(
         """\

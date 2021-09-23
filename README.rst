@@ -52,7 +52,8 @@ Usage
 =====
 
 ``django-upgrade`` is a commandline tool that rewrites files in place.
-Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag and the fixers will rewrite code to avoid ``DeprecationWarning``\s on that version of Django.
+Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag.
+The built-in fixers will rewrite your code to avoid some ``DeprecationWarning``\s and use some new features on your Django version.
 For example:
 
 .. code-block:: sh

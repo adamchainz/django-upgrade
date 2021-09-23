@@ -171,6 +171,16 @@ __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-sy
     +    path('weblog/', include('blog.urls')),
      ]
 
+``lru_cache``
+~~~~~~~~~~~~~
+
+Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``functools``.
+
+.. code-block:: diff
+
+    -from django.utils.functional import lru_cache
+    +from functools import lru_cache
+
 Django 2.2
 ----------
 

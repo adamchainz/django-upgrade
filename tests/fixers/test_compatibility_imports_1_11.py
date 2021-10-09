@@ -14,6 +14,15 @@ def test_unmatched_import():
     )
 
 
+def test_unmatched_import_name():
+    check_noop(
+        """\
+        from django.db.models.fields import something
+        """,
+        settings,
+    )
+
+
 def test_unrecognized_import_format():
     check_noop(
         """\

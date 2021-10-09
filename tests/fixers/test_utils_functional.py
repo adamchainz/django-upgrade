@@ -13,6 +13,15 @@ def test_unmatched_import():
     )
 
 
+def test_unmatched_import_name():
+    check_noop(
+        """\
+        from django.utils.functional import SimpleLazyObject
+        """,
+        settings,
+    )
+
+
 def test_unrecognized_import_format():
     check_noop(
         """\

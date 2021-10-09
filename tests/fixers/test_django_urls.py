@@ -26,6 +26,15 @@ def test_alias_not_supported():
     )
 
 
+def test_unrecognized_name():
+    check_noop(
+        """\
+        from django.conf.urls import something
+        """,
+        settings,
+    )
+
+
 def test_include():
     check_transformed(
         """\

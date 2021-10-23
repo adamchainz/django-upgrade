@@ -4,6 +4,10 @@ History
 
 * Add Django 2.0+ fixer to rewrite imports of ``lru_cache`` from ``django.utils.functional`` to use ``functools``.
 
+* Support Django 4.0 as a target version.
+  There are no fixers for it at current.
+  Most of its deprecations don’t seem automatically fixable.
+
 1.3.2 (2021-09-23)
 ------------------
 

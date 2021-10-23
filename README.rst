@@ -88,7 +88,7 @@ Fixers
 Django 1.9
 -----------
 
-Based on the `Django 1.9 release notes <https://github.com/django/django/blob/main/docs/releases/1.9.txt>`__.
+`Release Notes <https://github.com/django/django/blob/main/docs/releases/1.9.txt>`__
 
 ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -121,7 +121,7 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
 Django 1.11
 -----------
 
-Base on the `Django 1.11 release notes <https://docs.djangoproject.com/en/1.11/releases/1.11/#features-deprecated-in-1-11>`__.
+`Release Notes <https://docs.djangoproject.com/en/1.11/releases/1.11/#features-deprecated-in-1-11>`__
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +144,7 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
 Django 2.0
 ----------
 
-Based on the `Django 2.0 release notes <https://docs.djangoproject.com/en/2.0/releases/2.0/#features-deprecated-in-2-0>`__.
+`Release Notes <https://docs.djangoproject.com/en/2.0/releases/2.0/#features-deprecated-in-2-0>`__
 
 URL’s
 ~~~~~
@@ -184,7 +184,7 @@ Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``func
 Django 2.2
 ----------
 
-Based on the `Django 2.2 release notes <https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2>`__.
+`Release Notes <https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2>`__
 
 ``HttpRequest.headers``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,7 +268,7 @@ With multiple databases you can save some test time by limiting test cases to th
 Django 3.0
 ----------
 
-Based on the `Django 3.0 release notes <https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0>`__.
+`Release Notes <https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0>`__
 
 ``django.utils.encoding`` aliases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -329,7 +329,7 @@ Rewrites the ``ugettext()``, ``ugettext_lazy()``, ``ugettext_noop()``, ``ungette
 Django 3.1
 ----------
 
-Based on the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1>`__.
+`Release Notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1>`__
 
 ``JSONField``
 ~~~~~~~~~~~~~
@@ -393,7 +393,7 @@ Transforms the ``NullBooleanField()`` model field to ``BooleanField(null=True)``
 Django 3.2
 ----------
 
-Based on the `Django 3.2 release notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2>`__.
+`Release Notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2>`__
 
 ``EmailValidator``
 ~~~~~~~~~~~~~~~~~~
@@ -408,3 +408,11 @@ Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``, a
     +EmailValidator(allowlist=["example.com"])
     -EmailValidator(domain_whitelist=["example.org"])
     +EmailValidator(domain_allowlist=["example.org"])
+
+Django 4.0
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/4.0/releases/4.0/#features-deprecated-in-4-0>`__
+
+There are no fixers for Django 4.0 at current.
+Most of its deprecations don’t seem automatically fixable.

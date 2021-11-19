@@ -5,8 +5,8 @@ django-upgrade
 .. image:: https://img.shields.io/github/workflow/status/adamchainz/django-upgrade/CI/main?style=for-the-badge
    :target: https://github.com/adamchainz/django-upgrade/actions?workflow=CI
 
-.. image:: https://img.shields.io/codecov/c/github/adamchainz/django-upgrade/main?style=for-the-badge
-  :target: https://app.codecov.io/gh/adamchainz/django-upgrade
+.. image:: https://img.shields.io/badge/Coverage-100%25-success?style=for-the-badge
+  :target: https://github.com/adamchainz/django-upgrade/actions?workflow=CI
 
 .. image:: https://img.shields.io/pypi/v/django-upgrade.svg?style=for-the-badge
    :target: https://pypi.org/project/django-upgrade/

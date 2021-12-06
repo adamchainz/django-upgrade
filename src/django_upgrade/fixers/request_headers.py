@@ -79,7 +79,6 @@ if sys.version_info >= (3, 9):
             return node.value
         return None
 
-
 else:
 
     def extract_constant(node: ast.AST) -> Optional[str]:

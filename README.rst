@@ -43,8 +43,9 @@ Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of you
 
 ----
 
-**Are your tests slow?**
-Check out my book `Speed Up Your Django Tests <https://gumroad.com/l/suydt>`__ which covers loads of best practices so you can write faster, more accurate tests.
+**Want to improve your code quality?**
+Check out my book `Boost Your Django DX <https://adamchainz.gumroad.com/l/byddx>`__ which covers using  pre-commit, django-upgrade, and many other tools.
+I wrote django-upgrade whilst working on the book!
 
 ----
 

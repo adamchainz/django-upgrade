@@ -2,9 +2,11 @@
 Replace FloatRangeField with DecimalRangeField:
 https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset
 
@@ -33,7 +35,7 @@ def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module in MODULES
         and is_rewritable_import_from(node)
@@ -49,7 +51,7 @@ def visit_Name(
     state: State,
     node: ast.Name,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in NAME_MAP and any(
         name in state.from_imports[m] for m in MODULES
     ):

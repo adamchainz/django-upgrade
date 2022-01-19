@@ -2,10 +2,12 @@
 Update use of request.META to fetch headers to use request.headers
 https://docs.djangoproject.com/en/2.2/releases/2.2/#requests-and-responses
 """
+from __future__ import annotations
+
 import ast
 import sys
 from functools import partial
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset, Token
 
@@ -24,7 +26,7 @@ def visit_Subscript(
     state: State,
     node: ast.Subscript,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         not isinstance(parent, ast.Assign)
         and is_request_or_self_request_meta(node.value)
@@ -41,7 +43,7 @@ def visit_Call(
     state: State,
     node: ast.Call,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
         and node.func.attr == "get"
@@ -74,14 +76,14 @@ def is_request_or_self_request_meta(node: ast.AST) -> bool:
 
 if sys.version_info >= (3, 9):
 
-    def extract_constant(node: ast.AST) -> Optional[str]:
+    def extract_constant(node: ast.AST) -> str | None:
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             return node.value
         return None
 
 else:
 
-    def extract_constant(node: ast.AST) -> Optional[str]:
+    def extract_constant(node: ast.AST) -> str | None:
         if (
             isinstance(node, ast.Index)
             and isinstance(node.value, ast.Constant)
@@ -91,7 +93,7 @@ else:
         return None
 
 
-def rewrite_header_access(tokens: List[Token], i: int, *, meta_name: str) -> None:
+def rewrite_header_access(tokens: list[Token], i: int, *, meta_name: str) -> None:
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
 

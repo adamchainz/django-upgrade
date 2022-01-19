@@ -2,10 +2,12 @@
 Replace declarations of database support in test cases:
 https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 """
+from __future__ import annotations
+
 import ast
 import re
 from functools import partial
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset, Token
 
@@ -31,7 +33,7 @@ def visit_Assign(
     state: State,
     node: ast.Assign,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(parent, ast.ClassDef)
         and len(node.targets) == 1
@@ -47,7 +49,7 @@ def visit_Assign(
 
 
 def replace_assignment(
-    tokens: List[Token], i: int, *, node: ast.Assign, value: bool
+    tokens: list[Token], i: int, *, node: ast.Assign, value: bool
 ) -> None:
     print("???", value)
     new_src = "databases = "

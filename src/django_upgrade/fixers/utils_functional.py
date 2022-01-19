@@ -2,9 +2,11 @@
 Replace django.utils.functional.lru_cache with functools.lru_cache
 Undocumented change
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset
 
@@ -28,7 +30,7 @@ def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module == MODULE
         and is_rewritable_import_from(node)

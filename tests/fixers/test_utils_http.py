@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 

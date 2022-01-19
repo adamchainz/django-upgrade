@@ -2,10 +2,12 @@
 Replace imports from django.utils.encoding:
 https://docs.djangoproject.com/en/3.0/releases/3.0/#django-utils-encoding-force-text-and-smart-text  # noqa: E501
 """
+from __future__ import annotations
+
 import ast
 import re
 from functools import partial
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset, Token
 
@@ -33,7 +35,7 @@ def visit_Assign(
     state: State,
     node: ast.Assign,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
@@ -43,7 +45,7 @@ def visit_Assign(
         yield ast_start_offset(node), partial(rewrite_setting, node=node)
 
 
-def rewrite_setting(tokens: List[Token], i: int, *, node: ast.Assign) -> None:
+def rewrite_setting(tokens: list[Token], i: int, *, node: ast.Assign) -> None:
     tokens[i] = tokens[i]._replace(name=CODE, src=NEW_NAME)
     j = find(tokens, i, name=OP, src="=")
     tokens.insert(j + 1, Token(name=CODE, src=" 60 * 60 * 24 *"))

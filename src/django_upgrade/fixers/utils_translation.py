@@ -2,9 +2,11 @@
 Replace imports from django.utils.translation:
 https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset
 
@@ -32,7 +34,7 @@ def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module == MODULE
         and is_rewritable_import_from(node)
@@ -48,7 +50,7 @@ def visit_Name(
     state: State,
     node: ast.Name,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in NAME_MAP and name in state.from_imports[MODULE]:
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAME_MAP[name]
@@ -60,7 +62,7 @@ def visit_Attribute(
     state: State,
     node: ast.Attribute,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (name := node.attr) in NAME_MAP
         and isinstance(node.value, ast.Name)

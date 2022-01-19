@@ -2,9 +2,11 @@
 Add the 'length' argument to get_random_string():
 https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset, Token
 
@@ -26,7 +28,7 @@ def visit_Call(
     state: State,
     node: ast.Call,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (
             (
@@ -51,7 +53,7 @@ def visit_Call(
         )
 
 
-def add_length_argument(tokens: List[Token], i: int, *, has_kwargs: bool) -> None:
+def add_length_argument(tokens: list[Token], i: int, *, has_kwargs: bool) -> None:
     j = find(tokens, i, name=OP, src="(")
     new_src = "length=12"
     if has_kwargs:

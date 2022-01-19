@@ -2,9 +2,11 @@
 Replace imports from django.utils.http:
 https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset, Token
 
@@ -39,7 +41,7 @@ def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if node.module == MODULE and is_rewritable_import_from(node):
         name_map = {}
         urllib_names = {}
@@ -60,12 +62,12 @@ def visit_ImportFrom(
 
 
 def fix_import(
-    tokens: List[Token],
+    tokens: list[Token],
     i: int,
     *,
     node: ast.ImportFrom,
-    name_map: Dict[str, str],
-    urllib_names: Dict[str, Optional[str]],
+    name_map: dict[str, str],
+    urllib_names: dict[str, str | None],
 ) -> None:
     j, indent = extract_indent(tokens, i)
 
@@ -91,9 +93,9 @@ def visit_Name(
     state: State,
     node: ast.Name,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in state.from_imports[MODULE]:
-        new_name: Optional[str]
+        new_name: str | None
         if name in RENAMES:
             new_name = RENAMES[name]
         elif name in URLLIB_NAMES:

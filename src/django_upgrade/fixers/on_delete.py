@@ -2,9 +2,11 @@
 Add on_delete=models.CASCADE to ForeignKey and OneToOneField:
 https://docs.djangoproject.com/en/stable/releases/1.9/#features-deprecated-in-1-9
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset, Token
 
@@ -23,7 +25,7 @@ def visit_Call(
     state: State,
     node: ast.Call,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
         and node.func.attr in {"ForeignKey", "OneToOneField"}
@@ -38,7 +40,7 @@ def visit_Call(
         )
 
 
-def add_on_delete_keyword(tokens: List[Token], i: int, *, num_pos_args: int) -> None:
+def add_on_delete_keyword(tokens: list[Token], i: int, *, num_pos_args: int) -> None:
     open_idx = find(tokens, i, name=OP, src="(")
     func_args, close_idx = parse_call_args(tokens, open_idx)
 

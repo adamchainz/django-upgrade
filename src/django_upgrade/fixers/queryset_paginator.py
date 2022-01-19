@@ -2,9 +2,11 @@
 Rewrite django.core.paginator’s alias QuerySetPaginator of Paginator:
 https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset
 
@@ -28,7 +30,7 @@ def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if node.module == MODULE and is_rewritable_import_from(node):
         yield ast_start_offset(node), partial(
             update_import_names, node=node, name_map=NAMES
@@ -40,7 +42,7 @@ def visit_Name(
     state: State,
     node: ast.Name,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in NAMES and name in state.from_imports[MODULE]:
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAMES[name]
@@ -52,7 +54,7 @@ def visit_Attribute(
     state: State,
     node: ast.Attribute,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     name = node.attr
     if (
         name in NAMES

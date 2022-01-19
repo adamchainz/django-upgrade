@@ -2,10 +2,12 @@
 Update URL definitions:
 https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 """
+from __future__ import annotations
+
 import ast
 import re
 from functools import partial
-from typing import Iterable, List, MutableMapping, Optional, Set, Tuple
+from typing import Iterable, MutableMapping
 from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
@@ -33,7 +35,7 @@ def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module == "django.conf.urls"
         and is_rewritable_import_from(node)
@@ -49,11 +51,11 @@ def visit_ImportFrom(
 # Track which of path and re_path have been used for this current file
 # Then when backtracking into an import statement, we can use the set of names
 # to determine what names to import.
-state_used_names: MutableMapping[State, Set[str]] = WeakKeyDictionary()
+state_used_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
 
 
 def update_import(
-    tokens: List[Token], i: int, *, node: ast.ImportFrom, state: State
+    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
     """ """
     removals = set()
@@ -91,7 +93,7 @@ def visit_Call(
     state: State,
     node: ast.Call,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Name)
         and node.func.id == "url"
@@ -99,7 +101,7 @@ def visit_Call(
         # cannot convert where called with all kwargs as names don't align
         and len(node.args) >= 1
     ):
-        regex_path: Optional[str] = None
+        regex_path: str | None = None
         if isinstance(node.args[0], ast.Constant) and isinstance(
             node.args[0].value, str
         ):
@@ -113,7 +115,7 @@ def visit_Call(
 
 
 def fix_url_call(
-    tokens: List[Token], i: int, *, regex_path: Optional[str], state: State
+    tokens: list[Token], i: int, *, regex_path: str | None, state: State
 ) -> None:
     new_name = "re_path"
     if regex_path is not None:
@@ -136,7 +138,7 @@ REGEX_TO_CONVERTER = {
 }
 
 
-def convert_path_syntax(regex_path: str) -> Optional[str]:
+def convert_path_syntax(regex_path: str) -> str | None:
     remaining = str_removesuffix(str_removeprefix(regex_path, "^"), "$")
     path = ""
     while "(?P<" in remaining:

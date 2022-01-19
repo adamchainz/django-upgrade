@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import argparse
 import sys
 import tokenize
-from typing import List, Optional, Sequence, Tuple, cast
+from typing import Sequence, Tuple, cast
 
 from tokenize_rt import (
     UNIMPORTANT_WS,
@@ -16,7 +18,7 @@ from django_upgrade.data import Settings, visit
 from django_upgrade.tokens import DEDENT
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("filenames", nargs="*")
     parser.add_argument("--exit-zero-even-if-changed", action="store_true")
@@ -38,7 +40,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    target_version: Tuple[int, int] = cast(
+    target_version: tuple[int, int] = cast(
         Tuple[int, int],
         tuple(int(x) for x in args.target_version.split(".", 1)),
     )
@@ -117,7 +119,7 @@ def apply_fixers(contents_text: str, settings: Settings, filename: str) -> str:
     return tokens_to_src(tokens)
 
 
-def fixup_dedent_tokens(tokens: List[Token]) -> None:
+def fixup_dedent_tokens(tokens: list[Token]) -> None:
     """For whatever reason the DEDENT / UNIMPORTANT_WS tokens are misordered
 
     | if True:

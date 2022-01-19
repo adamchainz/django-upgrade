@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import ast
 import warnings
-from typing import Union
 
 from tokenize_rt import Offset
 
@@ -12,7 +13,7 @@ def ast_parse(contents_text: str) -> ast.Module:
         return ast.parse(contents_text.encode())
 
 
-def ast_start_offset(node: Union[ast.expr, ast.keyword, ast.stmt]) -> Offset:
+def ast_start_offset(node: ast.expr | ast.keyword | ast.stmt) -> Offset:
     return Offset(node.lineno, node.col_offset)
 
 

@@ -1,18 +1,9 @@
+from __future__ import annotations
+
 import ast
 import pkgutil
 from collections import defaultdict
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Tuple, TypeVar
 
 from tokenize_rt import Offset, Token
 
@@ -20,7 +11,7 @@ from django_upgrade import fixers
 
 
 class Settings:
-    def __init__(self, target_version: Tuple[int, int]) -> None:
+    def __init__(self, target_version: tuple[int, int]) -> None:
         self.target_version = target_version
 
 
@@ -29,7 +20,7 @@ class State:
         self,
         settings: Settings,
         filename: str,
-        from_imports: Dict[str, Set[str]],
+        from_imports: dict[str, set[str]],
     ) -> None:
         self.settings = settings
         self.filename = filename
@@ -47,10 +38,10 @@ else:
 
 
 class ASTCallbackMapping(Protocol):
-    def __getitem__(self, tp: Type[AST_T]) -> List[ASTFunc[AST_T]]:  # pragma: no cover
+    def __getitem__(self, tp: type[AST_T]) -> list[ASTFunc[AST_T]]:  # pragma: no cover
         ...
 
-    def items(self) -> Iterable[Tuple[Any, Any]]:  # pragma: no cover
+    def items(self) -> Iterable[tuple[Any, Any]]:  # pragma: no cover
         ...
 
 
@@ -58,7 +49,7 @@ def visit(
     tree: ast.Module,
     settings: Settings,
     filename: str,
-) -> Dict[Offset, List[TokenFunc]]:
+) -> dict[Offset, list[TokenFunc]]:
     ast_funcs = get_ast_funcs(settings.target_version)
     initial_state = State(
         settings=settings,
@@ -66,7 +57,7 @@ def visit(
         from_imports=defaultdict(set),
     )
 
-    nodes: List[Tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
+    nodes: list[tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
     ret = defaultdict(list)
     while nodes:
         state, node, parent = nodes.pop()
@@ -103,7 +94,7 @@ def visit(
 
 
 class Fixer:
-    def __init__(self, name: str, min_version: Tuple[int, int]) -> None:
+    def __init__(self, name: str, min_version: tuple[int, int]) -> None:
         self.name = name
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
@@ -111,7 +102,7 @@ class Fixer:
         FIXERS.append(self)
 
     def register(
-        self, type_: Type[AST_T]
+        self, type_: type[AST_T]
     ) -> Callable[[ASTFunc[AST_T]], ASTFunc[AST_T]]:
         def decorator(func: ASTFunc[AST_T]) -> ASTFunc[AST_T]:
             self.ast_funcs[type_].append(func)
@@ -120,7 +111,7 @@ class Fixer:
         return decorator
 
 
-FIXERS: List[Fixer] = []
+FIXERS: list[Fixer] = []
 
 
 def _import_fixers() -> None:
@@ -134,7 +125,7 @@ def _import_fixers() -> None:
 _import_fixers()
 
 
-def get_ast_funcs(target_version: Tuple[int, int]) -> ASTCallbackMapping:
+def get_ast_funcs(target_version: tuple[int, int]) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
     for fixer in FIXERS:
         if target_version >= fixer.min_version:

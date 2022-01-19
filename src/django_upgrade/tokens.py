@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import ast
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
 
 from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
 
@@ -19,7 +20,7 @@ STRING = "STRING"
 # Basic functions
 
 
-def find(tokens: List[Token], i: int, *, name: str, src: Optional[str] = None) -> int:
+def find(tokens: list[Token], i: int, *, name: str, src: str | None = None) -> int:
     """
     Find the next token matching name and src.
     """
@@ -29,7 +30,7 @@ def find(tokens: List[Token], i: int, *, name: str, src: Optional[str] = None) -
 
 
 def reverse_find(
-    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
+    tokens: list[Token], i: int, *, name: str, src: str | None = None
 ) -> int:
     """
     Find the previous token matching name and src.
@@ -39,9 +40,7 @@ def reverse_find(
     return i
 
 
-def consume(
-    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
-) -> int:
+def consume(tokens: list[Token], i: int, *, name: str, src: str | None = None) -> int:
     """
     Move past any tokens matching name and src.
     """
@@ -51,7 +50,7 @@ def consume(
 
 
 def reverse_consume(
-    tokens: List[Token], i: int, *, name: str, src: Optional[str] = None
+    tokens: list[Token], i: int, *, name: str, src: str | None = None
 ) -> int:
     """
     Rewind past any tokens matching name and src.
@@ -61,7 +60,7 @@ def reverse_consume(
     return i
 
 
-def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
+def find_final_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     """
     Find the last token corresponding to the given ast node.
     """
@@ -76,7 +75,7 @@ def find_final_token(tokens: List[Token], i: int, *, node: ast.AST) -> int:
     return j
 
 
-def extract_indent(tokens: List[Token], i: int) -> Tuple[int, str]:
+def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
     """
     If the previous token is and indent, return its position and the
     indentation string. Otherwise return the current position and "".
@@ -90,7 +89,7 @@ def extract_indent(tokens: List[Token], i: int) -> Tuple[int, str]:
     return (j, indent)
 
 
-def alone_on_line(tokens: List[Token], start_idx: int, end_idx: int) -> bool:
+def alone_on_line(tokens: list[Token], start_idx: int, end_idx: int) -> bool:
     """
     Return if the given set of tokens is on its own physical line.
     """
@@ -108,9 +107,9 @@ BRACES = {"(": ")", "[": "]", "{": "}"}
 
 
 def parse_call_args(
-    tokens: List[Token],
+    tokens: list[Token],
     i: int,
-) -> Tuple[List[Tuple[int, int]], int]:
+) -> tuple[list[tuple[int, int]], int]:
     """
     Given the index of the opening bracket of a function call, step through
     and parse its arguments into a list of tuples of start, end indices.
@@ -143,14 +142,14 @@ def parse_call_args(
 # Rewriting functions
 
 
-def insert(tokens: List[Token], i: int, *, new_src: str) -> None:
+def insert(tokens: list[Token], i: int, *, new_src: str) -> None:
     """
     Insert a generated token with the given new source.
     """
     tokens.insert(i, Token(CODE, new_src))
 
 
-def replace(tokens: List[Token], i: int, *, src: str) -> None:
+def replace(tokens: list[Token], i: int, *, src: str) -> None:
     """
     Replace the token at position i with a generated token with the given new
     source.
@@ -158,7 +157,7 @@ def replace(tokens: List[Token], i: int, *, src: str) -> None:
     tokens[i] = tokens[i]._replace(name=CODE, src=src)
 
 
-def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
+def erase_node(tokens: list[Token], i: int, *, node: ast.AST) -> None:
     """
     Erase all tokens corresponding to the given ast node.
     """
@@ -169,17 +168,17 @@ def erase_node(tokens: List[Token], i: int, *, node: ast.AST) -> None:
     del tokens[i:j]
 
 
-def find_and_replace_name(tokens: List[Token], i: int, *, name: str, new: str) -> None:
+def find_and_replace_name(tokens: list[Token], i: int, *, name: str, new: str) -> None:
     j = find(tokens, i, name=NAME, src=name)
     tokens[j] = tokens[j]._replace(name="CODE", src=new)
 
 
 def replace_argument_names(
-    tokens: List[Token],
+    tokens: list[Token],
     i: int,
     *,
     node: ast.Call,
-    arg_map: Dict[str, str],
+    arg_map: dict[str, str],
 ) -> None:
     """
     Update an ast.Call node’s keyword argument names, where arg_map maps old to
@@ -201,11 +200,11 @@ def replace_argument_names(
 
 
 def update_import_names(
-    tokens: List[Token],
+    tokens: list[Token],
     i: int,
     *,
     node: ast.ImportFrom,
-    name_map: Dict[str, str],
+    name_map: dict[str, str],
 ) -> None:
     """
     Replace an ast.ImportFrom node’s imported names, where name_map maps old to
@@ -218,7 +217,7 @@ def update_import_names(
         alias.name for alias in node.names if alias.asname is None
     }
 
-    replacements: List[Tuple[int, int, List[Token]]] = []  # start, end, new tokens
+    replacements: list[tuple[int, int, list[Token]]] = []  # start, end, new tokens
     remove_all = True
     for alias_idx, alias in enumerate(node.names):
         if alias.name not in name_map:
@@ -276,11 +275,11 @@ def update_import_names(
 
 
 def update_import_modules(
-    tokens: List[Token],
+    tokens: list[Token],
     i: int,
     *,
     node: ast.ImportFrom,
-    module_rewrites: Dict[str, str],
+    module_rewrites: dict[str, str],
 ) -> None:
     """
     Replace import names from an ast.ImportFrom with new import statements from

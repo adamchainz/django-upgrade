@@ -2,9 +2,11 @@
 Remove the 'providing_args' argument from Signal():
 https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 from tokenize_rt import UNIMPORTANT_WS, Offset, Token
 
@@ -35,7 +37,7 @@ def visit_Call(
     state: State,
     node: ast.Call,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Name)
         and NAME in state.from_imports[MODULE]
@@ -54,7 +56,7 @@ def visit_Call(
             )
 
 
-def remove_providing_args(tokens: List[Token], i: int, *, node: ast.Call) -> None:
+def remove_providing_args(tokens: list[Token], i: int, *, node: ast.Call) -> None:
     j = find(tokens, i, name=OP, src="(")
     func_args, _ = parse_call_args(tokens, j)
 

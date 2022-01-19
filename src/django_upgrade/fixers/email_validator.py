@@ -2,9 +2,11 @@
 Rewrite django.core.validator.EmailValidator arguments:
 https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2
 """
+from __future__ import annotations
+
 import ast
 from functools import partial
-from typing import Iterable, Tuple
+from typing import Iterable
 
 from tokenize_rt import Offset
 
@@ -30,7 +32,7 @@ def visit_Call(
     state: State,
     node: ast.Call,
     parent: ast.AST,
-) -> Iterable[Tuple[Offset, TokenFunc]]:
+) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (
             isinstance(node.func, ast.Name)

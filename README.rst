@@ -64,8 +64,14 @@ For example:
 The ``--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
 For more on usage run ``django-upgrade --help``.
 
-``django-upgrade`` focuses on upgrading your code for the “99% case” and not on making it look nice.
-Run django-upgrade before your reformatters, such as `isort <https://isort.readthedocs.io/>`__ or `Black <https://black.readthedocs.io/en/stable/>`__.
+``django-upgrade`` focuses on upgrading your code and not on making it look nice.
+Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
+
+``django-upgrade`` does not have any ability to recurse through directories.
+Use the pre-commit integration, globbing, or another technique for applying to many files such as |with git ls-files pipe xargs|__.
+
+.. |with git ls-files pipe xargs| replace:: with ``git ls-files | xargs``
+__ https://adamj.eu/tech/2022/03/09/how-to-run-a-command-on-many-files-in-your-git-repository/
 
 The full list of fixers is documented below.
 

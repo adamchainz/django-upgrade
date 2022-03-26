@@ -87,9 +87,9 @@ def visit(
             if isinstance(value, ast.AST):
                 nodes.append((next_state, value, node))
             elif isinstance(value, list):
-                for value in reversed(value):
-                    if isinstance(value, ast.AST):
-                        nodes.append((next_state, value, node))
+                for subvalue in reversed(value):
+                    if isinstance(subvalue, ast.AST):
+                        nodes.append((next_state, subvalue, node))
     return ret
 
 

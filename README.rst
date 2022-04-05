@@ -172,7 +172,7 @@ __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-sy
     +    path('', views.index, name='index'),
     -    url(r'^about/$', views.about, name='about'),
     +    path('about/', views.about, name='about'),
-    -    url(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
+    -    url(r'^post/(?P<slug>[-a-zA-Z0-9_]++)/$', views.post, name='post'),
     +    re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
     -    url(r'^weblog/', include('blog.urls')),
     +    path('weblog/', include('blog.urls')),

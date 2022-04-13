@@ -181,9 +181,9 @@ def test_path_unanchored_end():
         url(r'^weblog/', views.blog)
         """,
         """\
-        from django.urls import path
+        from django.urls import re_path
 
-        path('weblog/', views.blog)
+        re_path(r'^weblog/', views.blog)
         """,
         settings,
     )
@@ -321,7 +321,7 @@ def test_complete():
             path('', views.index, name='index'),
             path('about/', views.about, name='about'),
             re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
-            path('weblog/', include('blog.urls')),
+            re_path(r'^weblog/', include('blog.urls')),
         ]
         """,
         settings,

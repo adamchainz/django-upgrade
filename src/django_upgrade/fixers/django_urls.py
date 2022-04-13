@@ -13,7 +13,7 @@ from weakref import WeakKeyDictionary
 from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
-from django_upgrade.compat import str_removeprefix, str_removesuffix
+from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     STRING,
@@ -139,7 +139,9 @@ REGEX_TO_CONVERTER = {
 
 
 def convert_path_syntax(regex_path: str) -> str | None:
-    remaining = str_removesuffix(str_removeprefix(regex_path, "^"), "$")
+    if not regex_path.endswith("$"):
+        return None
+    remaining = str_removeprefix(regex_path[:-1], "^")
     path = ""
     while "(?P<" in remaining:
         prefix, rest = remaining.split("(?P<", 1)

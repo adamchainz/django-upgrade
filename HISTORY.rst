@@ -2,6 +2,11 @@
 History
 =======
 
+* Fix URL rewriting to avoid converting regular expressions that don’t end with ``$``.
+  If the ``$`` is missing, Django will search for the given regular expression anywhere in the path.
+
+  Thanks to qdufrois for the report in `Issue #121 <https://github.com/adamchainz/django-upgrade/issues/121>`__.
+
 1.4.0 (2021-10-23)
 ------------------
 

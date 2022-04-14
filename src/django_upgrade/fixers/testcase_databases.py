@@ -5,7 +5,6 @@ https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 from __future__ import annotations
 
 import ast
-import re
 from functools import partial
 from typing import Iterable
 
@@ -21,13 +20,6 @@ fixer = Fixer(
 )
 
 
-test_re = re.compile(r"(\b|_)tests?(\b|_)")
-
-
-def looks_like_test_file(filename: str) -> bool:
-    return test_re.search(filename) is not None
-
-
 @fixer.register(ast.Assign)
 def visit_Assign(
     state: State,
@@ -41,7 +33,7 @@ def visit_Assign(
         and node.targets[0].id in ("allow_database_queries", "multi_db")
         and isinstance(node.value, ast.Constant)
         and (node.value.value is True or node.value.value is False)
-        and looks_like_test_file(state.filename)
+        and state.looks_like_test_file()
     ):
         yield ast_start_offset(node), partial(
             replace_assignment, node=node, value=node.value.value

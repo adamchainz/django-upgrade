@@ -47,6 +47,7 @@ def visit_ImportFrom(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module in REWRITES
+        and not state.looks_like_migrations_file()
         and is_rewritable_import_from(node)
         and any(alias.name in REWRITES[node.module] for alias in node.names)
     ):

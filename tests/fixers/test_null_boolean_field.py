@@ -16,6 +16,17 @@ def test_unmatched_import():
     )
 
 
+def test_untransformed_in_migration_file():
+    check_noop(
+        """\
+        from django.db.models import NullBooleanField
+        field = NullBooleanField()
+        """,
+        settings,
+        filename="example/core/migrations/0001_initial.py",
+    )
+
+
 def test_transform_in_class():
     check_transformed(
         """\

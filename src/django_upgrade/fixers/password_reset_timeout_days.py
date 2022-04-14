@@ -5,7 +5,6 @@ https://docs.djangoproject.com/en/3.0/releases/3.0/#django-utils-encoding-force-
 from __future__ import annotations
 
 import ast
-import re
 from functools import partial
 from typing import Iterable
 
@@ -23,12 +22,6 @@ fixer = Fixer(
 OLD_NAME = "PASSWORD_RESET_TIMEOUT_DAYS"
 NEW_NAME = "PASSWORD_RESET_TIMEOUT"
 
-settings_re = re.compile(r"\bsettings\b")
-
-
-def looks_like_settings_file(filename: str) -> bool:
-    return settings_re.search(filename) is not None
-
 
 @fixer.register(ast.Assign)
 def visit_Assign(
@@ -40,7 +33,7 @@ def visit_Assign(
         len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == OLD_NAME
-        and looks_like_settings_file(state.filename)
+        and state.looks_like_settings_file()
     ):
         yield ast_start_offset(node), partial(rewrite_setting, node=node)
 

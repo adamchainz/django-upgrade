@@ -2,6 +2,9 @@
 History
 =======
 
+1.5.0 (2022-04-14)
+------------------
+
 * Fix URL rewriting to avoid converting regular expressions that don’t end with ``$``.
   If the ``$`` is missing, Django will search for the given regular expression anywhere in the path.
 

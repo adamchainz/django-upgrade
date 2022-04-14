@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import ast
+import os
 import pkgutil
+import re
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Tuple, TypeVar
 
@@ -15,6 +17,11 @@ class Settings:
         self.target_version = target_version
 
 
+settings_re = re.compile(r"\bsettings\b")
+
+test_re = re.compile(r"(\b|_)tests?(\b|_)")
+
+
 class State:
     def __init__(
         self,
@@ -25,6 +32,15 @@ class State:
         self.settings = settings
         self.filename = filename
         self.from_imports = from_imports
+
+    def looks_like_migrations_file(self) -> bool:
+        return "migrations" in self.filename.split(os.path.sep)
+
+    def looks_like_settings_file(self) -> bool:
+        return settings_re.search(self.filename) is not None
+
+    def looks_like_test_file(self) -> bool:
+        return test_re.search(self.filename) is not None
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)

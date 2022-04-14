@@ -26,6 +26,18 @@ def test_unrecognized_import_format():
     )
 
 
+def test_untransformed_in_migration_file():
+    check_noop(
+        """\
+        from django.contrib.postgres.fields import (
+            JSONField, KeyTransform,  KeyTextTransform,
+        )
+        """,
+        settings,
+        filename="example/core/migrations/0001_initial.py",
+    )
+
+
 def test_full():
     check_transformed(
         """\

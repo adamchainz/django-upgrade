@@ -7,6 +7,11 @@ History
 
   Thanks to qdufrois for the report in `Issue #121 <https://github.com/adamchainz/django-upgrade/issues/121>`__.
 
+* Made ``JSONField`` and ``NullBooleanField`` fixers ignore migrations files.
+  Django kept these old field classes around for use in historical migrations, so there’s no need to rewrite such cases.
+
+  Thanks to Matthieu Rigal and Bruno Alla for the report in `Issue #79 <https://github.com/adamchainz/django-upgrade/issues/79>`__.
+
 1.4.0 (2021-10-23)
 ------------------
 

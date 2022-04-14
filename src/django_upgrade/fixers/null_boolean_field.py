@@ -33,7 +33,11 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if is_rewritable_import_from(node) and node.module == "django.db.models":
+    if (
+        is_rewritable_import_from(node)
+        and node.module == "django.db.models"
+        and not state.looks_like_migrations_file()
+    ):
         yield ast_start_offset(node), partial(
             update_import_names,
             node=node,
@@ -48,16 +52,19 @@ def visit_Call(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node.func, ast.Name)
-        and "NullBooleanField" in state.from_imports["django.db.models"]
-        and node.func.id == "NullBooleanField"
-    ) or (
-        isinstance(node.func, ast.Attribute)
-        and node.func.attr == "NullBooleanField"
-        and "models" in state.from_imports["django.db"]
-        and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "models"
-    ):
+        (
+            isinstance(node.func, ast.Name)
+            and "NullBooleanField" in state.from_imports["django.db.models"]
+            and node.func.id == "NullBooleanField"
+        )
+        or (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr == "NullBooleanField"
+            and "models" in state.from_imports["django.db"]
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "models"
+        )
+    ) and not state.looks_like_migrations_file():
         yield ast_start_offset(node), partial(fix_null_boolean_field, node=node)
 
 

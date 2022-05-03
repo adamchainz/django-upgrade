@@ -420,6 +420,15 @@ Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``, a
     -EmailValidator(domain_whitelist=["example.org"])
     +EmailValidator(domain_allowlist=["example.org"])
 
+``default_app_config``
+~~~~~~~~~~~~~~~~~~~~~~
+
+Removes ``default_app_config`` from ``__init__.py`` in apps:
+
+.. code-block:: diff
+
+    -default_app_config = 'my_app.apps.AppConfig'
+
 Django 4.0
 ----------
 

@@ -423,7 +423,7 @@ Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``, a
 ``default_app_config``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Removes ``default_app_config`` from ``__init__.py`` in apps:
+Removes module-level ``default_app_config`` assignments from ``__init__.py`` files:
 
 .. code-block:: diff
 

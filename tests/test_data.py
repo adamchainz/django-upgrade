@@ -58,7 +58,7 @@ def test_looks_like_test_file_false(filename):
         r"project\package\__init__.py",
     ),
 )
-def looks_like_dunder_init_file_true(filename):
+def test_looks_like_dunder_init_file_true(filename):
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
@@ -78,7 +78,7 @@ def looks_like_dunder_init_file_true(filename):
         "init__.py",
     ),
 )
-def looks_like_dunder_init_file_false(filename):
+def test_looks_like_dunder_init_file_false(filename):
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,

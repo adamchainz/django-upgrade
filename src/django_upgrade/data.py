@@ -21,6 +21,8 @@ settings_re = re.compile(r"\bsettings\b")
 
 test_re = re.compile(r"(\b|_)tests?(\b|_)")
 
+dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
+
 
 class State:
     def __init__(
@@ -41,6 +43,9 @@ class State:
 
     def looks_like_test_file(self) -> bool:
         return test_re.search(self.filename) is not None
+
+    def looks_like_dunder_init_file(self) -> bool:
+        return dunder_init_re.search(self.filename) is not None
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)

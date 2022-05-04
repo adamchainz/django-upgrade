@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 
@@ -47,24 +49,28 @@ def test_dynamic():
     )
 
 
-def test_invalid_filename():
+@pytest.mark.parametrize("filename", ["my_app.py", "my_app__init__.py"])
+def test_invalid_filename(filename):
     check_noop(
         """\
         default_app_config = 'myapp.apps.MyAppConfig'
         """,
         settings,
-        filename="my_app.py",
+        filename=filename,
     )
 
 
-def test_simple_case():
+@pytest.mark.parametrize(
+    "filename", ["__init__.py", "app/__init__.py", "project/app/__init__.py"]
+)
+def test_simple_case(filename):
     check_transformed(
         """\
         default_app_config = 'myapp.apps.MyAppConfig'
         """,
         "",
         settings,
-        filename="__init__.py",
+        filename=filename,
     )
 
 

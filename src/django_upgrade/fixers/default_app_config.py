@@ -12,7 +12,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import CODE, find_final_token
+from django_upgrade.tokens import LOGICAL_NEWLINE, find
 
 fixer = Fixer(
     __name__,
@@ -28,13 +28,16 @@ def visit_Assign(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         state.filename == "__init__.py"
+        and isinstance(parent, ast.Module)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == "default_app_config"
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
     ):
         yield ast_start_offset(node), partial(remove_assignment, node=node)
 
 
 def remove_assignment(tokens: list[Token], i: int, *, node: ast.Assign) -> None:
-    j = find_final_token(tokens, i, node=node)
-    tokens[i:j] = [Token(name=CODE, src="")]
+    j = find(tokens, i, name=LOGICAL_NEWLINE)
+    tokens[i : j + 1] = []

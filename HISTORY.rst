@@ -2,6 +2,10 @@
 History
 =======
 
+* Add ``--version`` flag.
+
+  Thanks to Ferran Jovell in `PR #143 <https://github.com/adamchainz/django-upgrade/pull/143>`__.
+
 1.6.0 (2022-05-04)
 ------------------
 

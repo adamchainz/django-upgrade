@@ -1,4 +1,3 @@
-exclude .pre-commit-hooks.yaml
 include HISTORY.rst
 include LICENSE
 include pyproject.toml

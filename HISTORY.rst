@@ -2,6 +2,10 @@
 History
 =======
 
+* Fix ``default_app_config`` fixer to work with ``__init__.py`` files in subdirectories.
+
+  Thanks to Bruno Alla in `PR #144 <https://github.com/adamchainz/django-upgrade/pull/144>`__.
+
 * Add ``--version`` flag.
 
   Thanks to Ferran Jovell in `PR #143 <https://github.com/adamchainz/django-upgrade/pull/143>`__.

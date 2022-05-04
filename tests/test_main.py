@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import re
 import sys
 from textwrap import dedent
 from unittest import mock
@@ -22,6 +23,17 @@ def test_main_help():
         main(["--help"])
 
     assert excinfo.value.code == 0
+
+
+def test_main_version(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--version"])
+
+    out, err = capsys.readouterr()
+
+    assert excinfo.value.code == 0
+    assert re.match(r"\d\.\d\.\d", out)
+    assert err == ""
 
 
 def test_main_syntax_error(tmp_path):

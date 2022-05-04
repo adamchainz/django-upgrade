@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 import tokenize
+from importlib import metadata
 from typing import Sequence, Tuple, cast
 
 from tokenize_rt import (
@@ -22,6 +23,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("filenames", nargs="*")
     parser.add_argument("--exit-zero-even-if-changed", action="store_true")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=metadata.version("django-upgrade"),
+    )
     parser.add_argument(
         "--target-version",
         default="2.2",

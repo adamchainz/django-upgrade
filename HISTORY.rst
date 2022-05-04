@@ -2,6 +2,9 @@
 History
 =======
 
+1.6.1 (2022-05-04)
+------------------
+
 * Fix ``default_app_config`` fixer to work with ``__init__.py`` files in subdirectories.
 
   Thanks to Bruno Alla in `PR #144 <https://github.com/adamchainz/django-upgrade/pull/144>`__.

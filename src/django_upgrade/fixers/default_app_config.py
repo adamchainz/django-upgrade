@@ -36,6 +36,5 @@ def visit_Assign(
 
 
 def remove_assignment(tokens: list[Token], i: int, *, node: ast.Assign) -> None:
-    new_src = ""
     j = find_final_token(tokens, i, node=node)
-    tokens[i:j] = [Token(name=CODE, src=new_src)]
+    tokens[i:j] = [Token(name=CODE, src="")]

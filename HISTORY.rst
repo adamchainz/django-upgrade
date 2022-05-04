@@ -2,6 +2,10 @@
 History
 =======
 
+* Add Django 3.2+ fixer to remove ``default_app_config`` assignments in ``__init__.py`` files.
+
+  Thanks to Bruno Alla in `PR #140 <https://github.com/adamchainz/django-upgrade/pull/140>`__.
+
 1.5.0 (2022-04-14)
 ------------------
 

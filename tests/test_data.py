@@ -53,7 +53,9 @@ def test_looks_like_test_file_false(filename):
     (
         "__init__.py",
         "package/__init__.py",
+        "package\__init__.py",
         "project/package/__init__.py",
+        "project\package\__init__.py",
     ),
 )
 def looks_like_dunder_init_file_true(filename):
@@ -69,6 +71,7 @@ def looks_like_dunder_init_file_true(filename):
     ("filename"),
     (
         "__thing__init__.py",
+        "thing-__init__.py",
         "__init___py",
         "_init_.py",
         "__init.py",

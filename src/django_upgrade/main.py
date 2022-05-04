@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 import tokenize
+from importlib import metadata
 from typing import Sequence, Tuple, cast
 
 from tokenize_rt import (
@@ -37,6 +38,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             "3.2",
             "4.0",
         ],
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f'%(prog)s {metadata.version("django-upgrade")}',
     )
     args = parser.parse_args(argv)
 

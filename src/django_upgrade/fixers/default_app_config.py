@@ -27,7 +27,7 @@ def visit_Assign(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.filename == "__init__.py"
+        state.looks_like_dunder_init_file()
         and isinstance(parent, ast.Module)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)

@@ -24,11 +24,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("filenames", nargs="*")
     parser.add_argument("--exit-zero-even-if-changed", action="store_true")
     parser.add_argument(
-        "--version",
-        action="version",
-        version=metadata.version("django-upgrade"),
-    )
-    parser.add_argument(
         "--target-version",
         default="2.2",
         choices=[
@@ -43,6 +38,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             "3.2",
             "4.0",
         ],
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f'%(prog)s {metadata.version("django-upgrade")}',
     )
     args = parser.parse_args(argv)
 

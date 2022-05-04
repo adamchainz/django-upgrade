@@ -21,7 +21,7 @@ settings_re = re.compile(r"\bsettings\b")
 
 test_re = re.compile(r"(\b|_)tests?(\b|_)")
 
-dunder_init_re = re.compile(r"(^|[\/])__init__.py$")
+dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
 
 
 class State:

@@ -64,7 +64,7 @@ def test_looks_like_dunder_init_file_true(filename):
         filename=filename,
         from_imports={},
     )
-    assert state.looks_like_test_file()
+    assert state.looks_like_dunder_init_file()
 
 
 @pytest.mark.parametrize(
@@ -84,4 +84,4 @@ def test_looks_like_dunder_init_file_false(filename):
         filename=filename,
         from_imports={},
     )
-    assert not state.looks_like_test_file()
+    assert not state.looks_like_dunder_init_file()

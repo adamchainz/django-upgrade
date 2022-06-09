@@ -49,7 +49,7 @@ class State:
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)
-TokenFunc = Callable[[int, List[Token]], None]
+TokenFunc = Callable[[List[Token], int], None]
 ASTFunc = Callable[[State, AST_T, ast.AST], Iterable[Tuple[Offset, TokenFunc]]]
 
 if TYPE_CHECKING:  # pragma: no cover

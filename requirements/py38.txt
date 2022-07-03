@@ -51,9 +51,9 @@ coverage==6.4.1 \
     --hash=sha256:fdb6f7bd51c2d1714cea40718f6149ad9be6a2ee7d93b19e9f00934c0f2a74d9 \
     --hash=sha256:ffa9297c3a453fba4717d06df579af42ab9a28022444cae7fa605af4df612d54
     # via -r requirements.in
-importlib-metadata==4.11.4 \
-    --hash=sha256:5d26852efe48c0a32b0509ffbc583fda1a2266545a78d104a6f4aff3db17d700 \
-    --hash=sha256:c58c8eb8a762858f49e18436ff552e83914778e50e9d2f1660535ffb364552ec
+importlib-metadata==4.12.0 \
+    --hash=sha256:637245b8bab2b6502fcbc752cc4b7a6f6243bb02b31c5c26156ad103d3d45670 \
+    --hash=sha256:7401a975809ea1fdc658c3aa4f78cc2195a0e019c5cbc4c06122884e9ae80c23
     # via pytest-randomly
 iniconfig==1.1.1 \
     --hash=sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3 \

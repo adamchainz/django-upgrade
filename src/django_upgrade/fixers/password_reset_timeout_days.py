@@ -1,6 +1,6 @@
 """
-Replace imports from django.utils.encoding:
-https://docs.djangoproject.com/en/3.0/releases/3.0/#django-utils-encoding-force-text-and-smart-text  # noqa: E501
+PASSWORD_RESET_TIMEOUT_DAYS setting replaced with PASSWORD_RESET_TIMEOUT:
+https://docs.djangoproject.com/en/3.1/releases/3.1/#django-contrib-auth
 """
 from __future__ import annotations
 

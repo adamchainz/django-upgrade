@@ -205,9 +205,22 @@ __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-sy
     -    url(r'^about/$', views.about, name='about'),
     +    path('about/', views.about, name='about'),
     -    url(r'^post/(?P<slug>[-a-zA-Z0-9_]+)/$', views.post, name='post'),
-    +    re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
-    -    url(r'^weblog/', include('blog.urls')),
-    +    path('weblog/', include('blog.urls')),
+    +    path('post/<slug:slug>/', views.post, name='post'),
+    -    url(r'^weblog', include('blog.urls')),
+    +    re_path(r'^weblog', include('blog.urls')),
+     ]
+
+Existing ``re_path()`` calls are also rewritten to the ``path()``   syntax when eligible.
+
+.. code-block:: diff
+
+    -from django.urls import include, re_path
+    +from django.urls import include, path, re_path
+
+     urlpatterns = [
+    -    re_path(r'^about/$', views.about, name='about'),
+    +    path('about/', views.about, name='about'),
+         re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
      ]
 
 ``lru_cache``

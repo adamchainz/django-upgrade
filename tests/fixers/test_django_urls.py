@@ -666,9 +666,9 @@ def test_re_path_transform(before: str, after: str) -> None:
             include('example.urls')
             path('', views.index)
             """,
-            id="Test only include from django.conf.urls"
+            id="Test only include from django.conf.urls",
         ),
-    ]
+    ],
 )
 def test_concurrent_transform(before: str, after: str) -> None:
     check_transformed(before, after, settings)

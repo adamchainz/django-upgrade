@@ -17,11 +17,12 @@ from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     STRING,
+    erase_node,
     extract_indent,
     find,
     insert,
     replace,
-    update_import_names, erase_node,
+    update_import_names,
 )
 
 fixer = Fixer(
@@ -86,7 +87,7 @@ def update_django_urls_import(
 def update_django_conf_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
-    is_concurrent = ("re_path" in state.from_imports["django.urls"])
+    is_concurrent = "re_path" in state.from_imports["django.urls"]
     used_names = state_used_names.pop(state, set())
     removals = set()
 

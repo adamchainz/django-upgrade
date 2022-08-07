@@ -21,7 +21,7 @@ from django_upgrade.tokens import (
     find,
     insert,
     replace,
-    update_import_names,
+    update_import_names, erase_node,
 )
 
 fixer = Fixer(
@@ -42,7 +42,17 @@ def visit_ImportFrom(
         and any(alias.name in ("include", "url") for alias in node.names)
     ):
         yield ast_start_offset(node), partial(
-            update_import,
+            update_django_conf_import,
+            node=node,
+            state=state,
+        )
+    if (
+        node.module == "django.urls"
+        and is_rewritable_import_from(node)
+        and any(alias.name == "re_path" for alias in node.names)
+    ):
+        yield ast_start_offset(node), partial(
+            update_django_urls_import,
             node=node,
             state=state,
         )
@@ -54,23 +64,37 @@ def visit_ImportFrom(
 state_used_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
 
 
-def update_import(
+def update_django_urls_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
-    """ """
-    removals = set()
-    additions = set()
     used_names = state_used_names.pop(state, set())
+
+    if used_names:
+        initial_names = state.from_imports["django.urls"] - {"re_path"}
+        used_names.update(initial_names)
+
+        j, indent = extract_indent(tokens, i)
+        erase_node(tokens, i, node=node)
+        joined_names = ", ".join(sorted(used_names))
+        insert(
+            tokens,
+            j,
+            new_src=f"{indent}from django.urls import {joined_names}\n",
+        )
+
+
+def update_django_conf_import(
+    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
+) -> None:
+    is_concurrent = ("re_path" in state.from_imports["django.urls"])
+    used_names = state_used_names.pop(state, set())
+    removals = set()
 
     for alias in node.names:
         if alias.asname is not None:
             continue
-        if alias.name == "include":
-            removals.add("include")
-            additions.add("include")
-        elif alias.name == "url" and used_names:
-            removals.add("url")
-            additions.update(used_names)
+        if alias.name in ("include", "url") and (used_names or is_concurrent):
+            removals.add(alias.name)
 
     if removals:
         j, indent = extract_indent(tokens, i)
@@ -80,12 +104,15 @@ def update_import(
             node=node,
             name_map={name: "" for name in removals},
         )
-        joined_names = ", ".join(sorted(additions))
-        insert(
-            tokens,
-            j,
-            new_src=f"{indent}from django.urls import {joined_names}\n",
-        )
+        if not is_concurrent:
+            joined_names = ", ".join(sorted(used_names))
+            insert(
+                tokens,
+                j,
+                new_src=f"{indent}from django.urls import {joined_names}\n",
+            )
+        else:
+            state_used_names[state] = used_names
 
 
 @fixer.register(ast.Call)
@@ -96,8 +123,12 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Name)
-        and node.func.id == "url"
-        and "url" in state.from_imports["django.conf.urls"]
+        and (
+            node.func.id == "url"
+            and "url" in state.from_imports["django.conf.urls"]
+            or node.func.id == "re_path"
+            and "re_path" in state.from_imports["django.urls"]
+        )
         # cannot convert where called with all kwargs as names don't align
         and len(node.args) >= 1
     ):
@@ -112,6 +143,13 @@ def visit_Call(
             regex_path=regex_path,
             state=state,
         )
+
+    if (
+        isinstance(node.func, ast.Name)
+        and node.func.id == "include"
+        and "include" in state.from_imports["django.conf.urls"]
+    ):
+        state_used_names.setdefault(state, set()).add("include")
 
 
 def fix_url_call(

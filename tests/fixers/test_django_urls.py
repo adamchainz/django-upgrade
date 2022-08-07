@@ -529,8 +529,10 @@ def test_re_path_noop(s: str) -> None:
             """\
             from django.urls import re_path
 
-            re_path(r'^uuid/(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/$', by_uuid)
-            """,
+            re_path(r'^uuid/(?P<uuid>{})/$', by_uuid)
+            """.format(
+                "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            ),
             """\
             from django.urls import path
 

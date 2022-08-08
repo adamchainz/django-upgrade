@@ -2,6 +2,8 @@
 History
 =======
 
+* Support Django 4.1 as a target version.
+
 1.7.0 (2022-05-11)
 ------------------
 

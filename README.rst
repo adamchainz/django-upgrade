@@ -440,3 +440,13 @@ Django 4.1
 ----------
 
 `Release Notes <https://docs.djangoproject.com/en/4.1/releases/4.1/#features-deprecated-in-4-1>`__
+
+``django.utils.timezone.utc`` deprecations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites imports of ``utc`` from ``django.utils.timezone`` to use ``datetime.timezone``.
+
+.. code-block:: diff
+
+    -from django.utils.timezone import utc
+    +from datetime.timezone import utc

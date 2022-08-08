@@ -4,6 +4,11 @@ History
 
 * Support Django 4.1 as a target version.
 
+* Add Django 4.1+ fixer to rewrite imports of ``utc`` from ``django.utils.timezone`` to use
+  ``datetime.timezone``.
+
+  Thanks to Hasan Ramezani in `PR #140 <https://github.com/adamchainz/django-upgrade/pull/140>`__.
+
 1.7.0 (2022-05-11)
 ------------------
 

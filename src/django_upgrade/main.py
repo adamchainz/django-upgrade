@@ -37,6 +37,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "3.1",
             "3.2",
             "4.0",
+            "4.1",
         ],
     )
     parser.add_argument(

@@ -210,7 +210,7 @@ __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-sy
     +    re_path(r'^weblog', include('blog.urls')),
      ]
 
-Existing ``re_path()`` calls are also rewritten to the ``path()``   syntax when eligible.
+Existing ``re_path()`` calls are also rewritten to the ``path()`` syntax when eligible.
 
 .. code-block:: diff
 

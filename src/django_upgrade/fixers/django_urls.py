@@ -47,7 +47,7 @@ def visit_ImportFrom(
             node=node,
             state=state,
         )
-    if (
+    elif (
         node.module == "django.urls"
         and is_rewritable_import_from(node)
         and any(alias.name == "re_path" for alias in node.names)
@@ -63,25 +63,6 @@ def visit_ImportFrom(
 # Then when backtracking into an import statement, we can use the set of names
 # to determine what names to import.
 state_used_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
-
-
-def update_django_urls_import(
-    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
-) -> None:
-    used_names = state_used_names.pop(state, set())
-
-    if used_names:
-        initial_names = state.from_imports["django.urls"] - {"re_path"}
-        used_names.update(initial_names)
-
-        j, indent = extract_indent(tokens, i)
-        erase_node(tokens, i, node=node)
-        joined_names = ", ".join(sorted(used_names))
-        insert(
-            tokens,
-            j,
-            new_src=f"{indent}from django.urls import {joined_names}\n",
-        )
 
 
 def update_django_conf_import(
@@ -114,6 +95,25 @@ def update_django_conf_import(
             )
         else:
             state_used_names[state] = used_names
+
+
+def update_django_urls_import(
+    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
+) -> None:
+    used_names = state_used_names.pop(state, set())
+
+    if used_names:
+        initial_names = state.from_imports["django.urls"] - {"re_path"}
+        used_names.update(initial_names)
+
+        j, indent = extract_indent(tokens, i)
+        erase_node(tokens, i, node=node)
+        joined_names = ", ".join(sorted(used_names))
+        insert(
+            tokens,
+            j,
+            new_src=f"{indent}from django.urls import {joined_names}\n",
+        )
 
 
 @fixer.register(ast.Call)

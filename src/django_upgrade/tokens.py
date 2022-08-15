@@ -93,7 +93,8 @@ def alone_on_line(tokens: list[Token], start_idx: int, end_idx: int) -> bool:
     """
     Return if the given set of tokens is on its own physical line.
     """
-    return (
+    # no types for tokenize-rt
+    return (  # type: ignore [no-any-return]
         tokens[start_idx - 2].name == PHYSICAL_NEWLINE
         and tokens[start_idx - 1].name == UNIMPORTANT_WS
         and tokens[end_idx + 1].name == PHYSICAL_NEWLINE

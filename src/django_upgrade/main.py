@@ -123,7 +123,8 @@ def apply_fixers(contents_text: str, settings: Settings, filename: str) -> str:
         for callback in callbacks.get(token.offset, ()):
             callback(tokens, i)
 
-    return tokens_to_src(tokens)
+    # no types for tokenize-rt
+    return tokens_to_src(tokens)  # type: ignore [no-any-return]
 
 
 def fixup_dedent_tokens(tokens: list[Token]) -> None:

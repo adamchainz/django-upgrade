@@ -194,6 +194,11 @@ Rewrites imports of ``include()`` and ``url()`` from ``django.conf.urls`` to ``d
 .. |new path() syntax| replace:: new ``path()`` syntax
 __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 
+For some cases, this change alters the type of the arguments passed to the view, from ``str`` to the converted type (e.g. ``int``).
+This is not guaranteed backwards compatible: there is a chance that the view expects a string, rather than the converted type.
+But, pragmatically, it seems 99.9% of views do not require strings, and instead work with either strings or the converted type.
+Thus, you should test affected paths after this fixer makes any changes.
+
 .. code-block:: diff
 
     -from django.conf.urls import include, url
@@ -205,9 +210,22 @@ __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-sy
     -    url(r'^about/$', views.about, name='about'),
     +    path('about/', views.about, name='about'),
     -    url(r'^post/(?P<slug>[-a-zA-Z0-9_]+)/$', views.post, name='post'),
-    +    re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
-    -    url(r'^weblog/', include('blog.urls')),
-    +    path('weblog/', include('blog.urls')),
+    +    path('post/<slug:slug>/', views.post, name='post'),
+    -    url(r'^weblog', include('blog.urls')),
+    +    re_path(r'^weblog', include('blog.urls')),
+     ]
+
+Existing ``re_path()`` calls are also rewritten to the ``path()`` syntax when eligible.
+
+.. code-block:: diff
+
+    -from django.urls import include, re_path
+    +from django.urls import include, path, re_path
+
+     urlpatterns = [
+    -    re_path(r'^about/$', views.about, name='about'),
+    +    path('about/', views.about, name='about'),
+         re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
      ]
 
 ``lru_cache``

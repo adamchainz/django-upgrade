@@ -6,12 +6,48 @@ from tests.fixers.tools import check_noop, check_transformed
 settings = Settings(target_version=(4, 0))
 
 
+def test_future_version_gt():
+    check_noop(
+        """\
+        import django
+
+        if django.VERSION > (4, 1):
+            foo()
+        """,
+        settings,
+    )
+
+
 def test_future_version_gte():
     check_noop(
         """\
         import django
 
         if django.VERSION >= (4, 1):
+            foo()
+        """,
+        settings,
+    )
+
+
+def test_future_version_lt():
+    check_noop(
+        """\
+        import django
+
+        if django.VERSION < (4, 1):
+            foo()
+        """,
+        settings,
+    )
+
+
+def test_future_version_lte():
+    check_noop(
+        """\
+        import django
+
+        if django.VERSION <= (4, 1):
             foo()
         """,
         settings,

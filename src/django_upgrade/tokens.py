@@ -155,7 +155,7 @@ def find_block_start(tokens: list[Token], i: int) -> int:
     return i
 
 
-class Block:
+class Block:  # pragma: no cover
     """
     Adapted from pyupgrade:
     https://github.com/asottile/pyupgrade/blob/ad5d9db9a206bfd221760fd81e407bf6040c808c/pyupgrade/_token_helpers.py#L179

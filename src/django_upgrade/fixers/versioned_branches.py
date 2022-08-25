@@ -71,7 +71,7 @@ def _is_passing_comparison(
     elif isinstance(test.ops[0], ast.Lt):
         if state.settings.target_version >= min_version:
             return "second"
-    elif isinstance(test.ops[0], ast.LtE):
+    else:  # ast.LtE
         if state.settings.target_version > min_version:
             return "second"
     return None
@@ -109,7 +109,7 @@ def _fix_block(
 def _find_if_else_block(tokens: list[Token], i: int) -> tuple[Block, Block]:
     if_block = Block.find(tokens, i)
     i = if_block.end
-    while tokens[i].src != "else":
+    while tokens[i].src != "else":  # pragma: no cover
         i += 1
     else_block = Block.find(tokens, i, trim_end=True)
     return if_block, else_block

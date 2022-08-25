@@ -32,6 +32,62 @@ def test_elif():
     )
 
 
+def test_old_version_lt():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (4, 0):
+            foo()
+        bar()
+        """,
+        """\
+        import django
+
+        bar()
+        """,
+        settings,
+    )
+
+
+def test_old_version_lt_with_else():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (4, 0):
+            foo()
+        else:
+            bar()
+        """,
+        """\
+        import django
+
+        bar()
+        """,
+        settings,
+    )
+
+
+def test_old_version_lte():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION <= (3, 2):
+            foo()
+        else:
+            bar()
+        """,
+        """\
+        import django
+
+        bar()
+        """,
+        settings,
+    )
+
+
 def test_current_version_gte():
     check_transformed(
         """\

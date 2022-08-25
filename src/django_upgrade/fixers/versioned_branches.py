@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable, cast
+from typing import Iterable, Literal, cast
 
 from tokenize_rt import Offset, Token
 
@@ -35,45 +35,74 @@ def visit_If(
         and isinstance(left.value, ast.Name)
         and left.value.id == "django"
         and left.attr == "VERSION"
-        and _is_valid_gt_tuple(node.test, state)
+        and (keep_branch := _is_passing_comparison(node.test, state)) is not None
         and (
             # do not handle 'if ... elif ...'
             not node.orelse
             or not isinstance(node.orelse[0], ast.If)
         )
     ):
-        yield ast_start_offset(node), partial(_fix_block, node=node)
+        yield ast_start_offset(node), partial(
+            _fix_block, node=node, keep_branch=keep_branch
+        )
 
 
-def _is_valid_gt_tuple(test: ast.Compare, state: State) -> bool:
+def _is_passing_comparison(
+    test: ast.Compare, state: State
+) -> Literal["first", "second", None]:
     if not (
         len(test.ops) == 1
-        and isinstance(test.ops[0], (ast.Gt, ast.GtE))
+        and isinstance(test.ops[0], (ast.Gt, ast.GtE, ast.Lt, ast.LtE))
         and isinstance(test.comparators[0], ast.Tuple)
         and len(test.comparators[0].elts) == 2
         and all(isinstance(n, ast.Num) for n in test.comparators[0].elts)
     ):
-        return False
+        return None
 
     nums = cast(tuple[ast.Num], test.comparators[0].elts)
     min_version = tuple(e.n for e in nums)
     if isinstance(test.ops[0], ast.Gt):
-        return min_version < state.settings.target_version
-    else:  # ast.GtE
-        return min_version <= state.settings.target_version
+        if state.settings.target_version > min_version:
+            return "first"
+    elif isinstance(test.ops[0], ast.GtE):
+        if state.settings.target_version >= min_version:
+            return "first"
+    elif isinstance(test.ops[0], ast.Lt):
+        if state.settings.target_version >= min_version:
+            return "second"
+    elif isinstance(test.ops[0], ast.LtE):
+        if state.settings.target_version > min_version:
+            return "second"
+    return None
 
 
-def _fix_block(tokens: list[Token], i: int, *, node: ast.If) -> None:
-    if tokens[i].src == "if":  # do not handle 'elif'
-        if node.orelse:
-            if_block, else_block = _find_if_else_block(tokens, i)
+def _fix_block(
+    tokens: list[Token],
+    i: int,
+    *,
+    node: ast.If,
+    keep_branch: Literal["first", "second"],
+) -> None:
+    if tokens[i].src != "if":
+        # do not handle 'elif'
+        return
+
+    if node.orelse:
+        if_block, else_block = _find_if_else_block(tokens, i)
+        if keep_branch == "first":
             if_block.dedent(tokens)
             del tokens[if_block.end : else_block.end]
             del tokens[if_block.start : if_block.block]
         else:
-            if_block = Block.find(tokens, i)
+            else_block.dedent(tokens)
+            del tokens[if_block.start : else_block.block]
+    else:
+        if_block = Block.find(tokens, i)
+        if keep_branch == "first":
             if_block.dedent(tokens)
             del tokens[if_block.start : if_block.block]
+        else:
+            del tokens[if_block.start : if_block.end]
 
 
 def _find_if_else_block(tokens: list[Token], i: int) -> tuple[Block, Block]:

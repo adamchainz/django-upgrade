@@ -6,6 +6,8 @@ History
 
   Thanks to Johnny Metz in `PR #173 <https://github.com/adamchainz/django-upgrade/pull/173>`__.
 
+* Add fixer to remove outdated blocks based on comparing ``django.VERSION`` with an old version.
+
 1.8.1 (2022-08-25)
 ------------------
 

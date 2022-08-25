@@ -99,24 +99,30 @@ The below fixers run regardless of the target version.
 Versioned Branch Remover
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Removes outdated branches based on ``django.VERSION``.
-Supports ``if`` blocks comparing ``django.VERSION`` against a two-tuple specifying the Django major version,, optionally with ``else:`` blocks:
+Removes outdated code within ``if`` statements comparing to ``django.VERSION``.
+Supports comparisons of the form:
 
-.. code-block:: python
+.. code-block:: text
 
-    if django.VERSION >= (4, 1):
+    if django.VERSION <comparator> (<X>, <Y>):
         ...
 
-    if django.VERSION > (4, 1):
-        ...
-
-Some examples:
+Where ``<comparator>`` is one of ``<``, ``<=`` , ``>``, or ``>=``, and ``<X>`` and ``<Y>`` are integer literals.
+A single ``else`` block may be present, but ``elif`` is not supported.
 
 .. code-block:: diff
 
+    -if django.VERSION < (4, 1):
+    -    class RenameIndex:
+    -        ...
+
     -if django.VERSION >= (4, 1):
     -    constraint.validate()
+    -else:
+    -    custom_validation(constraint)
     +constraint.validate()
+
+See also `pyupgrade’s similar feature <https://github.com/asottile/pyupgrade/#python2-and-old-python3x-blocks>`__ that removes outdated code from checks on the Python version.
 
 Django 1.9
 -----------

@@ -2,6 +2,9 @@
 History
 =======
 
+1.9.0 (2022-08-25)
+------------------
+
 * Add Django 4.0+ fixer to remove ``USE_L10N = True`` setting.
 
   Thanks to Johnny Metz in `PR #173 <https://github.com/adamchainz/django-upgrade/pull/173>`__.

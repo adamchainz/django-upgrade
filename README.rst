@@ -96,10 +96,10 @@ All Versions
 
 The below fixers run regardless of the target version.
 
-Versioned Branch Remover
-~~~~~~~~~~~~~~~~~~~~~~~~
+Versioned blocks
+~~~~~~~~~~~~~~~~
 
-Removes outdated code within ``if`` statements comparing to ``django.VERSION``.
+Removes outdated comparisons and blocks from ``if`` statements comparing to ``django.VERSION``.
 Supports comparisons of the form:
 
 .. code-block:: text

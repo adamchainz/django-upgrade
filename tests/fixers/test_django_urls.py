@@ -14,17 +14,29 @@ def test_unrecognized_import_format():
         from django.conf import urls
 
         urls.url("hahaha")
+        urls.re_path("hahaha")
         """,
         settings,
     )
 
 
-def test_alias_not_supported():
+def test_url_alias_not_supported():
     check_noop(
         """\
         from django.conf.urls import url as u
 
         u("hahaha")
+        """,
+        settings,
+    )
+
+
+def test_re_path_alias_not_supported():
+    check_noop(
+        """\
+        from django.conf.urls import re_path as rp
+
+        pr("hahaha")
         """,
         settings,
     )
@@ -75,7 +87,18 @@ def test_url_unsupported_call_format():
     )
 
 
-def test_re_path_unconverted_regex():
+def test_re_path_unsupported_call_format():
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        re_path(regex=r"^$", views.index)
+        """,
+        settings,
+    )
+
+
+def test_url_unconverted_regex():
     check_transformed(
         """\
         from django.conf.urls import url
@@ -91,7 +114,18 @@ def test_re_path_unconverted_regex():
     )
 
 
-def test_re_path_translation():
+def test_re_path_unconverted_regex():
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        re_path(r'^[abc]{123}$', views.example)
+        """,
+        settings,
+    )
+
+
+def test_url_translation():
     check_transformed(
         """\
         from django.conf.urls import url
@@ -109,7 +143,19 @@ def test_re_path_translation():
     )
 
 
-def test_re_path_variable():
+def test_re_path_translation():
+    check_noop(
+        """\
+        from django.urls import re_path
+        from django.utils.translation import gettext_lazy as _
+
+        re_path(_(r'^about/$'), views.about)
+        """,
+        settings,
+    )
+
+
+def test_url_variable():
     check_transformed(
         """\
         from django.conf.urls import url
@@ -122,6 +168,29 @@ def test_re_path_variable():
 
         path = r'^$'
         re_path(path, views.index)
+        """,
+        settings,
+    )
+
+
+def test_re_path_variable():
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        path = r'^$'
+        re_path(path, views.index)
+        """,
+        settings,
+    )
+
+
+def test_re_path_unanchored_end():
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        re_path(r'^weblog/', views.blog)
         """,
         settings,
     )
@@ -330,79 +399,6 @@ def test_complete():
         """,
         settings,
     )
-
-
-@pytest.mark.parametrize(
-    "s",
-    [
-        pytest.param(
-            """\
-            from django import urls
-
-            urls.re_path("hahaha")
-            """,
-            id="unrecognized_import_format",
-        ),
-        pytest.param(
-            """\
-            from django.urls import re_path as rrr
-
-            rrr("hahaha")
-            """,
-            id="alias_not_supported",
-        ),
-        pytest.param(
-            """\
-            from django.urls import yeet
-            """,
-            id="unrecognized_name",
-        ),
-        pytest.param(
-            """\
-            from django.urls import re_path
-
-            re_path(regex=r"^$", views.index)
-            """,
-            id="unsupported_call_format",
-        ),
-        pytest.param(
-            """\
-            from django.urls import re_path
-
-            re_path(r'^[abc]{123}$', views.index)
-            """,
-            id="re_path_unconverted_regex",
-        ),
-        pytest.param(
-            """\
-            from django.urls import re_path
-            from django.utils.translation import gettext_lazy as _
-
-            re_path(_(r'^about/$'), views.index)
-            """,
-            id="re_path_translation",
-        ),
-        pytest.param(
-            """\
-            from django.urls import re_path
-
-            path = r'^$'
-            re_path(path, views.index)
-            """,
-            id="re_path_variable",
-        ),
-        pytest.param(
-            """\
-            from django.urls import re_path
-
-            re_path(r'^weblog/', views.blog)
-            """,
-            id="re_path_unanchored_end",
-        ),
-    ],
-)
-def test_re_path_noop(s: str) -> None:
-    check_noop(s, settings=settings)
 
 
 @pytest.mark.parametrize(

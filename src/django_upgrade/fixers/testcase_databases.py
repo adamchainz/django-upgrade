@@ -43,7 +43,6 @@ def visit_Assign(
 def replace_assignment(
     tokens: list[Token], i: int, *, node: ast.Assign, value: bool
 ) -> None:
-    print("???", value)
     new_src = "databases = "
     if value:
         new_src += '"__all__"'

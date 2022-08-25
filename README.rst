@@ -436,7 +436,10 @@ Django 4.0
 ``USE_L10N``
 ~~~~~~~~~~~~~~~~~~
 
-Removes the deprecated ``USE_L10N`` setting if set to its default value of ``True``:
+Removes the deprecated ``USE_L10N`` setting if set to its default value of ``True``.
+
+Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
 .. code-block:: diff
 

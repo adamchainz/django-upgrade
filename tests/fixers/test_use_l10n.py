@@ -36,6 +36,17 @@ def test_dynamic():
     )
 
 
+def test_ignore_conditional():
+    check_noop(
+        """\
+        if something:
+            USE_L10N = True
+        """,
+        settings,
+        filename="myapp/settings.py",
+    )
+
+
 def test_success():
     check_transformed(
         """\

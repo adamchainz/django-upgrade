@@ -125,10 +125,11 @@ def visit_Call(
     if (
         isinstance(node.func, ast.Name)
         and (
-            node.func.id == "url"
-            and "url" in state.from_imports["django.conf.urls"]
-            or node.func.id == "re_path"
-            and "re_path" in state.from_imports["django.urls"]
+            (node.func.id == "url" and "url" in state.from_imports["django.conf.urls"])
+            or (
+                node.func.id == "re_path"
+                and "re_path" in state.from_imports["django.urls"]
+            )
         )
         # cannot convert where called with all kwargs as names don't align
         and len(node.args) >= 1

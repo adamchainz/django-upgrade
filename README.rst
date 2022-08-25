@@ -434,7 +434,7 @@ Django 4.0
 `Release Notes <https://docs.djangoproject.com/en/4.0/releases/4.0/#features-deprecated-in-4-0>`__
 
 ``USE_L10N``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 Removes the deprecated ``USE_L10N`` setting if set to its default value of ``True``.
 

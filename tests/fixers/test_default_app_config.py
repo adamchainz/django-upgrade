@@ -50,7 +50,7 @@ def test_dynamic():
 
 
 @pytest.mark.parametrize("filename", ["my_app.py", "my_app__init__.py"])
-def test_invalid_filename(filename):
+def test_invalid_filename(filename: str) -> None:
     check_noop(
         """\
         default_app_config = 'myapp.apps.MyAppConfig'
@@ -63,7 +63,7 @@ def test_invalid_filename(filename):
 @pytest.mark.parametrize(
     "filename", ["__init__.py", "app/__init__.py", "project/app/__init__.py"]
 )
-def test_simple_case(filename):
+def test_simple_case(filename: str) -> None:
     check_transformed(
         """\
         default_app_config = 'myapp.apps.MyAppConfig'

@@ -282,7 +282,7 @@ class Block:  # pragma: no cover
 
 
 def find_end(tokens: list[Token], i: int) -> int:
-    while tokens[i].name not in {"NEWLINE", "ENDMARKER"}:
+    while tokens[i].name not in {"NEWLINE", "ENDMARKER"}:  # pragma: no cover
         i += 1
 
     # depending on the version of python, some will not emit

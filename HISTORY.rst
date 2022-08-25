@@ -2,6 +2,10 @@
 History
 =======
 
+* Fix ``timezone.utc`` fixer to import and use ``timezone.utc`` correctly.
+
+  Thanks to Víðir Valberg Guðmundsson for the report in `Issue #172 <https://github.com/adamchainz/django-upgrade/issues/172>`__.
+
 1.8.0 (2022-08-11)
 ------------------
 

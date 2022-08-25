@@ -39,7 +39,7 @@ Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of you
         rev: ''  # replace with latest tag on GitHub
         hooks:
         -   id: django-upgrade
-            args: [--target-version, "3.2"]   # Replace with Django version
+            args: [--target-version, "4.1"]   # Replace with Django version
 
 ----
 
@@ -59,7 +59,7 @@ For example:
 
 .. code-block:: sh
 
-    django-upgrade --target-version 3.2 example/core/models.py example/settings.py
+    django-upgrade --target-version 4.1 example/core/models.py example/settings.py
 
 The ``--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
 For more on usage run ``django-upgrade --help``.

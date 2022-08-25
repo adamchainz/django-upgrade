@@ -8,11 +8,11 @@ import ast
 from functools import partial
 from typing import Iterable
 
-from tokenize_rt import Offset, Token
+from tokenize_rt import Offset
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import LOGICAL_NEWLINE, find
+from django_upgrade.tokens import erase_node
 
 fixer = Fixer(
     __name__,
@@ -35,9 +35,4 @@ def visit_Assign(
         and isinstance(node.value, ast.Constant)
         and isinstance(node.value.value, str)
     ):
-        yield ast_start_offset(node), partial(remove_assignment, node=node)
-
-
-def remove_assignment(tokens: list[Token], i: int, *, node: ast.Assign) -> None:
-    j = find(tokens, i, name=LOGICAL_NEWLINE)
-    tokens[i : j + 1] = []
+        yield ast_start_offset(node), partial(erase_node, node=node)

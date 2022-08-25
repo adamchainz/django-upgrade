@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 from collections import defaultdict
 
-from tokenize_rt import UNIMPORTANT_WS, Token, tokens_to_src
+from tokenize_rt import NON_CODING_TOKENS, UNIMPORTANT_WS, Token, tokens_to_src
 
 # Token name aliases
 CODE = "CODE"  # Token name meaning 'replaced by us'
@@ -101,7 +101,7 @@ def alone_on_line(tokens: list[Token], start_idx: int, end_idx: int) -> bool:
     )
 
 
-# More complex mini-parser functions
+# More complex mini-parsers
 
 
 BRACES = {"(": ")", "[": "]", "{": "}"}
@@ -138,6 +138,162 @@ def parse_call_args(
         i += 1
 
     return args, i
+
+
+BRACES = {"(": ")", "[": "]", "{": "}"}
+OPENING, CLOSING = frozenset(BRACES), frozenset(BRACES.values())
+
+
+def find_block_start(tokens: list[Token], i: int) -> int:
+    depth = 0
+    while depth or tokens[i].src != ":":
+        if tokens[i].src in OPENING:
+            depth += 1
+        elif tokens[i].src in CLOSING:
+            depth -= 1
+        i += 1
+    return i
+
+
+class Block:  # pragma: no cover
+    """
+    Adapted from pyupgrade:
+    https://github.com/asottile/pyupgrade/blob/ad5d9db9a206bfd221760fd81e407bf6040c808c/pyupgrade/_token_helpers.py#L179
+
+    Copyright (c) 2017 Anthony Sottile
+
+    MIT Licensed
+    """
+
+    def __init__(
+        self, start: int, colon: int, block: int, end: int, line: bool
+    ) -> None:
+        self.start = start
+        self.colon = colon
+        self.block = block
+        self.end = end
+        self.line = line
+
+    def _initial_indent(self, tokens: list[Token]) -> int:
+        if tokens[self.start].src.isspace():
+            return len(tokens[self.start].src)
+        else:
+            return 0
+
+    def _minimum_indent(self, tokens: list[Token]) -> int:
+        block_indent: int | None = None
+        for i in range(self.block, self.end):
+            if (
+                tokens[i - 1].name in ("NL", "NEWLINE")
+                and tokens[i].name in ("INDENT", UNIMPORTANT_WS)
+                and
+                # comments can have arbitrary indentation so ignore them
+                tokens[i + 1].name != "COMMENT"
+            ):
+                token_indent = len(tokens[i].src)
+                if block_indent is None:
+                    block_indent = token_indent
+                else:
+                    block_indent = min(block_indent, token_indent)
+
+        assert block_indent is not None
+        return block_indent
+
+    def dedent(self, tokens: list[Token]) -> None:
+        if self.line:
+            return
+        initial_indent = self._initial_indent(tokens)
+        diff = self._minimum_indent(tokens) - initial_indent
+        for i in range(self.block, self.end):
+            if tokens[i - 1].name in ("DEDENT", "NL", "NEWLINE") and tokens[i].name in (
+                "INDENT",
+                UNIMPORTANT_WS,
+            ):
+                # make sure we preserve *at least* the initial indent
+                s = tokens[i].src
+                s = s[:initial_indent] + s[initial_indent + diff :]
+                tokens[i] = tokens[i]._replace(src=s)
+
+    def replace_condition(self, tokens: list[Token], new: list[Token]) -> None:
+        start = self.start
+        while tokens[start].name == "UNIMPORTANT_WS":
+            start += 1
+        tokens[start : self.colon] = new
+
+    def _trim_end(self, tokens: list[Token]) -> Block:
+        """the tokenizer reports the end of the block at the beginning of
+        the next block
+        """
+        i = last_token = self.end - 1
+        while tokens[i].name in NON_CODING_TOKENS | {"DEDENT", "NEWLINE"}:
+            # if we find an indented comment inside our block, keep it
+            if (
+                tokens[i].name in {"NL", "NEWLINE"}
+                and tokens[i + 1].name == UNIMPORTANT_WS
+                and len(tokens[i + 1].src) > self._initial_indent(tokens)
+            ):
+                break
+            # otherwise we've found another line to remove
+            elif tokens[i].name in {"NL", "NEWLINE"}:
+                last_token = i
+            i -= 1
+        return self.__class__(
+            start=self.start,
+            colon=self.colon,
+            block=self.block,
+            end=last_token + 1,
+            line=self.line,
+        )
+
+    @classmethod
+    def find(
+        cls,
+        tokens: list[Token],
+        i: int,
+        trim_end: bool = False,
+    ) -> Block:
+        if i > 0 and tokens[i - 1].name in {"INDENT", UNIMPORTANT_WS}:
+            i -= 1
+        start = i
+        colon = find_block_start(tokens, i)
+
+        j = colon + 1
+        while tokens[j].name != "NEWLINE" and tokens[j].name in NON_CODING_TOKENS:
+            j += 1
+
+        if tokens[j].name == "NEWLINE":  # multi line block
+            block = j + 1
+            while tokens[j].name != "INDENT":
+                j += 1
+            level = 1
+            j += 1
+            while level:
+                level += {"INDENT": 1, "DEDENT": -1}.get(tokens[j].name, 0)
+                j += 1
+            ret = cls(start, colon, block, j, line=False)
+            if trim_end:
+                return ret._trim_end(tokens)
+            else:
+                return ret
+        else:  # single line block
+            block = j
+            j = find_end(tokens, j)
+            return cls(start, colon, block, j, line=True)
+
+
+def find_end(tokens: list[Token], i: int) -> int:  # pragma: no cover
+    while tokens[i].name not in {"NEWLINE", "ENDMARKER"}:
+        i += 1
+
+    # depending on the version of python, some will not emit
+    # NEWLINE('') at the end of a file which does not end with a
+    # newline (for example 3.7.0)
+    if tokens[i].name == "ENDMARKER":
+        i -= 1
+    else:
+        i += 1
+
+    return i
 
 
 # Rewriting functions

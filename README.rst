@@ -91,6 +91,39 @@ pyupgrade and django-upgrade both take less than 0.5 seconds.
 Fixers
 ======
 
+All Versions
+------------
+
+The below fixers run regardless of the target version.
+
+Versioned blocks
+~~~~~~~~~~~~~~~~
+
+Removes outdated comparisons and blocks from ``if`` statements comparing to ``django.VERSION``.
+Supports comparisons of the form:
+
+.. code-block:: text
+
+    if django.VERSION <comparator> (<X>, <Y>):
+        ...
+
+Where ``<comparator>`` is one of ``<``, ``<=`` , ``>``, or ``>=``, and ``<X>`` and ``<Y>`` are integer literals.
+A single ``else`` block may be present, but ``elif`` is not supported.
+
+.. code-block:: diff
+
+    -if django.VERSION < (4, 1):
+    -    class RenameIndex:
+    -        ...
+
+    -if django.VERSION >= (4, 1):
+    -    constraint.validate()
+    -else:
+    -    custom_validation(constraint)
+    +constraint.validate()
+
+See also `pyupgrade’s similar feature <https://github.com/asottile/pyupgrade/#python2-and-old-python3x-blocks>`__ that removes outdated code from checks on the Python version.
+
 Django 1.9
 -----------
 

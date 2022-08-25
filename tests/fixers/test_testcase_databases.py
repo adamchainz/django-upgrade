@@ -34,9 +34,7 @@ def test_simple_test_case_conditional():
         from django.test import SimpleTestCase
 
         class MyTests(SimpleTestCase):
-            if django.VERSION >= (2, 2):
-                databases = "__all__"
-            else:
+            if something:
                 allow_database_queries = True
 
             def test_something(self):

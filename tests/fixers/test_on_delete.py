@@ -9,7 +9,7 @@ settings = Settings(target_version=(1, 9))
 
 
 @pytest.mark.parametrize("field_class", ["ForeignKey", "OneToOneField"])
-def test_argument_already_set(field_class):
+def test_argument_already_set(field_class: str) -> None:
     check_noop(
         f"""\
         from django.db import models
@@ -20,7 +20,7 @@ def test_argument_already_set(field_class):
 
 
 @pytest.mark.parametrize("field_class", ["ForeignKey", "OneToOneField"])
-def test_field_class_imported(field_class):
+def test_field_class_imported(field_class: str) -> None:
     check_noop(
         f"""\
         from django.db.models import {field_class}

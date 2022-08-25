@@ -6,7 +6,7 @@ from django_upgrade.data import Settings, State
 
 
 @pytest.mark.parametrize(
-    ("filename"),
+    "filename",
     (
         "test_example.py",
         "example_test.py",
@@ -22,7 +22,7 @@ from django_upgrade.data import Settings, State
         "myapp/example_tests.py",
     ),
 )
-def test_looks_like_test_file_true(filename):
+def test_looks_like_test_file_true(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
@@ -32,14 +32,14 @@ def test_looks_like_test_file_true(filename):
 
 
 @pytest.mark.parametrize(
-    ("filename"),
+    "filename",
     (
         "conftest.py",
         "protester.py",
         "myapp/protests/models.py",
     ),
 )
-def test_looks_like_test_file_false(filename):
+def test_looks_like_test_file_false(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
@@ -49,7 +49,7 @@ def test_looks_like_test_file_false(filename):
 
 
 @pytest.mark.parametrize(
-    ("filename"),
+    "filename",
     (
         "__init__.py",
         "package/__init__.py",
@@ -58,7 +58,7 @@ def test_looks_like_test_file_false(filename):
         r"project\package\__init__.py",
     ),
 )
-def test_looks_like_dunder_init_file_true(filename):
+def test_looks_like_dunder_init_file_true(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
@@ -68,7 +68,7 @@ def test_looks_like_dunder_init_file_true(filename):
 
 
 @pytest.mark.parametrize(
-    ("filename"),
+    "filename",
     (
         "__thing__init__.py",
         "thing-__init__.py",
@@ -78,7 +78,7 @@ def test_looks_like_dunder_init_file_true(filename):
         "init__.py",
     ),
 )
-def test_looks_like_dunder_init_file_false(filename):
+def test_looks_like_dunder_init_file_false(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,

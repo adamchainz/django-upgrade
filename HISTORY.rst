@@ -14,6 +14,10 @@ History
       -    constraint.validate()
       +constraint.validate()
 
+* Update Django 2.0+ URL fixer to rewrite ``re_path()`` calls into ``path()`` when eligible.
+
+  Thanks to Thibaut Decombe in `PR #167 <https://github.com/adamchainz/django-upgrade/pull/167>`__.
+
 1.8.1 (2022-08-25)
 ------------------
 
@@ -30,10 +34,6 @@ History
   ``datetime.timezone``.
 
   Thanks to Hasan Ramezani in `PR #169 <https://github.com/adamchainz/django-upgrade/pull/169>`__.
-
-* Add Django 2.0+ fixer to rewrite ``re_path()`` calls into ``path()`` when eligible.
-
-  Thanks to Thibaut Decombe in `PR #167 <https://github.com/adamchainz/django-upgrade/pull/167>`__.
 
 1.7.0 (2022-05-11)
 ------------------

@@ -68,14 +68,14 @@ state_used_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
 def update_django_conf_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
-    is_concurrent = "re_path" in state.from_imports["django.urls"]
+    re_path_imported = "re_path" in state.from_imports["django.urls"]
     used_names = state_used_names.pop(state, set())
     removals = set()
 
     for alias in node.names:
         if alias.asname is not None:
             continue
-        if alias.name in ("include", "url") and (used_names or is_concurrent):
+        if alias.name in ("include", "url") and (used_names or re_path_imported):
             removals.add(alias.name)
 
     if removals:
@@ -86,7 +86,7 @@ def update_django_conf_import(
             node=node,
             name_map={name: "" for name in removals},
         )
-        if not is_concurrent:
+        if not re_path_imported:
             joined_names = ", ".join(sorted(used_names))
             insert(
                 tokens,

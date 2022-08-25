@@ -194,6 +194,11 @@ Rewrites imports of ``include()`` and ``url()`` from ``django.conf.urls`` to ``d
 .. |new path() syntax| replace:: new ``path()`` syntax
 __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 
+For some cases, this change alters the type of the arguments passed to the view, from ``str`` to the converted type (e.g. ``int``).
+This is not guaranteed backwards compatible: there is a chance that the view expects a string, rather than the converted type.
+But, pragmatically, it seems 99.9% of views do not require strings, and instead work with either strings or the converted type.
+Thus, you should test affected paths after this fixer makes any changes.
+
 .. code-block:: diff
 
     -from django.conf.urls import include, url

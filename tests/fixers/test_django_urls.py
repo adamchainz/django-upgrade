@@ -40,10 +40,19 @@ def test_re_path_alias_not_supported():
     )
 
 
-def test_unrecognized_name():
+def test_conf_urls_unrecognized_name():
     check_noop(
         """\
         from django.conf.urls import something
+        """,
+        settings,
+    )
+
+
+def test_urls_unrecognized_name():
+    check_noop(
+        """\
+        from django.urls import something
         """,
         settings,
     )
@@ -69,6 +78,15 @@ def test_url_not_used():
     check_noop(
         """\
         from django.conf.urls import url
+        """,
+        settings,
+    )
+
+
+def test_re_path_not_used():
+    check_noop(
+        """\
+        from django.urls import re_path
         """,
         settings,
     )

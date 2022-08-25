@@ -281,14 +281,14 @@ class Block:  # pragma: no cover
             return cls(start, colon, block, j, line=True)
 
 
-def find_end(tokens: list[Token], i: int) -> int:
-    while tokens[i].name not in {"NEWLINE", "ENDMARKER"}:  # pragma: no cover
+def find_end(tokens: list[Token], i: int) -> int:  # pragma: no cover
+    while tokens[i].name not in {"NEWLINE", "ENDMARKER"}:
         i += 1
 
     # depending on the version of python, some will not emit
     # NEWLINE('') at the end of a file which does not end with a
     # newline (for example 3.7.0)
-    if tokens[i].name == "ENDMARKER":  # pragma: no cover
+    if tokens[i].name == "ENDMARKER":
         i -= 1
     else:
         i += 1

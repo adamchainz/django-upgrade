@@ -8,12 +8,14 @@ else:
 from __future__ import annotations
 
 import ast
+from functools import partial
 from typing import Iterable, cast
 
 from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import Block
 
 fixer = Fixer(
     __name__,
@@ -34,14 +36,19 @@ def visit_If(
         and left.value.id == "django"
         and left.attr == "VERSION"
         and _is_valid_gt_tuple(node.test, state)
+        and (
+            # do not handle 'if ... elif ...'
+            not node.orelse
+            or not isinstance(node.orelse[0], ast.If)
+        )
     ):
-        yield ast_start_offset(node), _fix_block
+        yield ast_start_offset(node), partial(_fix_block, node=node)
 
 
 def _is_valid_gt_tuple(test: ast.Compare, state: State) -> bool:
     if not (
         len(test.ops) == 1
-        and isinstance(test.ops[0], ast.GtE)
+        and isinstance(test.ops[0], (ast.Gt, ast.GtE))
         and isinstance(test.comparators[0], ast.Tuple)
         and len(test.comparators[0].elts) == 2
         and all(isinstance(n, ast.Num) for n in test.comparators[0].elts)
@@ -50,9 +57,29 @@ def _is_valid_gt_tuple(test: ast.Compare, state: State) -> bool:
 
     nums = cast(tuple[ast.Num], test.comparators[0].elts)
     min_version = tuple(e.n for e in nums)
-    return min_version <= state.settings.target_version
+    if isinstance(test.ops[0], ast.Gt):
+        return min_version < state.settings.target_version
+    else:  # ast.GtE
+        return min_version <= state.settings.target_version
 
 
-def _fix_block(tokens: list[Token], i: int) -> None:
-    # TODO
-    pass
+def _fix_block(tokens: list[Token], i: int, *, node: ast.If) -> None:
+    if tokens[i].src == "if":  # do not handle 'elif'
+        if node.orelse:
+            if_block, else_block = _find_if_else_block(tokens, i)
+            if_block.dedent(tokens)
+            del tokens[if_block.end : else_block.end]
+            del tokens[if_block.start : if_block.block]
+        else:
+            if_block = Block.find(tokens, i)
+            if_block.dedent(tokens)
+            del tokens[if_block.start : if_block.block]
+
+
+def _find_if_else_block(tokens: list[Token], i: int) -> tuple[Block, Block]:
+    if_block = Block.find(tokens, i)
+    i = if_block.end
+    while tokens[i].src != "else":
+        i += 1
+    else_block = Block.find(tokens, i, trim_end=True)
+    return if_block, else_block

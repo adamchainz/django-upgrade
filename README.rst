@@ -91,6 +91,33 @@ pyupgrade and django-upgrade both take less than 0.5 seconds.
 Fixers
 ======
 
+All Versions
+------------
+
+The below fixers run regardless of the target version.
+
+Versioned Branch Remover
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Removes outdated branches based on ``django.VERSION``.
+Supports ``if`` blocks comparing ``django.VERSION`` against a two-tuple specifying the Django major version,, optionally with ``else:`` blocks:
+
+.. code-block:: python
+
+    if django.VERSION >= (4, 1):
+        ...
+
+    if django.VERSION > (4, 1):
+        ...
+
+Some examples:
+
+.. code-block:: diff
+
+    -if django.VERSION >= (4, 1):
+    -    constraint.validate()
+    +constraint.validate()
+
 Django 1.9
 -----------
 

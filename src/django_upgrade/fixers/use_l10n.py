@@ -1,6 +1,6 @@
 """
-Remove default_app_config:
-https://docs.djangoproject.com/en/stable/releases/3.2/#features-deprecated-in-3-2
+USE_L10N setting is deprecated:
+https://docs.djangoproject.com/en/4.0/releases/4.0/#localization
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from django_upgrade.tokens import erase_node
 
 fixer = Fixer(
     __name__,
-    min_version=(3, 2),
+    min_version=(4, 0),
 )
 
 
@@ -27,12 +27,12 @@ def visit_Assign(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_dunder_init_file()
-        and isinstance(parent, ast.Module)
-        and len(node.targets) == 1
+        len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
-        and node.targets[0].id == "default_app_config"
+        and node.targets[0].id == "USE_L10N"
         and isinstance(node.value, ast.Constant)
-        and isinstance(node.value.value, str)
+        and node.value.value is True
+        and isinstance(parent, ast.Module)
+        and state.looks_like_settings_file()
     ):
         yield ast_start_offset(node), partial(erase_node, node=node)

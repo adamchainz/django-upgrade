@@ -433,8 +433,17 @@ Django 4.0
 
 `Release Notes <https://docs.djangoproject.com/en/4.0/releases/4.0/#features-deprecated-in-4-0>`__
 
-There are no fixers for Django 4.0 at current.
-Most of its deprecations don’t seem automatically fixable.
+``USE_L10N``
+~~~~~~~~~~~~
+
+Removes the deprecated ``USE_L10N`` setting if set to its default value of ``True``.
+
+Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+.. code-block:: diff
+
+    -USE_L10N = True
 
 Django 4.1
 ----------

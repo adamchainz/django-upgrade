@@ -46,6 +46,18 @@ def test_if_elif():
     )
 
 
+def test_float_version():
+    check_noop(
+        """\
+        import django
+
+        if django.VERSION >= (4.0, 0):
+            foo()
+        """,
+        settings,
+    )
+
+
 def test_old_version_lt():
     check_transformed(
         """\

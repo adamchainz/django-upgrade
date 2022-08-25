@@ -5,16 +5,7 @@ import os
 import pkgutil
 import re
 from collections import defaultdict
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    DefaultDict,
-    Iterable,
-    List,
-    Tuple,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Tuple, TypeVar
 
 from tokenize_rt import Offset, Token
 
@@ -38,7 +29,7 @@ class State:
         self,
         settings: Settings,
         filename: str,
-        from_imports: DefaultDict[str, set[str]],
+        from_imports: dict[str, set[str]],
     ) -> None:
         self.settings = settings
         self.filename = filename

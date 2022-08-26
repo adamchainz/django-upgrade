@@ -607,7 +607,7 @@ def test_re_path_complete():
 
 
 def test_combined_keep_re_path():
-    # conf import for url() not procesed, so re_path's do not get converted
+    # conf import for url() not processed, so re_path's do not get converted
     check_transformed(
         """\
         from django.conf.urls import include
@@ -631,7 +631,7 @@ def test_combined_keep_re_path():
 
 
 def test_combined_rewrite_all():
-    # conf import being procesed, so re_path's do get converted
+    # conf import being processed, so re_path's do get converted
     check_transformed(
         """\
         from django.conf.urls import url, include

@@ -38,6 +38,10 @@ class State:
     def looks_like_migrations_file(self) -> bool:
         return "migrations" in self.filename.split(os.path.sep)
 
+    def looks_like_admin_command(self) -> bool:
+        path_parts = self.filename.split(os.path.sep)
+        return "management" in path_parts and "commands" in path_parts
+
     def looks_like_settings_file(self) -> bool:
         return settings_re.search(self.filename) is not None
 

@@ -481,6 +481,20 @@ Removes module-level ``default_app_config`` assignments from ``__init__.py`` fil
 
     -default_app_config = 'my_app.apps.AppConfig'
 
+``BaseCommand.requires_system_checks``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites the ``requires_system_checks`` attributes of admin command classes from boolean to either and empty list or ``"__all__"``. This only applies in commands files, which are heuristically detected as files with ``management`` and ``commands`` in their path.
+
+.. code-block:: diff
+
+     from django.core.management.base import BaseCommand
+
+     class Command(BaseCommand):
+    -    requires_system_checks = True
+    +    requires_system_checks = "__all__"
+
+
 Django 4.0
 ----------
 

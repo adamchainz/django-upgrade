@@ -1,0 +1,109 @@
+"""
+Replace `admin.site.register` with the new `@register` decorator syntax:
+https://docs.djangoproject.com/en/dev/releases/1.7/#minor-features
+"""
+from __future__ import annotations
+
+import ast
+from functools import partial
+from typing import Iterable, MutableMapping
+from weakref import WeakKeyDictionary
+
+from tokenize_rt import Offset, Token
+
+from django_upgrade.ast import ast_start_offset
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import erase_node, extract_indent, insert
+
+fixer = Fixer(
+    __name__,
+    min_version=(1, 7),
+)
+
+# Keep track of classes that could be decorated with `@admin.register()`
+# For each class name, store the associated custom ModelAdmin class
+# inferred from eligible `admin.site.register` calls.
+class_to_decorate: MutableMapping[State, dict[str, set[str]]] = WeakKeyDictionary()
+
+
+@fixer.register(ast.ClassDef)
+def visit_ClassDef(
+    state: State,
+    node: ast.ClassDef,
+    parent: ast.AST,
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if "admin" in state.from_imports["django.contrib"] and not node.decorator_list:
+        class_to_decorate.setdefault(state, {})[node.name] = set()
+        yield ast_start_offset(node), partial(
+            update_class_def,
+            node=node,
+            state=state,
+        )
+
+
+def update_class_def(
+    tokens: list[Token], i: int, *, node: ast.ClassDef, state: State
+) -> None:
+    arg_kwargs = class_to_decorate.get(state, {}).pop(node.name, set())
+    if len(arg_kwargs) == 1:
+        j, indent = extract_indent(tokens, i)
+        insert(
+            tokens,
+            j,
+            new_src=f"{indent}@admin.register({arg_kwargs.pop()})\n",
+        )
+
+
+@fixer.register(ast.Call)
+def visit_Call(
+    state: State,
+    node: ast.Call,
+    parent: ast.AST,
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        "admin" in state.from_imports["django.contrib"]
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "register"
+        and isinstance(node.func.value, ast.Attribute)
+        and node.func.value.attr == "site"
+        and isinstance(node.func.value.value, ast.Name)
+        and node.func.value.value.id == "admin"
+        and not node.keywords
+        and (
+            len(node.args) == 2
+            and isinstance(node.args[0], ast.Name)
+            and isinstance(node.args[1], ast.Name)
+        )
+    ):
+        admin_model_name = node.args[1].id
+        if admin_model_name in class_to_decorate.get(state, {}).keys():
+            class_to_decorate[state][admin_model_name].add(node.args[0].id)
+            yield ast_start_offset(node), partial(
+                erase_register_node,
+                node=parent,
+                admin_model_name=admin_model_name,
+                state=state,
+            )
+
+    elif (
+        "admin" in state.from_imports["django.contrib"]
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "super"
+        and isinstance(parent, ast.Attribute)
+        and parent.attr in {"__init__", "__new__"}
+        and len(node.args) == 2
+        and isinstance(node.args[0], ast.Name)
+        and isinstance(node.args[1], ast.Name)
+    ):
+        # Cannot convert class using py2 style `super(MyAdmin, self)`
+        # in its `__init__` or `__new__` method.
+        # https://docs.djangoproject.com/en/dev/ref/contrib/admin/#the-register-decorator
+        class_to_decorate[state].popitem()
+
+
+def erase_register_node(
+    tokens: list[Token], i: int, *, node: ast.Call, admin_model_name: str, state: State
+) -> None:
+    arg_kwargs = class_to_decorate.get(state, {}).get(admin_model_name, set())
+    if len(arg_kwargs) == 1:
+        erase_node(tokens, i, node=node)

@@ -19,11 +19,6 @@ fixer = Fixer(
     min_version=(3, 2),
 )
 
-REPLACEMENTS = {
-    True: '"__all__"',
-    False: "[]",
-}
-
 
 @fixer.register(ast.Assign)
 def visit_Assign(
@@ -40,5 +35,8 @@ def visit_Assign(
         and (node.value.value is True or node.value.value is False)
         and state.looks_like_command_file()
     ):
-        new_src = REPLACEMENTS[node.value.value]
+        if node.value.value:
+            new_src = '"__all__"'
+        else:
+            new_src = "[]"
         yield ast_start_offset(node.value), partial(replace, src=new_src)

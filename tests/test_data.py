@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import defaultdict
+
 import pytest
 
 from django_upgrade.data import Settings, State
@@ -64,7 +66,7 @@ def test_looks_like_test_file_true(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
-        from_imports={},
+        from_imports=defaultdict(set),
     )
     assert state.looks_like_test_file()
 
@@ -81,7 +83,7 @@ def test_looks_like_test_file_false(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
-        from_imports={},
+        from_imports=defaultdict(set),
     )
     assert not state.looks_like_test_file()
 
@@ -100,7 +102,7 @@ def test_looks_like_dunder_init_file_true(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
-        from_imports={},
+        from_imports=defaultdict(set),
     )
     assert state.looks_like_dunder_init_file()
 
@@ -120,6 +122,6 @@ def test_looks_like_dunder_init_file_false(filename: str) -> None:
     state = State(
         settings=Settings(target_version=(4, 0)),
         filename=filename,
-        from_imports={},
+        from_imports=defaultdict(set),
     )
     assert not state.looks_like_dunder_init_file()

@@ -38,7 +38,7 @@ def visit_Assign(
         and node.targets[0].id == "requires_system_checks"
         and isinstance(node.value, ast.Constant)
         and (node.value.value is True or node.value.value is False)
-        and state.looks_like_admin_command()
+        and state.looks_like_command_file()
     ):
         new_src = REPLACEMENTS[node.value.value]
         yield ast_start_offset(node.value), partial(replace, src=new_src)

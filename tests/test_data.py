@@ -8,6 +8,44 @@ from django_upgrade.data import Settings, State
 @pytest.mark.parametrize(
     "filename",
     (
+        "management/commands/test.py",
+        "myapp/management/commands/test.py",
+        "myapp/subapp/management/commands/test.py",
+        "myapp/subapp/management/commands/test/subcommand.py",
+    ),
+)
+def test_looks_like_command_file_true(filename: str) -> None:
+    state = State(
+        settings=Settings(target_version=(4, 0)),
+        filename=filename,
+        from_imports={},
+    )
+    assert state.looks_like_command_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "test.py",
+        "management/commands.py",
+        "myapp/management/commands.py",
+        "myapp/mgmt/commands.py",
+        "myapp/management/something/commands/example.py",
+        "myapp/commands/management/example.py",
+    ),
+)
+def test_looks_like_command_file_false(filename: str) -> None:
+    state = State(
+        settings=Settings(target_version=(4, 0)),
+        filename=filename,
+        from_imports={},
+    )
+    assert not state.looks_like_command_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
         "test_example.py",
         "example_test.py",
         "test.py",

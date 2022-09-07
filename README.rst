@@ -458,6 +458,24 @@ Django 3.2
 
 `Release Notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2>`__
 
+``BaseCommand.requires_system_checks``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites the ``requires_system_checks`` attributes of management command classes from bools to ``"__all__"`` or ``[]`` as appropriate.
+This only applies in command files, which are heuristically detected as files with ``management/commands`` somewhere in their path.
+
+.. code-block:: diff
+
+     from django.core.management.base import BaseCommand
+
+     class Command(BaseCommand):
+    -    requires_system_checks = True
+    +    requires_system_checks = "__all__"
+
+     class SecondCommand(BaseCommand):
+    -    requires_system_checks = False
+    +    requires_system_checks = []
+
 ``EmailValidator``
 ~~~~~~~~~~~~~~~~~~
 
@@ -480,20 +498,6 @@ Removes module-level ``default_app_config`` assignments from ``__init__.py`` fil
 .. code-block:: diff
 
     -default_app_config = 'my_app.apps.AppConfig'
-
-``BaseCommand.requires_system_checks``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Rewrites the ``requires_system_checks`` attributes of admin command classes from boolean to either and empty list or ``"__all__"``. This only applies in commands files, which are heuristically detected as files with ``management`` and ``commands`` in their path.
-
-.. code-block:: diff
-
-     from django.core.management.base import BaseCommand
-
-     class Command(BaseCommand):
-    -    requires_system_checks = True
-    +    requires_system_checks = "__all__"
-
 
 Django 4.0
 ----------

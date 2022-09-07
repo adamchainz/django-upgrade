@@ -2,6 +2,9 @@
 History
 =======
 
+1.10.0 (2022-09-07)
+-------------------
+
 * Add Django 3.2+ fixer to update ``requires_system_checks`` in management command classes.
 
   Thanks to Bruno Alla in `PR #184 <https://github.com/adamchainz/django-upgrade/pull/184>`__.

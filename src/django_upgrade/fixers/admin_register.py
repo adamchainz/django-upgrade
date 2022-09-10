@@ -44,13 +44,13 @@ def visit_ClassDef(
 def update_class_def(
     tokens: list[Token], i: int, *, node: ast.ClassDef, state: State
 ) -> None:
-    arg_kwargs = class_to_decorate.get(state, {}).pop(node.name, set())
-    if len(arg_kwargs) == 1:
+    model_names = class_to_decorate.get(state, {}).pop(node.name, set())
+    if len(model_names) == 1:
         j, indent = extract_indent(tokens, i)
         insert(
             tokens,
             j,
-            new_src=f"{indent}@admin.register({arg_kwargs.pop()})\n",
+            new_src=f"{indent}@admin.register({model_names.pop()})\n",
         )
 
 
@@ -76,7 +76,7 @@ def visit_Call(
         )
     ):
         admin_model_name = node.args[1].id
-        if admin_model_name in class_to_decorate.get(state, {}).keys():
+        if admin_model_name in class_to_decorate.get(state, {}):
             class_to_decorate[state][admin_model_name].add(node.args[0].id)
             yield ast_start_offset(node), partial(
                 erase_register_node,
@@ -104,6 +104,6 @@ def visit_Call(
 def erase_register_node(
     tokens: list[Token], i: int, *, node: ast.Call, admin_model_name: str, state: State
 ) -> None:
-    arg_kwargs = class_to_decorate.get(state, {}).get(admin_model_name, set())
-    if len(arg_kwargs) == 1:
+    model_names = class_to_decorate.get(state, {}).get(admin_model_name, set())
+    if len(model_names) == 1:
         erase_node(tokens, i, node=node)

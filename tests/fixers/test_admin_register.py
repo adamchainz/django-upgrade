@@ -156,6 +156,32 @@ def test_py2_style_init_super_with_branching():
     )
 
 
+def test_py3_style_init_super():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(CustomMixin):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        admin.site.register(Author, AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        @admin.register(Author)
+        class AuthorAdmin(CustomMixin):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        """,
+        settings=settings,
+    )
+
+
 def test_py2_style_new_super():
     check_noop(
         """\

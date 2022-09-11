@@ -110,6 +110,52 @@ def test_py2_style_init_super_with_inheritance():
     )
 
 
+def test_py2_style_init_super_with_branching():
+    check_transformed(
+        """\
+        import sys
+        from django.contrib import admin
+        from myapp.models import Ham, Spam
+
+        class HamAdmin(...):
+            pass
+
+        class SpamAdmin(SubAdmin):
+            def __init__(self, *args, **kwargs):
+                if sys.version_info >= (3, 10):
+                    # something
+                    super(SpamAdmin, self).__init__(*args, **kwargs)
+                else:
+                    # something else
+                    super(SubAdmin, self).__init__(*args, **kwargs)
+
+        admin.site.register(Ham, HamAdmin)
+        admin.site.register(Spam, SpamAdmin)
+        """,
+        """\
+        import sys
+        from django.contrib import admin
+        from myapp.models import Ham, Spam
+
+        @admin.register(Ham)
+        class HamAdmin(...):
+            pass
+
+        class SpamAdmin(SubAdmin):
+            def __init__(self, *args, **kwargs):
+                if sys.version_info >= (3, 10):
+                    # something
+                    super(SpamAdmin, self).__init__(*args, **kwargs)
+                else:
+                    # something else
+                    super(SubAdmin, self).__init__(*args, **kwargs)
+
+        admin.site.register(Spam, SpamAdmin)
+        """,
+        settings=settings,
+    )
+
+
 def test_py2_style_new_super():
     check_noop(
         """\

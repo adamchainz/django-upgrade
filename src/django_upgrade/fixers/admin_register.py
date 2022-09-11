@@ -33,6 +33,27 @@ def visit_ClassDef(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if "admin" in state.from_imports["django.contrib"] and not node.decorator_list:
+        # Cannot convert class using py2 style `super(MyAdmin, self)`
+        # in its `__init__` or `__new__` method.
+        # https://docs.djangoproject.com/en/dev/ref/contrib/admin/#the-register-decorator
+        for body_node in node.body:
+            if isinstance(body_node, ast.FunctionDef) and body_node.name in {
+                "__init__",
+                "__new__",
+            }:
+                for target_node in ast.walk(body_node):
+                    if (
+                        isinstance(target_node, ast.Attribute)
+                        and target_node.attr in {"__init__", "__new__"}
+                        and isinstance(target_node.value, ast.Call)
+                        and isinstance(target_node.value.func, ast.Name)
+                        and target_node.value.func.id == "super"
+                        and len(target_node.value.args) == 2
+                        and isinstance(target_node.value.args[0], ast.Name)
+                        and isinstance(target_node.value.args[1], ast.Name)
+                    ):
+                        return
+
         class_to_decorate.setdefault(state, {})[node.name] = set()
         yield ast_start_offset(node), partial(
             update_class_def,
@@ -84,21 +105,6 @@ def visit_Call(
                 admin_model_name=admin_model_name,
                 state=state,
             )
-
-    elif (
-        "admin" in state.from_imports["django.contrib"]
-        and isinstance(node.func, ast.Name)
-        and node.func.id == "super"
-        and isinstance(parent, ast.Attribute)
-        and parent.attr in {"__init__", "__new__"}
-        and len(node.args) == 2
-        and isinstance(node.args[0], ast.Name)
-        and isinstance(node.args[1], ast.Name)
-    ):
-        # Cannot convert class using py2 style `super(MyAdmin, self)`
-        # in its `__init__` or `__new__` method.
-        # https://docs.djangoproject.com/en/dev/ref/contrib/admin/#the-register-decorator
-        class_to_decorate[state].popitem()
 
 
 def erase_register_node(

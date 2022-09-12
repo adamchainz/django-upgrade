@@ -110,7 +110,41 @@ def test_py2_style_init_super_with_inheritance():
     )
 
 
-def test_py2_style_init_super_with_branching():
+def test_py2_style_init_super_with_outer_branching():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(CustomMixin):
+            if something():
+                def __init__(self, *args, **kwargs):
+                    super(CustomMixin, self).__init__(*args, **kwargs)
+
+        admin.site.register(Author, AuthorAdmin)
+        """,
+        settings=settings,
+    )
+
+
+def test_py2_style_init_super_delayed():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(CustomMixin):
+            def __init__(self, *args, **kwargs):
+                sup = super(CustomMixin, self)
+                sup.__init__(*args, **kwargs)
+
+        admin.site.register(Author, AuthorAdmin)
+        """,
+        settings=settings,
+    )
+
+
+def test_py2_style_init_super_with_inner_branching():
     check_transformed(
         """\
         import sys

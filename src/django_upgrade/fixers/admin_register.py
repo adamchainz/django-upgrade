@@ -45,30 +45,31 @@ def visit_ClassDef(
         )
 
 
+class FullSuperVisitor(ast.NodeVisitor):
+    def __init__(self) -> None:
+        self.found_full_super = False
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        if node.name in ("__init__", "__new__"):
+            for subnode in ast.walk(node):
+                if (
+                    isinstance(subnode, ast.Call)
+                    and isinstance(subnode.func, ast.Name)
+                    and subnode.func.id == "super"
+                    and len(subnode.args) == 2
+                ):
+                    self.found_full_super = True
+
+
 def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
     """
     We cannot convert classes using py2 style `super(MyAdmin, self)`
     in the `__init__` or `__new__` method.
     https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-decorator
     """
-    for body_node in node.body:
-        if isinstance(body_node, ast.FunctionDef) and body_node.name in {
-            "__init__",
-            "__new__",
-        }:
-            for target_node in ast.walk(body_node):
-                if (
-                    isinstance(target_node, ast.Attribute)
-                    and target_node.attr in {"__init__", "__new__"}
-                    and isinstance(target_node.value, ast.Call)
-                    and isinstance(target_node.value.func, ast.Name)
-                    and target_node.value.func.id == "super"
-                    and len(target_node.value.args) == 2
-                    and isinstance(target_node.value.args[0], ast.Name)
-                    and isinstance(target_node.value.args[1], ast.Name)
-                ):
-                    return True
-    return False
+    visitor = FullSuperVisitor()
+    visitor.visit(node)
+    return visitor.found_full_super
 
 
 def update_class_def(tokens: list[Token], i: int, *, name: str, state: State) -> None:

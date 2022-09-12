@@ -32,34 +32,43 @@ def visit_ClassDef(
     node: ast.ClassDef,
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if "admin" in state.from_imports["django.contrib"] and not node.decorator_list:
-        # Cannot convert class using py2 style `super(MyAdmin, self)`
-        # in its `__init__` or `__new__` method.
-        # https://docs.djangoproject.com/en/dev/ref/contrib/admin/#the-register-decorator
-        for body_node in node.body:
-            if isinstance(body_node, ast.FunctionDef) and body_node.name in {
-                "__init__",
-                "__new__",
-            }:
-                for target_node in ast.walk(body_node):
-                    if (
-                        isinstance(target_node, ast.Attribute)
-                        and target_node.attr in {"__init__", "__new__"}
-                        and isinstance(target_node.value, ast.Call)
-                        and isinstance(target_node.value.func, ast.Name)
-                        and target_node.value.func.id == "super"
-                        and len(target_node.value.args) == 2
-                        and isinstance(target_node.value.args[0], ast.Name)
-                        and isinstance(target_node.value.args[1], ast.Name)
-                    ):
-                        return
-
+    if (
+        "admin" in state.from_imports["django.contrib"]
+        and not node.decorator_list
+        and not uses_full_super_in_init_or_new(node)
+    ):
         class_to_decorate.setdefault(state, {})[node.name] = set()
         yield ast_start_offset(node), partial(
             update_class_def,
             node=node,
             state=state,
         )
+
+
+def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
+    """
+    We cannot convert classes using py2 style `super(MyAdmin, self)`
+    in the `__init__` or `__new__` method.
+    https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-decorator
+    """
+    for body_node in node.body:
+        if isinstance(body_node, ast.FunctionDef) and body_node.name in {
+            "__init__",
+            "__new__",
+        }:
+            for target_node in ast.walk(body_node):
+                if (
+                    isinstance(target_node, ast.Attribute)
+                    and target_node.attr in {"__init__", "__new__"}
+                    and isinstance(target_node.value, ast.Call)
+                    and isinstance(target_node.value.func, ast.Name)
+                    and target_node.value.func.id == "super"
+                    and len(target_node.value.args) == 2
+                    and isinstance(target_node.value.args[0], ast.Name)
+                    and isinstance(target_node.value.args[1], ast.Name)
+                ):
+                    return True
+    return False
 
 
 def update_class_def(

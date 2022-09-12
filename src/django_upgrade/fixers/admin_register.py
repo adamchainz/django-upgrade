@@ -40,7 +40,7 @@ def visit_ClassDef(
         class_to_decorate.setdefault(state, {})[node.name] = set()
         yield ast_start_offset(node), partial(
             update_class_def,
-            node=node,
+            name=node.name,
             state=state,
         )
 
@@ -71,10 +71,8 @@ def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
     return False
 
 
-def update_class_def(
-    tokens: list[Token], i: int, *, node: ast.ClassDef, state: State
-) -> None:
-    model_names = class_to_decorate.get(state, {}).pop(node.name, set())
+def update_class_def(tokens: list[Token], i: int, *, name: str, state: State) -> None:
+    model_names = class_to_decorate.get(state, {}).pop(name, set())
     if len(model_names) == 1:
         j, indent = extract_indent(tokens, i)
         insert(

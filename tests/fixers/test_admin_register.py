@@ -88,6 +88,9 @@ def test_py2_style_init_super():
             def __init__(self, *args, **kwargs):
                 super(AuthorAdmin, self).__init__(*args, **kwargs)
 
+            def other(self):
+                pass
+
         admin.site.register(Author, AuthorAdmin)
         """,
         settings=settings,

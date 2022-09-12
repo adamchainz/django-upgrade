@@ -126,10 +126,28 @@ A single ``else`` block may be present, but ``elif`` is not supported.
 
 See also `pyupgrade’s similar feature <https://github.com/asottile/pyupgrade/#python2-and-old-python3x-blocks>`__ that removes outdated code from checks on the Python version.
 
+Django 1.7
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/stable/releases/1.7/>`__
+
+Admin model registration
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites ``admin.site.register()`` calls to the new ``@admin.register()`` decorator syntax when eligible.
+
+.. code-block:: diff
+
+    +@admin.register(MyModel)
+     class MyCustomAdmin:
+         pass
+
+    -admin.site.register(MyModel, MyCustomAdmin)
+
 Django 1.9
 -----------
 
-`Release Notes <https://github.com/django/django/blob/main/docs/releases/1.9.txt>`__
+`Release Notes <https://docs.djangoproject.com/en/stable/releases/1.9/>`__
 
 ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~

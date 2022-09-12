@@ -103,20 +103,22 @@ def visit_Call(
             and isinstance(node.args[1], ast.Name)
         )
     ):
-        admin_model_name = node.args[1].id
-        if admin_model_name in class_to_decorate.get(state, {}):
-            class_to_decorate[state][admin_model_name].add(node.args[0].id)
+        admin_name = node.args[1].id
+        to_decorate = class_to_decorate.get(state, {})
+        if admin_name in to_decorate:
+            model_name = node.args[0].id
+            to_decorate[admin_name].add(model_name)
             yield ast_start_offset(node), partial(
                 erase_register_node,
                 node=parent,
-                admin_model_name=admin_model_name,
+                admin_name=admin_name,
                 state=state,
             )
 
 
 def erase_register_node(
-    tokens: list[Token], i: int, *, node: ast.Call, admin_model_name: str, state: State
+    tokens: list[Token], i: int, *, node: ast.Call, admin_name: str, state: State
 ) -> None:
-    model_names = class_to_decorate.get(state, {}).get(admin_model_name, set())
+    model_names = class_to_decorate.get(state, {}).get(admin_name, set())
     if len(model_names) == 1:
         erase_node(tokens, i, node=node)

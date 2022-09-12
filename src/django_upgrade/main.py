@@ -27,6 +27,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--target-version",
         default="2.2",
         choices=[
+            "1.7",
+            "1.8",
             "1.9",
             "1.10",
             "1.11",

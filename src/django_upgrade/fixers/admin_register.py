@@ -1,6 +1,6 @@
 """
 Replace `admin.site.register` with the new `@register` decorator syntax:
-https://docs.djangoproject.com/en/dev/releases/1.7/#minor-features
+https://docs.djangoproject.com/en/stable/releases/1.7/#minor-features
 """
 from __future__ import annotations
 

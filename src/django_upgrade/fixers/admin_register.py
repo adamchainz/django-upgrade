@@ -23,7 +23,7 @@ fixer = Fixer(
 # Keep track of classes that could be decorated with `@admin.register()`
 # For each class name, store the associated custom ModelAdmin class
 # inferred from eligible `admin.site.register` calls.
-class_to_decorate: MutableMapping[State, dict[str, set[str]]] = WeakKeyDictionary()
+decorable_admins: MutableMapping[State, dict[str, set[str]]] = WeakKeyDictionary()
 
 
 @fixer.register(ast.ClassDef)
@@ -37,7 +37,7 @@ def visit_ClassDef(
         and not node.decorator_list
         and not uses_full_super_in_init_or_new(node)
     ):
-        class_to_decorate.setdefault(state, {})[node.name] = set()
+        decorable_admins.setdefault(state, {})[node.name] = set()
         yield ast_start_offset(node), partial(
             update_class_def,
             name=node.name,
@@ -72,7 +72,7 @@ def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
 
 
 def update_class_def(tokens: list[Token], i: int, *, name: str, state: State) -> None:
-    model_names = class_to_decorate.get(state, {}).pop(name, set())
+    model_names = decorable_admins.get(state, {}).pop(name, set())
     if len(model_names) == 1:
         j, indent = extract_indent(tokens, i)
         insert(
@@ -104,7 +104,7 @@ def visit_Call(
         )
     ):
         admin_name = node.args[1].id
-        to_decorate = class_to_decorate.get(state, {})
+        to_decorate = decorable_admins.get(state, {})
         if admin_name in to_decorate:
             model_name = node.args[0].id
             to_decorate[admin_name].add(model_name)
@@ -119,6 +119,6 @@ def visit_Call(
 def erase_register_node(
     tokens: list[Token], i: int, *, node: ast.Call, admin_name: str, state: State
 ) -> None:
-    model_names = class_to_decorate.get(state, {}).get(admin_name, set())
+    model_names = decorable_admins.get(state, {}).get(admin_name, set())
     if len(model_names) == 1:
         erase_node(tokens, i, node=node)

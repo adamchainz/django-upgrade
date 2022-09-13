@@ -47,7 +47,9 @@ def visit_Module(
     admin_imported = False
 
     for subnode in ast.iter_child_nodes(node):
-        if (
+        # coverage bug
+        # https://github.com/nedbat/coveragepy/issues/1333
+        if (  # pragma: no cover
             isinstance(subnode, ast.ImportFrom)
             and subnode.module == "django.contrib"
             and any(
@@ -62,6 +64,7 @@ def visit_Module(
             # positionally (modeladmin, request, queryset)
             and (len(subnode.args.posonlyargs) + len(subnode.args.args)) == 3
             and len(subnode.args.kwonlyargs) == 0
+            # TODO: check that no admin.action decorator already applied
         ):
             action_funcs[subnode.name] = (subnode, {})
         elif (

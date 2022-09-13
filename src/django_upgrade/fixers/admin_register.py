@@ -13,7 +13,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import erase_node, extract_indent, insert
+from django_upgrade.tokens import OP, erase_node, extract_indent, insert, reverse_find
 
 fixer = Fixer(
     __name__,
@@ -34,14 +34,21 @@ def visit_ClassDef(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         "admin" in state.from_imports["django.contrib"]
-        and not node.decorator_list
+        # and not node.decorator_list
         and not uses_full_super_in_init_or_new(node)
     ):
         decorable_admins.setdefault(state, {})[node.name] = set()
-        yield ast_start_offset(node), partial(
+        if not node.decorator_list:
+            offset = ast_start_offset(node)
+            decorated = False
+        else:
+            offset = ast_start_offset(node.decorator_list[0])
+            decorated = True
+        yield offset, partial(
             update_class_def,
             name=node.name,
             state=state,
+            decorated=decorated,
         )
 
 
@@ -72,9 +79,13 @@ def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
     return visitor.found_full_super
 
 
-def update_class_def(tokens: list[Token], i: int, *, name: str, state: State) -> None:
+def update_class_def(
+    tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
+) -> None:
     model_names = decorable_admins.get(state, {}).pop(name, set())
     if len(model_names) == 1:
+        if decorated:
+            i = reverse_find(tokens, i, name=OP, src="@")
         j, indent = extract_indent(tokens, i)
         insert(
             tokens,

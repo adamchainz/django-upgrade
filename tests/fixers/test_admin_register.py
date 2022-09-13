@@ -235,7 +235,7 @@ def test_py2_style_new_super():
     )
 
 
-def test_simple_rewrite():
+def test_rewrite():
     check_transformed(
         """\
         from django.contrib import admin
@@ -257,7 +257,7 @@ def test_simple_rewrite():
     )
 
 
-def test_simple_rewrite_indented():
+def test_rewrite_indented():
     check_transformed(
         """\
         from django.contrib import admin
@@ -281,7 +281,7 @@ def test_simple_rewrite_indented():
     )
 
 
-def test_simple_rewrite_kwarg():
+def test_rewrite_kwarg():
     check_transformed(
         """\
         from django.contrib import admin
@@ -296,6 +296,62 @@ def test_simple_rewrite_kwarg():
         from myapp.models import Author
 
         @admin.register(Author)
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        """,
+        settings=settings,
+    )
+
+
+def test_rewrite_class_decorator():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.admin_tools import add_display_methods
+        from myapp.models import Author
+
+        @add_display_methods
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Author, admin_class=AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.admin_tools import add_display_methods
+        from myapp.models import Author
+
+        @admin.register(Author)
+        @add_display_methods
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        """,
+        settings=settings,
+    )
+
+
+def test_rewrite_class_decorator_multiline():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.admin_tools import add_display_methods
+        from myapp.models import Author
+
+        @(
+            add_display_methods
+        )
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Author, admin_class=AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.admin_tools import add_display_methods
+        from myapp.models import Author
+
+        @admin.register(Author)
+        @(
+            add_display_methods
+        )
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,

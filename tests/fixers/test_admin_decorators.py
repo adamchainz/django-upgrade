@@ -25,7 +25,7 @@ class TestActionFunctions:
             """\
             from django.contrib import admin
 
-            def make_published(request):
+            def make_published(modeladmin, request):
                 ...
 
             make_published.short_description = "yada"

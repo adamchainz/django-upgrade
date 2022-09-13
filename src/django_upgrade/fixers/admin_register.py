@@ -97,17 +97,27 @@ def visit_Call(
         and node.func.value.attr == "site"
         and isinstance(node.func.value.value, ast.Name)
         and node.func.value.value.id == "admin"
-        and not node.keywords
         and (
-            len(node.args) == 2
-            and isinstance(node.args[0], ast.Name)
-            and isinstance(node.args[1], ast.Name)
+            (
+                len(node.args) == 2
+                and isinstance((model_arg := node.args[0]), ast.Name)
+                and isinstance((admin_arg := node.args[1]), ast.Name)
+                and not node.keywords
+            )
+            or (
+                len(node.args) == 1
+                and isinstance((model_arg := node.args[0]), ast.Name)
+                and len(node.keywords) == 1
+                and node.keywords[0].arg == "admin_class"
+                and isinstance((admin_arg := node.keywords[0].value), ast.Name)
+            )
         )
     ):
-        admin_name = node.args[1].id
+        model_name = model_arg.id
+        admin_name = admin_arg.id
+
         to_decorate = decorable_admins.get(state, {})
         if admin_name in to_decorate:
-            model_name = node.args[0].id
             to_decorate[admin_name].add(model_name)
             yield ast_start_offset(node), partial(
                 erase_register_node,

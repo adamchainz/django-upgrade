@@ -108,26 +108,38 @@ def visit_Call(
         and node.func.value.attr == "site"
         and isinstance(node.func.value.value, ast.Name)
         and node.func.value.value.id == "admin"
-        and (
-            (
-                len(node.args) == 2
-                and isinstance((model_arg := node.args[0]), ast.Name)
-                and isinstance((admin_arg := node.args[1]), ast.Name)
-                and not node.keywords
-            )
-            or (
-                len(node.args) == 1
-                and isinstance((model_arg := node.args[0]), ast.Name)
-                and len(node.keywords) == 1
-                and node.keywords[0].arg == "admin_class"
-                and isinstance((admin_arg := node.keywords[0].value), ast.Name)
-            )
-        )
     ):
-        model_name = model_arg.id
-        admin_name = admin_arg.id
+        if (  # admin.site.register(MyModel, MyCustomAdmin)
+            len(node.args) == 2
+            and isinstance((model_arg := node.args[0]), ast.Name)
+            and isinstance((admin_arg := node.args[1]), ast.Name)
+            and not node.keywords
+        ) or (  # admin.site.register(MyModel, admin_class=MyCustomAdmin)
+            len(node.args) == 1
+            and isinstance((model_arg := node.args[0]), ast.Name)
+            and len(node.keywords) == 1
+            and node.keywords[0].arg == "admin_class"
+            and isinstance((admin_arg := node.keywords[0].value), ast.Name)
+        ):
+            model_names = {model_arg.id}
 
+        elif (  # admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
+            len(node.args) == 2
+            and isinstance((model_tuple := node.args[0]), ast.Tuple)
+            and all(isinstance(elt, ast.Name) for elt in model_tuple.elts)
+            and isinstance((admin_arg := node.args[1]), ast.Name)
+            and not node.keywords
+        ):
+            model_names = {
+                elt.id for elt in model_tuple.elts if isinstance(elt, ast.Name)
+            }
+
+        else:
+            return
+
+        admin_name = admin_arg.id
         to_decorate = decorable_admins.get(state, {})
+
         if admin_name in to_decorate:
-            to_decorate[admin_name].add(model_name)
+            to_decorate[admin_name].update(model_names)
             yield ast_start_offset(node), partial(erase_node, node=parent)

@@ -319,6 +319,10 @@ def erase_node(tokens: list[Token], i: int, *, node: ast.AST) -> None:
     Erase all tokens corresponding to the given ast node.
     """
     j = find_final_token(tokens, i, node=node)
+    if tokens[j].name == UNIMPORTANT_WS:
+        j += 1
+    if tokens[j].name == COMMENT:
+        j += 1
     if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
         j += 1
     i, _ = extract_indent(tokens, i)

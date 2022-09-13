@@ -392,6 +392,28 @@ def test_rewrite_class_decorator_multiline():
     )
 
 
+def test_rewrite_comment():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Author, AuthorAdmin)  # yada
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        @admin.register(Author)
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        """,
+        settings=settings,
+    )
+
+
 def test_multiple_rewrite():
     check_transformed(
         """\

@@ -58,6 +58,17 @@ def test_success():
     )
 
 
+def test_success_comment():
+    check_transformed(
+        """\
+        USE_L10N = True  # localization
+        """,
+        "",
+        settings,
+        filename="myapp/settings.py",
+    )
+
+
 def test_success_settings_subfolder():
     check_transformed(
         """\

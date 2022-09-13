@@ -321,3 +321,204 @@ class TestActionFunctions:
             """,
             settings,
         )
+
+
+class TestDisplayFunctions:
+    def test_module_unknown_attribute(self):
+        check_noop(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.long_description = "yada"
+            """,
+            settings,
+        )
+
+    def test_module_incorrect_argument_count(self):
+        check_noop(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj, obj2):
+                ...
+
+            upper_case_name.short_description = "yada"
+            """,
+            settings,
+        )
+
+    def test_module_kwargs(self):
+        check_noop(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj, *, proper=True):
+                ...
+
+            upper_case_name.short_description = "yada"
+            """,
+            settings,
+        )
+
+    def test_module_admin_not_imported(self):
+        check_noop(
+            """\
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.short_description = 'yada'
+            """,
+            settings,
+        )
+
+    def test_module_admin_imported_with_as(self):
+        check_noop(
+            """\
+            from django.contrib import admin as shmadmin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.short_description = "yada"
+            """,
+            settings,
+        )
+
+    def test_module_admin_using_setattr(self):
+        check_noop(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            setattr(upper_case_name, "short_description", "yada")
+            """,
+            settings,
+        )
+
+    def test_module_description(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.short_description = 'yada'
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.display(
+                description='yada',
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )
+
+    def test_module_boolean(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.boolean = True
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.display(
+                boolean=True,
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )
+
+    def test_module_empty_value(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.empty_value_display = "xxx"
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.display(
+                empty_value="xxx",
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )
+
+    def test_module_ordering(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.admin_order_field = "name"
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.display(
+                ordering="name",
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )
+
+    def test_module_all(self):
+        # boolean and empty_value are mutually exclusive but we don't check
+        # that here, let it crash at runtime
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.empty_value_display = "xxx"
+            upper_case_name.short_description = 'yada'
+            upper_case_name.admin_order_field = "name"
+            upper_case_name.boolean = True
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.display(
+                description='yada',
+                boolean=True,
+                empty_value="xxx",
+                ordering="name",
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )

@@ -6,7 +6,7 @@ from tests.fixers.tools import check_noop, check_transformed
 settings = Settings(target_version=(3, 2))
 
 
-def test_module_func_unknown_attribute():
+def test_module_action_unknown_attribute():
     check_noop(
         """\
         from django.contrib import admin
@@ -20,7 +20,7 @@ def test_module_func_unknown_attribute():
     )
 
 
-def test_module_func_incorrect_argument_count():
+def test_module_action_incorrect_argument_count():
     check_noop(
         """\
         from django.contrib import admin
@@ -34,7 +34,7 @@ def test_module_func_incorrect_argument_count():
     )
 
 
-def test_module_func_kwargs():
+def test_module_action_kwargs():
     check_noop(
         """\
         from django.contrib import admin
@@ -55,6 +55,34 @@ def test_module_action_admin_not_imported():
             pass
 
         make_published.short_description = 'yada'
+        """,
+        settings,
+    )
+
+
+def test_module_action_admin_imported_with_as():
+    check_noop(
+        """\
+        from django.contrib import admin as shmadmin
+
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        make_published.long_description = "yada"
+        """,
+        settings,
+    )
+
+
+def test_module_action_admin_using_setattr():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        setattr(make_published, "long_description", "yada")
         """,
         settings,
     )
@@ -179,6 +207,32 @@ def test_module_action_description_multiline():
         @admin.action(
             description='yada'
                 'yada!',
+        )
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        """,
+        settings,
+    )
+
+
+def test_module_action_comment_not_copied():
+    # Mypy complains about setting the func attribute, but not about the
+    # decorator, so it seems wise to ensure comments aren't copied.
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        make_published.short_description = 'yada'  # type: ignore [attr-defined]
+        """,
+        """\
+        from django.contrib import admin
+
+        @admin.action(
+            description='yada',
         )
         def make_published(modeladmin, request, queryset):
             pass

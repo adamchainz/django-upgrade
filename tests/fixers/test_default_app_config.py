@@ -74,6 +74,17 @@ def test_simple_case(filename: str) -> None:
     )
 
 
+def test_with_comment() -> None:
+    check_transformed(
+        """\
+        default_app_config = 'myapp.apps.MyAppConfig'  # django < 3.2
+        """,
+        "",
+        settings,
+        filename="__init__.py",
+    )
+
+
 def test_with_other_lines():
     check_transformed(
         """\

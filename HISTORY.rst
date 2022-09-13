@@ -6,6 +6,8 @@ History
 
   Thanks to Thibaut Decombe in `PR #189 <https://github.com/adamchainz/django-upgrade/pull/189>`__.
 
+* Make fixers that erase lines also erase any trailing comments.
+
 1.10.0 (2022-09-07)
 -------------------
 

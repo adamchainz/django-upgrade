@@ -240,3 +240,98 @@ def test_module_action_comment_not_copied():
         """,
         settings,
     )
+
+
+def test_class_action_unknown_attribute():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            def make_published(modeladmin, request, queryset):
+                pass
+
+            make_published.long_description = "yada"
+        """,
+        settings,
+    )
+
+
+def test_class_action_description():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            def make_published(self, request, queryset):
+                pass
+
+            make_published.short_description = "yada"
+        """,
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            @admin.action(
+                description="yada",
+            )
+            def make_published(self, request, queryset):
+                pass
+
+        """,
+        settings,
+    )
+
+
+def test_class_action_permissions():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            def make_published(self, request, queryset):
+                pass
+
+            make_published.allowed_permissions = ('change',)
+        """,
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            @admin.action(
+                permissions=('change',),
+            )
+            def make_published(self, request, queryset):
+                pass
+
+        """,
+        settings,
+    )
+
+
+def test_class_action_both():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            def make_published(self, request, queryset):
+                pass
+
+            make_published.allowed_permissions = ('change',)
+            make_published.short_description = 'yada'
+        """,
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            @admin.action(
+                description='yada',
+                permissions=('change',),
+            )
+            def make_published(self, request, queryset):
+                pass
+
+        """,
+        settings,
+    )

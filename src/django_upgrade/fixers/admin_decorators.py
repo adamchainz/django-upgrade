@@ -35,22 +35,40 @@ def visit_Module(
     node: ast.Module,
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
+    yield from visit_Module_or_ClassDef(state, node, parent)
+
+
+@fixer.register(ast.ClassDef)
+def visit_ClassDef(
+    state: State,
+    node: ast.ClassDef,
+    parent: ast.AST,
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    yield from visit_Module_or_ClassDef(state, node, parent)
+
+
+def visit_Module_or_ClassDef(
+    state: State,
+    node: ast.Module | ast.ClassDef,
+    parent: ast.AST,
+) -> Iterable[tuple[Offset, TokenFunc]]:
     # Store potential action functions, by name, keeping also their ast node
     # and a dict of attributes. The attributes are initially the ast.Assign
     # nodes that can be moved into the decorator, replaced with the source of
     # the attribute value during the token modification phase
     action_funcs: dict[str, tuple[ast.FunctionDef, dict[str, ast.Assign | str]]] = {}
 
-    # Check for 'from django.contrib import admin'
-    # We cannot use state.from_imports within a visit_Module since it's not
-    # at all populated yet... (could fix by doing two passes?)
-    admin_imported = False
+    # Check for 'from django.contrib import admin' from state.from_imports,
+    # but also directly when visiting a module. state.from_imports isn’t
+    # populated yet when visiting a module... (could fix by doing two passes?)
+    admin_imported = "admin" in state.from_imports["django.contrib"]
 
     for subnode in ast.iter_child_nodes(node):
         # coverage bug
         # https://github.com/nedbat/coveragepy/issues/1333
         if (  # pragma: no cover
-            isinstance(subnode, ast.ImportFrom)
+            not admin_imported
+            and isinstance(subnode, ast.ImportFrom)
             and subnode.module == "django.contrib"
             and any(
                 alias.name == "admin" and alias.asname is None

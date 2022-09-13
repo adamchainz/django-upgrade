@@ -480,7 +480,7 @@ Django 3.2
 ~~~~~~~~~~~~~~~~~~~
 
 Rewrites functions that have action attributes assigned to them to use the new |@admin.action decorator|__.
-This only applies in files that have ``from django.contrib import action`` at the module scope.
+This only applies in files that have ``from django.contrib import admin`` at the module scope.
 
 .. |@admin.action decorator| replace:: ``@admin.action()`` decorator
 __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.contrib.admin.action
@@ -489,13 +489,29 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.co
 
      from django.contrib import admin
 
+     # Module-level actions:
+
     +@admin.action(
-    +    description='yada',
+    +    description="Publish articles",
     +)
      def make_published(modeladmin, request, queryset):
          ...
 
-    -make_published.short_description = 'yada'
+    -make_published.short_description = "Publish articles"
+
+     # …and within classes:
+
+     @admin.register(Book)
+     class BookAdmin(admin.ModelAdmin):
+    +    @admin.action(
+    +        description="Unpublish articles",
+    +        permissions=("unpublish",),
+    +    )
+         def make_unpublished(self, request, queryset):
+             ...
+
+    -    make_unpublished.allowed_permissions = ("unpublish",)
+    -    make_unpublished.short_description = "Unpublish articles"
 
 ``BaseCommand.requires_system_checks``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

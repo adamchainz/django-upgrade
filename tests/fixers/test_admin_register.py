@@ -470,6 +470,55 @@ def test_custom_model_admin_base_class():
     )
 
 
+def test_multiple_model_multiline_registration():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.register(MyModel1, MyCustomAdmin)
+        admin.site.register(MyModel2, MyCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        @admin.register(MyModel1, MyModel2)
+        class MyCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+    )
+
+
+def test_multiple_model_tuple_registration():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        @admin.register(MyModel1, MyModel2)
+        class MyCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+    )
+
+
 def test_complete():
     check_transformed(
         """\

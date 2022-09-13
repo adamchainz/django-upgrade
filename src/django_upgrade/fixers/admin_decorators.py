@@ -56,7 +56,13 @@ def visit_Module(
             )
         ):
             admin_imported = True
-        elif isinstance(subnode, ast.FunctionDef):
+        elif (
+            isinstance(subnode, ast.FunctionDef)
+            # Django calls action functions with exactly three arguments,
+            # positionally (modeladmin, request, queryset)
+            and (len(subnode.args.posonlyargs) + len(subnode.args.args)) == 3
+            and len(subnode.args.kwonlyargs) == 0
+        ):
             action_funcs[subnode.name] = (subnode, {})
         elif (
             isinstance(subnode, ast.Assign)

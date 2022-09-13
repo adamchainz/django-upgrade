@@ -492,7 +492,7 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.co
     +@admin.action(
     +    description='yada',
     +)
-     def make_published(request, queryset):
+     def make_published(modeladmin, request, queryset):
          ...
 
     -make_published.short_description = 'yada'

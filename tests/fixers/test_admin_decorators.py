@@ -11,7 +11,35 @@ def test_module_func_unknown_attribute():
         """\
         from django.contrib import admin
 
-        def make_published(request, queryset):
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        make_published.long_description = "yada"
+        """,
+        settings,
+    )
+
+
+def test_module_func_incorrect_argument_count():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        def make_published(request):
+            pass
+
+        make_published.long_description = "yada"
+        """,
+        settings,
+    )
+
+
+def test_module_func_kwargs():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        def make_published(modeladmin, request, queryset, *, extra=True):
             pass
 
         make_published.long_description = "yada"
@@ -23,7 +51,7 @@ def test_module_func_unknown_attribute():
 def test_module_action_admin_not_imported():
     check_noop(
         """\
-        def make_published(request, queryset):
+        def make_published(modeladmin, request, queryset):
             pass
 
         make_published.short_description = 'yada'
@@ -37,7 +65,7 @@ def test_module_action_description():
         """\
         from django.contrib import admin
 
-        def make_published(request, queryset):
+        def make_published(modeladmin, request, queryset):
             pass
 
         make_published.short_description = 'yada'
@@ -48,7 +76,31 @@ def test_module_action_description():
         @admin.action(
             description='yada',
         )
-        def make_published(request, queryset):
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        """,
+        settings,
+    )
+
+
+def test_module_action_pos_only_args():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        def make_published(modeladmin, request, queryset, /):
+            pass
+
+        make_published.short_description = 'yada'
+        """,
+        """\
+        from django.contrib import admin
+
+        @admin.action(
+            description='yada',
+        )
+        def make_published(modeladmin, request, queryset, /):
             pass
 
         """,
@@ -61,7 +113,7 @@ def test_module_action_permissions():
         """\
         from django.contrib import admin
 
-        def make_published(request, queryset):
+        def make_published(modeladmin, request, queryset):
             pass
 
         make_published.allowed_permissions = ('change',)
@@ -72,7 +124,7 @@ def test_module_action_permissions():
         @admin.action(
             permissions=('change',),
         )
-        def make_published(request, queryset):
+        def make_published(modeladmin, request, queryset):
             pass
 
         """,

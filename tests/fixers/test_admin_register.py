@@ -66,22 +66,6 @@ def test_already_using_decorator_registration():
     )
 
 
-def test_multiple_model_one_admin():
-    check_noop(
-        """\
-        from django.contrib import admin
-        from myapp.models import MyModel1, MyModel2
-
-        class MyCustomAdmin:
-            pass
-
-        admin.site.register(MyModel1, MyCustomAdmin)
-        admin.site.register(MyModel2, MyCustomAdmin)
-        """,
-        settings,
-    )
-
-
 def test_py2_style_init_super():
     check_noop(
         """\
@@ -542,6 +526,7 @@ def test_complete():
         from myapp.models import Author, Blog, MyModel1, MyModel2
         from myapp.admin import MyImportedAdmin
 
+        @admin.register(MyModel1, MyModel2)
         class MyCustomAdmin:
             pass
 
@@ -549,8 +534,6 @@ def test_complete():
         class AuthorAdmin(CustomModelAdmin):
             pass
 
-        admin.site.register(MyModel1, MyCustomAdmin)
-        admin.site.register(MyModel2, MyCustomAdmin)
         admin.site.register(Blog, MyImportedAdmin)
         """,
         settings=settings,

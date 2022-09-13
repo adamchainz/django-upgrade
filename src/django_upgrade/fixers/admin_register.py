@@ -83,14 +83,14 @@ def update_class_def(
     tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
 ) -> None:
     model_names = decorable_admins.get(state, {}).pop(name, set())
-    if len(model_names) == 1:
+    if model_names:
         if decorated:
             i = reverse_find(tokens, i, name=OP, src="@")
         j, indent = extract_indent(tokens, i)
         insert(
             tokens,
             j,
-            new_src=f"{indent}@admin.register({model_names.pop()})\n",
+            new_src=f"{indent}@admin.register({', '.join(sorted(model_names))})\n",
         )
 
 
@@ -130,17 +130,4 @@ def visit_Call(
         to_decorate = decorable_admins.get(state, {})
         if admin_name in to_decorate:
             to_decorate[admin_name].add(model_name)
-            yield ast_start_offset(node), partial(
-                erase_register_node,
-                node=parent,
-                admin_name=admin_name,
-                state=state,
-            )
-
-
-def erase_register_node(
-    tokens: list[Token], i: int, *, node: ast.Call, admin_name: str, state: State
-) -> None:
-    model_names = decorable_admins.get(state, {}).get(admin_name, set())
-    if len(model_names) == 1:
-        erase_node(tokens, i, node=node)
+            yield ast_start_offset(node), partial(erase_node, node=parent)

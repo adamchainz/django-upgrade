@@ -8,6 +8,8 @@ History
 
 * Make fixers that erase lines also erase any trailing comments.
 
+* Add Django 3.2+ fixer to rewrite action functions to use the ``@admin.action()`` decorator.
+
 1.10.0 (2022-09-07)
 -------------------
 

@@ -476,6 +476,27 @@ Django 3.2
 
 `Release Notes <https://docs.djangoproject.com/en/3.2/releases/3.2/>`__
 
+``@admin.action()``
+~~~~~~~~~~~~~~~~~~~
+
+Rewrites functions that have action attributes assigned to them to use the new |@admin.action decorator|__.
+This only applies in files that have ``from django.contrib import action`` at the module scope.
+
+.. |@admin.action decorator| replace:: ``@admin.action()`` decorator
+__ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.contrib.admin.action
+
+.. code-block:: diff
+
+     from django.contrib import admin
+
+    +@admin.action(
+    +    description='yada',
+    +)
+     def make_published(modeladmin, request, queryset):
+         ...
+
+    -make_published.short_description = 'yada'
+
 ``BaseCommand.requires_system_checks``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

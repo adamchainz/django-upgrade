@@ -56,6 +56,30 @@ def test_module_action_description():
     )
 
 
+def test_module_action_permissions():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        def make_published(request, queryset):
+            pass
+
+        make_published.allowed_permissions = ('change',)
+        """,
+        """\
+        from django.contrib import admin
+
+        @admin.action(
+            permissions=('change',),
+        )
+        def make_published(request, queryset):
+            pass
+
+        """,
+        settings,
+    )
+
+
 # def test_class_action_description():
 #     check_transformed(
 #         """\

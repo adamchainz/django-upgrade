@@ -21,6 +21,13 @@ fixer = Fixer(
     min_version=(3, 2),
 )
 
+# Map from old assigned names to new decorator names, which were changed to be
+# shorter
+ACTION_NAMES = {
+    "short_description": "description",
+    "allowed_permissions": "permissions",
+}
+
 
 @fixer.register(ast.Module)
 def visit_Module(
@@ -57,9 +64,10 @@ def visit_Module(
             and isinstance((target := subnode.targets[0]), ast.Attribute)
             and isinstance(target.value, ast.Name)
             and target.value.id in action_funcs
-            and target.attr == "short_description"
+            and target.attr in ACTION_NAMES
         ):
-            action_funcs[target.value.id][1]["description"] = subnode
+            new_name = ACTION_NAMES[target.attr]
+            action_funcs[target.value.id][1][new_name] = subnode
 
     if not admin_imported:
         return

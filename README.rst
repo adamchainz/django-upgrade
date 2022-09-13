@@ -180,7 +180,7 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
 Django 1.11
 -----------
 
-`Release Notes <https://docs.djangoproject.com/en/1.11/releases/1.11/#features-deprecated-in-1-11>`__
+`Release Notes <https://docs.djangoproject.com/en/1.11/releases/1.11/>`__
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
@@ -203,7 +203,7 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
 Django 2.0
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/2.0/releases/2.0/#features-deprecated-in-2-0>`__
+`Release Notes <https://docs.djangoproject.com/en/2.0/releases/2.0/>`__
 
 URL’s
 ~~~~~
@@ -261,7 +261,7 @@ Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``func
 Django 2.2
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2>`__
+`Release Notes <https://docs.djangoproject.com/en/2.2/releases/2.2/>`__
 
 ``HttpRequest.headers``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -345,7 +345,7 @@ With multiple databases you can save some test time by limiting test cases to th
 Django 3.0
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0>`__
+`Release Notes <https://docs.djangoproject.com/en/3.0/releases/3.0/>`__
 
 ``django.utils.encoding`` aliases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,7 +406,7 @@ Rewrites the ``ugettext()``, ``ugettext_lazy()``, ``ugettext_noop()``, ``ungette
 Django 3.1
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1>`__
+`Release Notes <https://docs.djangoproject.com/en/3.1/releases/3.1/>`__
 
 ``JSONField``
 ~~~~~~~~~~~~~
@@ -474,7 +474,7 @@ You will need to make migrations after this fix makes changes to models.
 Django 3.2
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2>`__
+`Release Notes <https://docs.djangoproject.com/en/3.2/releases/3.2/>`__
 
 ``BaseCommand.requires_system_checks``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -520,7 +520,7 @@ Removes module-level ``default_app_config`` assignments from ``__init__.py`` fil
 Django 4.0
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/4.0/releases/4.0/#features-deprecated-in-4-0>`__
+`Release Notes <https://docs.djangoproject.com/en/4.0/releases/4.0/>`__
 
 ``USE_L10N``
 ~~~~~~~~~~~~
@@ -537,7 +537,7 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 Django 4.1
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/4.1/releases/4.1/#features-deprecated-in-4-1>`__
+`Release Notes <https://docs.djangoproject.com/en/4.1/releases/4.1/>`__
 
 ``django.utils.timezone.utc`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

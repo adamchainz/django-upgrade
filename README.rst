@@ -479,8 +479,8 @@ Django 3.2
 ``@admin.action()``
 ~~~~~~~~~~~~~~~~~~~
 
-Rewrites functions that have action attributes assigned to them to use the new |@admin.action decorator|__.
-This only applies in files that have ``from django.contrib import admin`` at the module scope.
+Rewrites functions that have admin action attributes assigned to them to use the new |@admin.action decorator|__.
+This only applies in files that use ``from django.contrib import admin``.
 
 .. |@admin.action decorator| replace:: ``@admin.action()`` decorator
 __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.contrib.admin.action
@@ -512,6 +512,45 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.co
 
     -    make_unpublished.allowed_permissions = ("unpublish",)
     -    make_unpublished.short_description = "Unpublish articles"
+
+``@admin.display()``
+~~~~~~~~~~~~~~~~~~~
+
+Rewrites functions that have admin display attributes assigned to them to use the new |@admin.display decorator|__.
+This only applies in files that use ``from django.contrib import admin``.
+
+.. |@admin.display decorator| replace:: ``@admin.display()`` decorator
+__ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.display
+
+.. code-block:: diff
+
+     from django.contrib import admin
+
+     # Module-level display functions:
+
+    +@admin.display(
+    +    description="NAME",
+    +)
+     def upper_case_name(obj):
+         ...
+
+    -upper_case_name.short_description = "NAME"
+
+     # …and within classes:
+
+     @admin.register(Book)
+     class BookAdmin(admin.ModelAdmin):
+    +    @admin.display(
+    +        description='Is Published?',
+    +        boolean=True,
+    +        ordering='-publish_date',
+    +    )
+         def is_published(self, obj):
+             ...
+
+    -    is_published.boolean = True
+    -    is_published.admin_order_field = '-publish_date'
+    -    is_published.short_description = 'Is Published?'
 
 ``BaseCommand.requires_system_checks``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

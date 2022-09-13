@@ -132,55 +132,30 @@ def test_module_action_permissions():
     )
 
 
-# def test_class_action_description():
-#     check_transformed(
-#         """\
-#         class MyModelAdmin:
-#             def make_published(self, request, queryset):
-#                 pass
+def test_module_action_both():
+    check_transformed(
+        """\
+        from django.contrib import admin
 
-#             make_published.short_description = 'yada'
-#         """,
-#         """\
-#         from django.contrib import admin
+        def make_published(modeladmin, request, queryset):
+            pass
 
-#         @admin.action(
-#             description='yada',
-#         )
-#         def make_published(request, queryset):
-#             pass
-#         """,
-#         settings,
-#     )
+        make_published.allowed_permissions = ('change',)
+        make_published.short_description = 'yada'
+        """,
+        """\
+        from django.contrib import admin
 
+        @admin.action(
+            description='yada',
+            permissions=('change',),
+        )
+        def make_published(modeladmin, request, queryset):
+            pass
 
-# def test_function_action_description():
-#     check_transformed(
-#         """\
-#         def outer():
-#             print('making action')
-
-#             def make_published(request, queryset):
-#                 pass
-
-#             make_published.short_description = 'yada'
-
-#             return make_published
-#         """,
-#         """\
-#         def outer():
-#             print('making action')
-
-#             from django.contrib import admin
-
-#             @admin.action(
-#                 description='yada',
-#             )
-#             def make_published(request, queryset):
-#                 pass
-#         """,
-#         settings,
-#     )
+        """,
+        settings,
+    )
 
 
 # def test_module_action_description_multiline():

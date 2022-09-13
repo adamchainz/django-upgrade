@@ -99,7 +99,10 @@ def decorate_action_function(
 ) -> None:
     j, indent = extract_indent(tokens, i)
     dec_src = f"{indent}@admin.action(\n"
-    for name, source in attrs.items():
+    for name in ACTION_NAMES.values():  # Use predefined order
+        if name not in attrs:
+            continue
+        source = attrs[name]
         assert isinstance(source, str)
         dec_src += f"{indent}    {name}={source},\n"
     dec_src += f"{indent})\n"

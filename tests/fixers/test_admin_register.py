@@ -257,6 +257,30 @@ def test_simple_rewrite():
     )
 
 
+def test_simple_rewrite_indented():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        if True:
+            class AuthorAdmin(admin.ModelAdmin):
+                pass
+            admin.site.register(Author, AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        if True:
+            @admin.register(Author)
+            class AuthorAdmin(admin.ModelAdmin):
+                pass
+        """,
+        settings=settings,
+    )
+
+
 def test_multiple_rewrite():
     check_transformed(
         """\

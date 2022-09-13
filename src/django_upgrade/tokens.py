@@ -81,7 +81,7 @@ def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
     indentation string. Otherwise return the current position and "".
     """
     j = i
-    if j > 0 and tokens[j - 1].name == INDENT:
+    if j > 0 and tokens[j - 1].name in (INDENT, UNIMPORTANT_WS):
         j -= 1
         indent = tokens[j].src
     else:

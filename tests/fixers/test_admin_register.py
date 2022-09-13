@@ -333,6 +333,34 @@ def test_rewrite_class_decorator():
     )
 
 
+def test_rewrite_class_decorator_multiple():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.admin_tools import add_common_actions, add_display_methods
+        from myapp.models import Author
+
+        @add_common_actions
+        @add_display_methods
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Author, admin_class=AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.admin_tools import add_common_actions, add_display_methods
+        from myapp.models import Author
+
+        @admin.register(Author)
+        @add_common_actions
+        @add_display_methods
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        """,
+        settings=settings,
+    )
+
+
 @pytest.mark.skipif(sys.version_info < (3, 9), reason="Python 3.9+ PEP 614 decorators")
 def test_rewrite_class_decorator_multiline():
     check_transformed(

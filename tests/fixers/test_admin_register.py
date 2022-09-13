@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import sys
+
+import pytest
+
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 
@@ -329,6 +333,7 @@ def test_rewrite_class_decorator():
     )
 
 
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="Python 3.9+ PEP 614 decorators")
 def test_rewrite_class_decorator_multiline():
     check_transformed(
         """\

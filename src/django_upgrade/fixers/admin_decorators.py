@@ -8,71 +8,97 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable, MutableMapping
-from weakref import WeakKeyDictionary
+from typing import Iterable
 
-from tokenize_rt import Offset, Token
+from tokenize_rt import Offset, Token, tokens_to_src
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import extract_indent, insert
+from django_upgrade.tokens import erase_node, extract_indent, find_final_token, insert
 
 fixer = Fixer(
     __name__,
-    min_version=(2, 0),
+    min_version=(3, 2),
 )
 
 
-@fixer.register(ast.Assign)
-def visit_Assign(
+@fixer.register(ast.Module)
+def visit_Module(
     state: State,
-    node: ast.Assign,
+    node: ast.Module,
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        len(node.targets) == 1
-        and isinstance(node.targets[0], ast.Attribute)
-        and isinstance(node.targets[0].value, ast.Name)
-        and node.targets[0].attr == "short_description"
-        and isinstance(parent, (ast.Module, ast.ClassDef, ast.FunctionDef))
-    ):
-        assigned_name = node.targets[0].value.id
-        funcnode: ast.FunctionDef | None = None
-        for subnode in parent.body:
-            # must be before
-            if subnode == node:
-                break
+    # Store potential action functions, by name, keeping also their ast node
+    # and a dict of attributes. The attributes are initially the ast.Assign
+    # nodes that can be moved into the decorator, replaced with the source of
+    # the attribute value during the token modification phase
+    action_funcs: dict[str, tuple[ast.FunctionDef, dict[str, ast.Assign | str]]] = {}
 
-            if isinstance(subnode, ast.FunctionDef) and subnode.name == assigned_name:
-                funcnode = subnode
+    # Check for 'from django.contrib import admin'
+    # We cannot use state.from_imports within a visit_Module since it's not
+    # at all populated yet... (could fix by doing two passes?)
+    admin_imported = False
 
-        if funcnode is not None:
-            func_map = attrs_to_add.setdefault(state, {})
-            if funcnode not in func_map:
-                attrs: dict[str, ast.AST] = {}
-                func_map[funcnode] = attrs
-                yield ast_start_offset(funcnode), partial(
-                    decorate_action_function,
+    for subnode in ast.iter_child_nodes(node):
+        if (
+            isinstance(subnode, ast.ImportFrom)
+            and subnode.module == "django.contrib"
+            and any(
+                alias.name == "admin" and alias.asname is None
+                for alias in subnode.names
+            )
+        ):
+            admin_imported = True
+        elif isinstance(subnode, ast.FunctionDef):
+            action_funcs[subnode.name] = (subnode, {})
+        elif (
+            isinstance(subnode, ast.Assign)
+            and len(subnode.targets) == 1
+            and isinstance((target := subnode.targets[0]), ast.Attribute)
+            and isinstance(target.value, ast.Name)
+            and target.value.id in action_funcs
+            and target.attr == "short_description"
+        ):
+            action_funcs[target.value.id][1]["description"] = subnode
+
+    if not admin_imported:
+        return
+
+    for name, (funcnode, attrs) in action_funcs.items():
+        if attrs:
+            yield ast_start_offset(funcnode), partial(
+                decorate_action_function, attrs=attrs
+            )
+            for name, assignnode in attrs.items():
+                assert isinstance(assignnode, ast.Assign)
+                yield ast_start_offset(assignnode), partial(erase_node, node=assignnode)
+                yield ast_start_offset(assignnode.value), partial(
+                    store_value_src,
+                    node=assignnode.value,
+                    name=name,
                     attrs=attrs,
                 )
-            else:
-                attrs = func_map[funcnode]
-            attrs["short_description"] = node.value
-
-
-# Track which of path and re_path have been used for this current file
-# Then when backtracking into an import statement, we can use the set of names
-# to determine what names to import.
-attrs_to_add: MutableMapping[
-    State, dict[ast.FunctionDef, dict[str, ast.AST]]
-] = WeakKeyDictionary()
 
 
 def decorate_action_function(
-    tokens: list[Token], i: int, *, attrs: dict[str, ast.AST]
+    tokens: list[Token], i: int, *, attrs: dict[str, ast.AST | str]
 ) -> None:
     j, indent = extract_indent(tokens, i)
     dec_src = f"{indent}@admin.action(\n"
-    dec_src += f"{indent}    description='yada'\n"
+    for name, source in attrs.items():
+        assert isinstance(source, str)
+        dec_src += f"{indent}    {name}={source},\n"
     dec_src += f"{indent})\n"
     insert(tokens, j, new_src=dec_src)
+
+
+def store_value_src(
+    tokens: list[Token],
+    i: int,
+    *,
+    node: ast.AST,
+    name: str,
+    attrs: dict[str, ast.AST | str],
+) -> None:
+    j = find_final_token(tokens, i, node=node)
+    attrs[name] = tokens_to_src(tokens[i:j])

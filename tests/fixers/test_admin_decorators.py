@@ -3,12 +3,14 @@ from __future__ import annotations
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 
-settings = Settings(target_version=(3, 1))
+settings = Settings(target_version=(3, 2))
 
 
-def test_unknown_attribute():
+def test_module_func_unknown_attribute():
     check_noop(
         """\
+        from django.contrib import admin
+
         def make_published(request, queryset):
             pass
 
@@ -18,9 +20,23 @@ def test_unknown_attribute():
     )
 
 
+def test_module_action_admin_not_imported():
+    check_noop(
+        """\
+        def make_published(request, queryset):
+            pass
+
+        make_published.short_description = 'yada'
+        """,
+        settings,
+    )
+
+
 def test_module_action_description():
     check_transformed(
         """\
+        from django.contrib import admin
+
         def make_published(request, queryset):
             pass
 
@@ -34,6 +50,7 @@ def test_module_action_description():
         )
         def make_published(request, queryset):
             pass
+
         """,
         settings,
     )

@@ -158,28 +158,31 @@ def test_module_action_both():
     )
 
 
-# def test_module_action_description_multiline():
-#     check_transformed(
-#         """\
-#         def make_published(request, queryset):
-#             pass
+def test_module_action_description_multiline():
+    # We don't really care about parenthesizing this nicely, just that it's
+    # valid syntax
+    check_transformed(
+        """\
+        from django.contrib import admin
 
-#         make_published.short_description = (
-#             'yada'
-#             'yada!'
-#         )
-#         """,
-#         """\
-#         from django.contrib import admin
+        def make_published(modeladmin, request, queryset):
+            pass
 
-#         @admin.action(
-#             description=(
-#                 'yada'
-#                 'yada!'
-#             ),
-#         )
-#         def make_published(request, queryset):
-#             pass
-#         """,
-#         settings,
-#     )
+        make_published.short_description = (
+            'yada'
+            'yada!'
+        )
+        """,
+        """\
+        from django.contrib import admin
+
+        @admin.action(
+            description='yada'
+                'yada!',
+        )
+        def make_published(modeladmin, request, queryset):
+            pass
+
+        """,
+        settings,
+    )

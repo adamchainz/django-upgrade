@@ -104,6 +104,7 @@ def decorate_action_function(
             continue
         source = attrs[name]
         assert isinstance(source, str)
+        source = source.replace("\n", f"\n{indent}    ")
         dec_src += f"{indent}    {name}={source},\n"
     dec_src += f"{indent})\n"
     insert(tokens, j, new_src=dec_src)

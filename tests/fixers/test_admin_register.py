@@ -261,6 +261,28 @@ def test_rewrite():
     )
 
 
+def test_rewrite_gis():
+    check_transformed(
+        """\
+        from django.contrib.gis import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register(Author, AuthorAdmin)
+        """,
+        """\
+        from django.contrib.gis import admin
+        from myapp.models import Author
+
+        @admin.register(Author)
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        """,
+        settings=settings,
+    )
+
+
 def test_rewrite_indented():
     check_transformed(
         """\

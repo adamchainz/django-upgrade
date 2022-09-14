@@ -26,17 +26,20 @@ fixer = Fixer(
 decorable_admins: MutableMapping[State, dict[str, set[str]]] = WeakKeyDictionary()
 
 
+def _is_django_admin_imported(state: State) -> bool:
+    return (
+        "admin" in state.from_imports["django.contrib"]
+        or "admin" in state.from_imports["django.contrib.gis"]
+    )
+
+
 @fixer.register(ast.ClassDef)
 def visit_ClassDef(
     state: State,
     node: ast.ClassDef,
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        "admin" in state.from_imports["django.contrib"]
-        # and not node.decorator_list
-        and not uses_full_super_in_init_or_new(node)
-    ):
+    if _is_django_admin_imported(state) and not uses_full_super_in_init_or_new(node):
         decorable_admins.setdefault(state, {})[node.name] = set()
         if not node.decorator_list:
             offset = ast_start_offset(node)
@@ -101,7 +104,7 @@ def visit_Call(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        "admin" in state.from_imports["django.contrib"]
+        _is_django_admin_imported(state)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "register"
         and isinstance(node.func.value, ast.Attribute)

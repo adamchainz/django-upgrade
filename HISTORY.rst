@@ -6,9 +6,11 @@ History
 
   Thanks to Thibaut Decombe in `PR #189 <https://github.com/adamchainz/django-upgrade/pull/189>`__.
 
-* Make fixers that erase lines also erase any trailing comments.
+* Add Django 3.2+ fixer to rewrite admin action function attributes to use the ``@admin.action()`` decorator.
 
-* Add Django 3.2+ fixer to rewrite action functions to use the ``@admin.action()`` decorator.
+* Add Django 3.2+ fixer to rewrite admin display function attributes to use the ``@admin.display()`` decorator.
+
+* Make fixers that erase lines also erase any trailing comments.
 
 1.10.0 (2022-09-07)
 -------------------

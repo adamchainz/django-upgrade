@@ -231,6 +231,29 @@ class TestActionFunctions:
             settings,
         )
 
+    def test_module_gis(self):
+        check_transformed(
+            """\
+            from django.contrib.gis import admin
+
+            def make_published(modeladmin, request, queryset):
+                ...
+
+            make_published.short_description = 'yada'
+            """,
+            """\
+            from django.contrib.gis import admin
+
+            @admin.action(
+                description='yada',
+            )
+            def make_published(modeladmin, request, queryset):
+                ...
+
+            """,
+            settings,
+        )
+
     def test_class_unknown_attribute(self):
         check_noop(
             """\
@@ -314,6 +337,31 @@ class TestActionFunctions:
                 @admin.action(
                     description='yada',
                     permissions=('change',),
+                )
+                def make_published(self, request, queryset):
+                    ...
+
+            """,
+            settings,
+        )
+
+    def test_class_gis(self):
+        check_transformed(
+            """\
+            from django.contrib.gis import admin
+
+            class BookAdmin(admin.ModelAdmin):
+                def make_published(self, request, queryset):
+                    ...
+
+                make_published.short_description = 'yada'
+            """,
+            """\
+            from django.contrib.gis import admin
+
+            class BookAdmin(admin.ModelAdmin):
+                @admin.action(
+                    description='yada',
                 )
                 def make_published(self, request, queryset):
                     ...
@@ -523,6 +571,29 @@ class TestDisplayFunctions:
             settings,
         )
 
+    def test_module_gis(self):
+        check_transformed(
+            """\
+            from django.contrib.gis import admin
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.short_description = 'yada'
+            """,
+            """\
+            from django.contrib.gis import admin
+
+            @admin.display(
+                description='yada',
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )
+
     def test_class_unknown_attribute(self):
         check_noop(
             """\
@@ -668,6 +739,33 @@ class TestDisplayFunctions:
                     description='Is Published?',
                     boolean=True,
                     ordering='-publish_date',
+                )
+                def is_published(self, obj):
+                    ...
+
+            """,
+            settings,
+        )
+
+    def test_class_gis(self):
+        check_transformed(
+            """\
+            from django.contrib.gis import admin
+
+            @admin.register(Book)
+            class BookAdmin(admin.ModelAdmin):
+                def is_published(self, obj):
+                    ...
+
+                is_published.short_description = 'Is Published?'
+            """,
+            """\
+            from django.contrib.gis import admin
+
+            @admin.register(Book)
+            class BookAdmin(admin.ModelAdmin):
+                @admin.display(
+                    description='Is Published?',
                 )
                 def is_published(self, obj):
                     ...

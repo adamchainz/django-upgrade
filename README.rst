@@ -480,7 +480,7 @@ Django 3.2
 ~~~~~~~~~~~~~~~~~~~
 
 Rewrites functions that have admin action attributes assigned to them to use the new |@admin.action decorator|__.
-This only applies in files that use ``from django.contrib import admin``.
+This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |@admin.action decorator| replace:: ``@admin.action()`` decorator
 __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.contrib.admin.action
@@ -517,7 +517,7 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.co
 ~~~~~~~~~~~~~~~~~~~
 
 Rewrites functions that have admin display attributes assigned to them to use the new |@admin.display decorator|__.
-This only applies in files that use ``from django.contrib import admin``.
+This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |@admin.display decorator| replace:: ``@admin.display()`` decorator
 __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.display

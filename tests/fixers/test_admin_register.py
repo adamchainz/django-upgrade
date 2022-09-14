@@ -651,3 +651,27 @@ def test_complete():
         """,
         settings=settings,
     )
+
+
+def test_custom_admin_site_simple():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site, CustomModelAdmin
+        from django.contrib import admin
+
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        custom_site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site
+        from django.contrib import admin
+
+        @admin.register(MyModel, site=custom_site)
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        """,
+        settings=settings,
+    )

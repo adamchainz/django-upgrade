@@ -85,7 +85,10 @@ def visit_Module_or_ClassDef(
     # Check for 'from django.contrib import admin' from state.from_imports,
     # but also directly when visiting a module. state.from_imports isn’t
     # populated yet when visiting a module... (could fix by doing two passes?)
-    admin_imported = "admin" in state.from_imports["django.contrib"]
+    admin_imported = (
+        "admin" in state.from_imports["django.contrib"]
+        or "admin" in state.from_imports["django.contrib.gis"]
+    )
 
     for subnode in ast.iter_child_nodes(node):
         # coverage bug
@@ -93,7 +96,7 @@ def visit_Module_or_ClassDef(
         if (  # pragma: no cover
             not admin_imported
             and isinstance(subnode, ast.ImportFrom)
-            and subnode.module == "django.contrib"
+            and subnode.module in ("django.contrib", "django.contrib.gis")
             and any(
                 alias.name == "admin" and alias.asname is None
                 for alias in subnode.names

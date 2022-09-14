@@ -12,6 +12,8 @@ History
 
 * Make fixers that erase lines also erase any trailing comments.
 
+* Fix leaving a trailing comma when editing imports in certain cases.
+
 1.10.0 (2022-09-07)
 -------------------
 

@@ -479,6 +479,31 @@ def test_multiple_model_multiline_registration():
     )
 
 
+def test_multiple_model_multiline_registration_sorted():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.register(MyModel2, MyCustomAdmin)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        @admin.register(MyModel1, MyModel2)
+        class MyCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+    )
+
+
 def test_multiple_model_tuple_registration():
     check_transformed(
         """\
@@ -538,12 +563,13 @@ def test_multiple_model_mixed_registration():
 
         admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
         admin.site.register(MyModel3, MyCustomAdmin)
+        admin.site.register([MyModel4], MyCustomAdmin)
         """,
         """\
         from django.contrib import admin
         from myapp.models import MyModel1, MyModel2
 
-        @admin.register(MyModel1, MyModel2, MyModel3)
+        @admin.register(MyModel1, MyModel2, MyModel3, MyModel4)
         class MyCustomAdmin:
             pass
 

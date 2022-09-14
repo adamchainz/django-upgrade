@@ -83,13 +83,15 @@ def update_class_def(
     tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
 ) -> None:
     model_names = decorable_admins.get(state, {}).pop(name, set())
-    if model_names:
-        if decorated:
-            i = reverse_find(tokens, i, name=OP, src="@")
-        j, indent = extract_indent(tokens, i)
-        joined_names = ", ".join(sorted(model_names))
-        new_src = f"{indent}@admin.register({joined_names})\n"
-        insert(tokens, j, new_src=new_src)
+    if not model_names:
+        return
+
+    if decorated:
+        i = reverse_find(tokens, i, name=OP, src="@")
+    j, indent = extract_indent(tokens, i)
+    joined_names = ", ".join(sorted(model_names))
+    new_src = f"{indent}@admin.register({joined_names})\n"
+    insert(tokens, j, new_src=new_src)
 
 
 @fixer.register(ast.Call)

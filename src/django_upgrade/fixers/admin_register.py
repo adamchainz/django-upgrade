@@ -125,7 +125,7 @@ def visit_Call(
 
         elif (  # admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
             len(node.args) == 2
-            and isinstance((model_tuple := node.args[0]), ast.Tuple)
+            and isinstance((model_tuple := node.args[0]), (ast.Tuple, ast.List))
             and all(isinstance(elt, ast.Name) for elt in model_tuple.elts)
             and isinstance((admin_arg := node.args[1]), ast.Name)
             and not node.keywords

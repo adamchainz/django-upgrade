@@ -503,6 +503,30 @@ def test_multiple_model_tuple_registration():
     )
 
 
+def test_multiple_model_list_registration():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        @admin.register(MyModel1, MyModel2)
+        class MyCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+    )
+
+
 def test_multiple_model_mixed_registration():
     check_transformed(
         """\

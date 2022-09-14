@@ -385,7 +385,7 @@ def update_import_names(
             # Skip over
             remove_all = False
             j = find(tokens, j, name=NAME, src=alias.name)
-            if alias.asname is not None:  # pragma: no branch
+            if alias.asname is not None:
                 j = find(tokens, j, name=NAME, src="as")
                 j = find(tokens, j, name=NAME, src=alias.asname)
             continue
@@ -396,12 +396,12 @@ def update_import_names(
             start_idx = find(tokens, j, name=NAME, src=alias.name)
 
             end_idx = start_idx
-            if alias.asname is not None:  # pragma: no cover
+            if alias.asname is not None:
                 end_idx = find(tokens, end_idx, name=NAME, src="as")
                 end_idx = find(tokens, end_idx, name=NAME, src=alias.asname)
 
             if len(node.names) > 1:
-                if alias_idx < len(node.names) - 1:
+                if alias_idx == 0:
                     end_idx = find(tokens, end_idx, name=OP, src=",")
                 else:
                     start_idx = reverse_find(tokens, start_idx, name=OP, src=",")

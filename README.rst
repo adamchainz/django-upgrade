@@ -135,6 +135,7 @@ Admin model registration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Rewrites ``admin.site.register()`` calls to the new ``@admin.register()`` decorator syntax when eligible.
+This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. code-block:: diff
 

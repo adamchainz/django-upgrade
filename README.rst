@@ -138,11 +138,14 @@ Rewrites ``admin.site.register()`` calls to the new ``@admin.register()`` decora
 
 .. code-block:: diff
 
-    +@admin.register(MyModel)
-     class MyCustomAdmin:
-         pass
+     from django.contrib import admin
 
-    -admin.site.register(MyModel, MyCustomAdmin)
+    +@admin.register(MyModel1, MyModel2)
+     class MyCustomAdmin(admin.ModelAdmin):
+         ...
+
+    -admin.site.register(MyModel1, MyCustomAdmin)
+    -admin.site.register(MyModel2, MyCustomAdmin)
 
 Django 1.9
 -----------

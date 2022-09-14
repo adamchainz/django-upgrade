@@ -83,15 +83,15 @@ def update_class_def(
     tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
 ) -> None:
     model_names = decorable_admins.get(state, {}).pop(name, set())
-    if len(model_names) == 1:
-        if decorated:
-            i = reverse_find(tokens, i, name=OP, src="@")
-        j, indent = extract_indent(tokens, i)
-        insert(
-            tokens,
-            j,
-            new_src=f"{indent}@admin.register({model_names.pop()})\n",
-        )
+    if not model_names:
+        return
+
+    if decorated:
+        i = reverse_find(tokens, i, name=OP, src="@")
+    j, indent = extract_indent(tokens, i)
+    joined_names = ", ".join(sorted(model_names))
+    new_src = f"{indent}@admin.register({joined_names})\n"
+    insert(tokens, j, new_src=new_src)
 
 
 @fixer.register(ast.Call)
@@ -108,39 +108,38 @@ def visit_Call(
         and node.func.value.attr == "site"
         and isinstance(node.func.value.value, ast.Name)
         and node.func.value.value.id == "admin"
-        and (
-            (
-                len(node.args) == 2
-                and isinstance((model_arg := node.args[0]), ast.Name)
-                and isinstance((admin_arg := node.args[1]), ast.Name)
-                and not node.keywords
-            )
-            or (
-                len(node.args) == 1
-                and isinstance((model_arg := node.args[0]), ast.Name)
-                and len(node.keywords) == 1
-                and node.keywords[0].arg == "admin_class"
-                and isinstance((admin_arg := node.keywords[0].value), ast.Name)
-            )
-        )
     ):
-        model_name = model_arg.id
+        if (  # admin.site.register(MyModel, MyCustomAdmin)
+            len(node.args) == 2
+            and isinstance((model_arg := node.args[0]), ast.Name)
+            and isinstance((admin_arg := node.args[1]), ast.Name)
+            and not node.keywords
+        ) or (  # admin.site.register(MyModel, admin_class=MyCustomAdmin)
+            len(node.args) == 1
+            and isinstance((model_arg := node.args[0]), ast.Name)
+            and len(node.keywords) == 1
+            and node.keywords[0].arg == "admin_class"
+            and isinstance((admin_arg := node.keywords[0].value), ast.Name)
+        ):
+            model_names = {model_arg.id}
+
+        elif (  # admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
+            len(node.args) == 2
+            and isinstance((model_tuple := node.args[0]), (ast.Tuple, ast.List))
+            and all(isinstance(elt, ast.Name) for elt in model_tuple.elts)
+            and isinstance((admin_arg := node.args[1]), ast.Name)
+            and not node.keywords
+        ):
+            model_names = {
+                elt.id for elt in model_tuple.elts if isinstance(elt, ast.Name)
+            }
+
+        else:
+            return
+
         admin_name = admin_arg.id
-
         to_decorate = decorable_admins.get(state, {})
+
         if admin_name in to_decorate:
-            to_decorate[admin_name].add(model_name)
-            yield ast_start_offset(node), partial(
-                erase_register_node,
-                node=parent,
-                admin_name=admin_name,
-                state=state,
-            )
-
-
-def erase_register_node(
-    tokens: list[Token], i: int, *, node: ast.Call, admin_name: str, state: State
-) -> None:
-    model_names = decorable_admins.get(state, {}).get(admin_name, set())
-    if len(model_names) == 1:
-        erase_node(tokens, i, node=node)
+            to_decorate[admin_name].update(model_names)
+            yield ast_start_offset(node), partial(erase_node, node=parent)

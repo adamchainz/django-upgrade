@@ -87,11 +87,9 @@ def update_class_def(
         if decorated:
             i = reverse_find(tokens, i, name=OP, src="@")
         j, indent = extract_indent(tokens, i)
-        insert(
-            tokens,
-            j,
-            new_src=f"{indent}@admin.register({', '.join(sorted(model_names))})\n",
-        )
+        joined_names = ", ".join(sorted(model_names))
+        new_src = f"{indent}@admin.register({joined_names})\n"
+        insert(tokens, j, new_src=new_src)
 
 
 @fixer.register(ast.Call)

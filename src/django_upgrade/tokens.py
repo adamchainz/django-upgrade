@@ -60,6 +60,21 @@ def reverse_consume(
     return i
 
 
+def find_first_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
+    """
+    Find the first token corresponding to the given ast node.
+    """
+    j = i
+    while tokens[j].line is None or tokens[j].line < node.lineno:
+        j += 1
+    while (
+        tokens[j].utf8_byte_offset is None
+        or tokens[j].utf8_byte_offset < node.col_offset
+    ):
+        j += 1
+    return j
+
+
 def find_final_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     """
     Find the last token corresponding to the given ast node.

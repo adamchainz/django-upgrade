@@ -57,7 +57,18 @@ def test_response_from_custom_client_use():
     )
 
 
-def test_response_from_inner_func_client_use():
+def test_response_from_client_assigned_after():
+    check_noop(
+        """\
+        def test_something():
+            self.assertFormError(page, "form", "user", "woops")
+            page = self.client.get()
+        """,
+        settings,
+    )
+
+
+def test_response_from_client_inner_func():
     check_noop(
         """\
         def test_something():
@@ -69,7 +80,7 @@ def test_response_from_inner_func_client_use():
     )
 
 
-def test_response_from_inner_class_client_use():
+def test_response_from_client_inner_class():
     check_noop(
         """\
         def test_something():
@@ -151,12 +162,14 @@ def test_response_from_client():
     check_transformed(
         """\
         def test_something():
-            page = self.client.get()
+            url = "/"
+            page = self.client.get(url)
             self.assertFormError(page, "form", "user", "woops")
         """,
         """\
         def test_something():
-            page = self.client.get()
+            url = "/"
+            page = self.client.get(url)
             self.assertFormError(page.context["form"], "user", "woops")
         """,
         settings,

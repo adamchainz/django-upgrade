@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Any, Iterable
+from typing import Any, Iterable, Literal
 
 from tokenize_rt import UNIMPORTANT_WS, Offset, Token, tokens_to_src
 
@@ -82,7 +82,12 @@ CLIENT_REQUEST_METHODS = frozenset(
 
 
 class ResponseAssignmentVisitor(ast.NodeVisitor):
-    def __init__(self, funcdef: ast.FunctionDef, name: str, before: ast.Expr) -> None:
+    def __init__(
+        self,
+        funcdef: ast.FunctionDef | ast.AsyncFunctionDef,
+        name: str,
+        before: ast.Expr,
+    ) -> None:
         self.funcdef = funcdef
         self.name = name
         self.before = before
@@ -96,6 +101,10 @@ class ResponseAssignmentVisitor(ast.NodeVisitor):
         if self.stop_search:
             return None
         return super().visit(node)
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        # Avoid descending into a new scope
+        return None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         # Avoid descending into a new scope
@@ -117,17 +126,31 @@ class ResponseAssignmentVisitor(ast.NodeVisitor):
             and len(node.targets) == 1
             and isinstance(node.targets[0], ast.Name)
             and node.targets[0].id == self.name
-            and isinstance((call := node.value), ast.Call)
-            and isinstance(call.func, ast.Attribute)
-            and call.func.attr in CLIENT_REQUEST_METHODS
-            and isinstance(call.func.value, ast.Attribute)
-            and call.func.value.attr == "client"
-            and isinstance(call.func.value.value, ast.Name)
-            and call.func.value.value.id == "self"
+            and (
+                looks_like_client_call(node.value, "client")
+                or (
+                    isinstance(node.value, ast.Await)
+                    and looks_like_client_call(node.value.value, "async_client")
+                )
+            )
         ):
             self.stop_search = True
             self.looks_like_response = True
         return None
+
+
+def looks_like_client_call(
+    node: ast.AST, client_name: Literal["async_client", "client"]
+) -> bool:
+    return (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr in CLIENT_REQUEST_METHODS
+        and isinstance(node.func.value, ast.Attribute)
+        and node.func.value.attr == client_name
+        and isinstance(node.func.value.value, ast.Name)
+        and node.func.value.value.id == "self"
+    )
 
 
 def is_response_from_client(
@@ -137,7 +160,9 @@ def is_response_from_client(
 ) -> bool:
     if not (
         isinstance(parents[-1], ast.Expr)
-        and isinstance((funcdef := parents[-2]), ast.FunctionDef)
+        and isinstance(
+            (funcdef := parents[-2]), (ast.AsyncFunctionDef, ast.FunctionDef)
+        )
     ):
         return False
 

@@ -46,23 +46,35 @@ def test_response_from_unknown_client_method():
     )
 
 
-def test_response_from_gated_client_use():
+def test_response_from_custom_client_use():
     check_noop(
         """\
         def test_something():
-            with some_mock:
-                page = self.client.poke()
+            page = Client().get()
             self.assertFormError(page, "form", "user", "woops")
         """,
         settings,
     )
 
 
-def test_response_from_unseen_client_use():
+def test_response_from_inner_func_client_use():
     check_noop(
         """\
         def test_something():
-            page = Client().get()
+            def f():
+                page = self.client.get()
+            self.assertFormError(page, "form", "user", "woops")
+        """,
+        settings,
+    )
+
+
+def test_response_from_inner_class_client_use():
+    check_noop(
+        """\
+        def test_something():
+            class Wtf:
+                page = self.client.get()
             self.assertFormError(page, "form", "user", "woops")
         """,
         settings,
@@ -145,6 +157,42 @@ def test_response_from_client():
         """\
         def test_something():
             page = self.client.get()
+            self.assertFormError(page.context["form"], "user", "woops")
+        """,
+        settings,
+    )
+
+
+def test_response_from_gated_client_use():
+    check_transformed(
+        """\
+        def test_something():
+            if True:
+                page = self.client.get()
+            self.assertFormError(page, "form", "user", "woops")
+        """,
+        """\
+        def test_something():
+            if True:
+                page = self.client.get()
+            self.assertFormError(page.context["form"], "user", "woops")
+        """,
+        settings,
+    )
+
+
+def test_response_from_context_manager_client_use():
+    check_transformed(
+        """\
+        def test_something():
+            with some_mock:
+                page = self.client.get()
+            self.assertFormError(page, "form", "user", "woops")
+        """,
+        """\
+        def test_something():
+            with some_mock:
+                page = self.client.get()
             self.assertFormError(page.context["form"], "user", "woops")
         """,
         settings,

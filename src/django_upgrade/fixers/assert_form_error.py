@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable
+from typing import Any, Iterable
 
 from tokenize_rt import UNIMPORTANT_WS, Offset, Token, tokens_to_src
 
@@ -81,6 +81,55 @@ CLIENT_REQUEST_METHODS = frozenset(
 )
 
 
+class ResponseAssignmentVisitor(ast.NodeVisitor):
+    def __init__(self, name: str, before: ast.Expr) -> None:
+        self.name = name
+        self.before = before
+        self.stop_search = False
+        self.looks_like_response = False
+
+    def search(self, funcdef: ast.FunctionDef) -> None:
+        self.funcdef = funcdef
+        self.generic_visit(funcdef)
+
+    def visit(self, node: ast.AST) -> Any:
+        if self.stop_search:
+            return None
+        return super().visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        # Avoid descending into a new scope
+        return None
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        # Avoid descending into a new scope
+        return None
+
+    def visit_Expr(self, node: ast.Expr) -> Any:
+        if node == self.before:
+            self.stop_search = True
+            return None
+        return self.generic_visit(node)
+
+    def visit_Assign(self, node: ast.Assign) -> Any:
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id == self.name
+            and isinstance((call := node.value), ast.Call)
+            and isinstance(call.func, ast.Attribute)
+            and call.func.attr in CLIENT_REQUEST_METHODS
+            and isinstance(call.func.value, ast.Attribute)
+            and call.func.value.attr == "client"
+            and isinstance(call.func.value.value, ast.Name)
+            and call.func.value.value.id == "self"
+        ):
+            self.stop_search = True
+            self.looks_like_response = True
+        return None
+
+
 def is_response_from_client(
     parents: list[ast.AST],
     node: ast.Call,
@@ -92,30 +141,9 @@ def is_response_from_client(
     ):
         return False
 
-    expr_idx = funcdef.body.index(parents[-1])
-
-    # Work backwards looking for an assignment to the given name that looks
-    # like it comes from the test client.
-    for subnode in funcdef.body[expr_idx - 1 : None : -1]:
-        if (
-            isinstance(subnode, ast.Assign)
-            and len(subnode.targets) == 1
-            and isinstance(subnode.targets[0], ast.Name)
-            and subnode.targets[0].id == name
-        ):
-            call = subnode.value
-            if (
-                isinstance(call, ast.Call)
-                and isinstance(call.func, ast.Attribute)
-                and call.func.attr in CLIENT_REQUEST_METHODS
-                and isinstance(call.func.value, ast.Attribute)
-                and call.func.value.attr == "client"
-                and isinstance(call.func.value.value, ast.Name)
-                and call.func.value.value.id == "self"
-            ):
-                return True
-            break
-    return False
+    visitor = ResponseAssignmentVisitor(name, parents[-1])
+    visitor.search(funcdef)
+    return visitor.looks_like_response
 
 
 def rewrite_args(

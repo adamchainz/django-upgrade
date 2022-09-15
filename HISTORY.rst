@@ -10,6 +10,8 @@ History
 
 * Add Django 3.2+ fixer to rewrite admin display function attributes to use the ``@admin.display()`` decorator.
 
+* Add Django 4.1+ fixer to rewrite calls to ``assertFormError()`` from the old signature to the new one.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

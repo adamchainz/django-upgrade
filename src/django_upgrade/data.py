@@ -67,7 +67,7 @@ class State:
 
 AST_T = TypeVar("AST_T", bound=ast.AST)
 TokenFunc = Callable[[List[Token], int], None]
-ASTFunc = Callable[[State, AST_T, ast.AST], Iterable[Tuple[Offset, TokenFunc]]]
+ASTFunc = Callable[[State, AST_T, List[ast.AST]], Iterable[Tuple[Offset, TokenFunc]]]
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
@@ -96,12 +96,17 @@ def visit(
     )
 
     nodes: list[tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
+    parents: list[ast.AST] = [tree]
     ret = defaultdict(list)
     while nodes:
         state, node, parent = nodes.pop()
+        if len(parents) > 1 and parent == parents[-2]:
+            parents.pop()
+        elif parent != parents[-1]:
+            parents.append(parent)
 
         for ast_func in ast_funcs[type(node)]:
-            for offset, token_func in ast_func(state, node, parent):
+            for offset, token_func in ast_func(state, node, parents):
                 ret[offset].append(token_func)
 
         if (

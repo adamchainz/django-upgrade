@@ -27,7 +27,7 @@ MODULE = "django.utils.timezone"
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module == MODULE
@@ -53,12 +53,12 @@ updating_import: MutableMapping[State, bool] = WeakKeyDictionary()
 def visit_Name(
     state: State,
     node: ast.Name,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         updating_import.get(state, False)
         and node.id == "utc"
-        and not isinstance(parent, ast.Attribute)
+        and not isinstance(parents[-1], ast.Attribute)
     ):
         yield ast_start_offset(node), partial(
             replace,

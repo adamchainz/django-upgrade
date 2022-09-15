@@ -24,7 +24,7 @@ fixer = Fixer(
 def visit_Assign(
     state: State,
     node: ast.Assign,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         len(node.targets) == 1
@@ -32,7 +32,7 @@ def visit_Assign(
         and node.targets[0].id == "USE_L10N"
         and isinstance(node.value, ast.Constant)
         and node.value.value is True
-        and isinstance(parent, ast.Module)
+        and isinstance(parents[-1], ast.Module)
         and state.looks_like_settings_file()
     ):
         yield ast_start_offset(node), partial(erase_node, node=node)

@@ -27,7 +27,7 @@ NEW_NAME = "PASSWORD_RESET_TIMEOUT"
 def visit_Assign(
     state: State,
     node: ast.Assign,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         len(node.targets) == 1

@@ -35,7 +35,7 @@ OLD_NAME = "FixedOffset"
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module == MODULE
@@ -55,7 +55,7 @@ def fix_import_from(tokens: list[Token], i: int, *, node: ast.ImportFrom) -> Non
 def visit_Call(
     state: State,
     node: ast.Call,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         OLD_NAME in state.from_imports[MODULE]

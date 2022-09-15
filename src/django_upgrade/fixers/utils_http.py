@@ -40,7 +40,7 @@ URLLIB_NAMES = {
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if node.module == MODULE and is_rewritable_import_from(node):
         name_map = {}
@@ -92,7 +92,7 @@ def fix_import(
 def visit_Name(
     state: State,
     node: ast.Name,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in state.from_imports[MODULE]:
         new_name: str | None

@@ -82,15 +82,15 @@ CLIENT_REQUEST_METHODS = frozenset(
 
 
 class ResponseAssignmentVisitor(ast.NodeVisitor):
-    def __init__(self, name: str, before: ast.Expr) -> None:
+    def __init__(self, funcdef: ast.FunctionDef, name: str, before: ast.Expr) -> None:
+        self.funcdef = funcdef
         self.name = name
         self.before = before
         self.stop_search = False
         self.looks_like_response = False
 
-    def search(self, funcdef: ast.FunctionDef) -> None:
-        self.funcdef = funcdef
-        self.generic_visit(funcdef)
+    def search(self) -> None:
+        self.generic_visit(self.funcdef)
 
     def visit(self, node: ast.AST) -> Any:
         if self.stop_search:
@@ -141,8 +141,8 @@ def is_response_from_client(
     ):
         return False
 
-    visitor = ResponseAssignmentVisitor(name, parents[-1])
-    visitor.search(funcdef)
+    visitor = ResponseAssignmentVisitor(funcdef, name, parents[-1])
+    visitor.search()
     return visitor.looks_like_response
 
 

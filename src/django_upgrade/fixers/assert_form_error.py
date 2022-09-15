@@ -42,11 +42,6 @@ def visit_Call(
         and node.func.value.id == "self"
         and len(node.args) in (4, 5)
         and len(node.keywords) == 0
-        and isinstance((first_arg := node.args[0]), ast.Name)
-        # Heuristically detect response arguments
-        # Better would be to backtrack to try spot assignment from call to
-        # self.client.*
-        and ("response" in first_arg.id or first_arg.id in ("resp", "res", "r"))
         and (
             (
                 isinstance((second_arg := node.args[1]), ast.Constant)
@@ -54,12 +49,73 @@ def visit_Call(
             )
             or isinstance(second_arg, ast.Name)
         )
+        and isinstance((first_arg := node.args[0]), ast.Name)
+        # Detect response arguments either from some hardcoded names, or by
+        # looking back in current function for assignment from self.client.*()
+        # Necessary because new signature with msg_prefix overlaps old one
+        and (
+            "response" in first_arg.id
+            or first_arg.id in ("resp", "res", "r")
+            or is_response_from_client(parents, node, first_arg.id)
+        )
     ):
         yield ast_start_offset(first_arg), partial(
             rewrite_args,
             response_arg=first_arg,
             form_arg=second_arg,
         )
+
+
+CLIENT_REQUEST_METHODS = frozenset(
+    (
+        "request",
+        "get",
+        "post",
+        "head",
+        "options",
+        "put",
+        "patch",
+        "delete",
+        "trace",
+    )
+)
+
+
+def is_response_from_client(
+    parents: list[ast.AST],
+    node: ast.Call,
+    name: str,
+) -> bool:
+    if not (
+        isinstance(parents[-1], ast.Expr)
+        and isinstance((funcdef := parents[-2]), ast.FunctionDef)
+    ):
+        return False
+
+    expr_idx = funcdef.body.index(parents[-1])
+
+    # Work backwards looking for an assignment to the given name that looks
+    # like it comes from the test client.
+    for subnode in funcdef.body[expr_idx - 1 : None : -1]:
+        if (
+            isinstance(subnode, ast.Assign)
+            and len(subnode.targets) == 1
+            and isinstance(subnode.targets[0], ast.Name)
+            and subnode.targets[0].id == name
+        ):
+            call = subnode.value
+            if (
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Attribute)
+                and call.func.attr in CLIENT_REQUEST_METHODS
+                and isinstance(call.func.value, ast.Attribute)
+                and call.func.value.attr == "client"
+                and isinstance(call.func.value.value, ast.Name)
+                and call.func.value.value.id == "self"
+            ):
+                return True
+            break
+    return False
 
 
 def rewrite_args(

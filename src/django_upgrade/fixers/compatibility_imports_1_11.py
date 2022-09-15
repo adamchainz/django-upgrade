@@ -39,7 +39,7 @@ REWRITES = {
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module in REWRITES

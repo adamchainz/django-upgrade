@@ -26,18 +26,18 @@ fixer = Fixer(
 def visit_Module(
     state: State,
     node: ast.Module,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    yield from visit_Module_or_ClassDef(state, node, parent)
+    yield from visit_Module_or_ClassDef(state, node, parents)
 
 
 @fixer.register(ast.ClassDef)
 def visit_ClassDef(
     state: State,
     node: ast.ClassDef,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    yield from visit_Module_or_ClassDef(state, node, parent)
+    yield from visit_Module_or_ClassDef(state, node, parents)
 
 
 # Map from old assigned names to new decorator names, which were changed to be
@@ -70,7 +70,7 @@ class FunctionDetails:
 def visit_Module_or_ClassDef(
     state: State,
     node: ast.Module | ast.ClassDef,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     # Potential action and display functions to details of assigned attributes
     funcs: dict[str, FunctionDetails] = {}

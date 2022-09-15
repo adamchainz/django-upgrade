@@ -24,10 +24,10 @@ fixer = Fixer(
 def visit_Assign(
     state: State,
     node: ast.Assign,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(parent, ast.ClassDef)
+        isinstance(parents[-1], ast.ClassDef)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id in ("allow_database_queries", "multi_db")

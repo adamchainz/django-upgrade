@@ -31,7 +31,7 @@ fixer = Fixer(
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         is_rewritable_import_from(node)
@@ -49,7 +49,7 @@ def visit_ImportFrom(
 def visit_Call(
     state: State,
     node: ast.Call,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (

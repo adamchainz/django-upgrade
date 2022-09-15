@@ -24,11 +24,11 @@ fixer = Fixer(
 def visit_Assign(
     state: State,
     node: ast.Assign,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         state.looks_like_dunder_init_file()
-        and isinstance(parent, ast.Module)
+        and isinstance(parents[-1], ast.Module)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == "default_app_config"

@@ -37,7 +37,7 @@ def _is_django_admin_imported(state: State) -> bool:
 def visit_ClassDef(
     state: State,
     node: ast.ClassDef,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if _is_django_admin_imported(state) and not uses_full_super_in_init_or_new(node):
         decorable_admins.setdefault(state, {})[node.name] = set()
@@ -101,7 +101,7 @@ def update_class_def(
 def visit_Call(
     state: State,
     node: ast.Call,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         _is_django_admin_imported(state)
@@ -145,4 +145,4 @@ def visit_Call(
 
         if admin_name in to_decorate:
             to_decorate[admin_name].update(model_names)
-            yield ast_start_offset(node), partial(erase_node, node=parent)
+            yield ast_start_offset(node), partial(erase_node, node=parents[-1])

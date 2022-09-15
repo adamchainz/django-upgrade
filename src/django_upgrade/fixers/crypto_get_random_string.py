@@ -27,7 +27,7 @@ NAME = "get_random_string"
 def visit_Call(
     state: State,
     node: ast.Call,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (

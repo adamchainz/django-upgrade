@@ -25,10 +25,10 @@ fixer = Fixer(
 def visit_Subscript(
     state: State,
     node: ast.Subscript,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        not isinstance(parent, ast.Assign)
+        not isinstance(parents[-1], ast.Assign)
         and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
         and meta_name.startswith("HTTP_")
@@ -42,7 +42,7 @@ def visit_Subscript(
 def visit_Call(
     state: State,
     node: ast.Call,
-    parent: ast.AST,
+    parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)

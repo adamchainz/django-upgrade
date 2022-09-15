@@ -33,7 +33,7 @@ def visit_ClassDef(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        admin_imported(state)
+        "admin" in state.from_imports["django.contrib"]
         # and not node.decorator_list
         and not uses_full_super_in_init_or_new(node)
     ):
@@ -50,13 +50,6 @@ def visit_ClassDef(
             state=state,
             decorated=decorated,
         )
-
-
-def admin_imported(state: State) -> bool:
-    return (
-        "admin" in state.from_imports["django.contrib"]
-        or "admin" in state.from_imports["django.contrib.gis"]
-    )
 
 
 class FullSuperVisitor(ast.NodeVisitor):
@@ -108,7 +101,7 @@ def visit_Call(
     parent: ast.AST,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        admin_imported(state)
+        "admin" in state.from_imports["django.contrib"]
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "register"
         and isinstance(node.func.value, ast.Attribute)

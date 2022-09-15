@@ -630,4 +630,7 @@ Rewrites imports of ``utc`` from ``django.utils.timezone`` to use ``datetime.tim
 .. code-block:: diff
 
     -from django.utils.timezone import utc
-    +from datetime.timezone import utc
+    +from datetime import timezone
+
+    -calculate_some_datetime(utc)
+    +calculate_some_datetime(timezone.utc)

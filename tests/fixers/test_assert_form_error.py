@@ -92,6 +92,17 @@ def test_response_from_client_inner_class():
     )
 
 
+def test_response_from_client_no_match():
+    check_noop(
+        """\
+        def test_something():
+            page = "whatever"
+            self.assertFormError(page, "form", "user", "woops")
+        """,
+        settings,
+    )
+
+
 def test_assert_called_in_func_kw_default():
     check_noop(
         """\
@@ -162,14 +173,14 @@ def test_response_from_client():
     check_transformed(
         """\
         def test_something():
-            url = "/"
-            page = self.client.get(url)
+            f()
+            page = self.client.get()
             self.assertFormError(page, "form", "user", "woops")
         """,
         """\
         def test_something():
-            url = "/"
-            page = self.client.get(url)
+            f()
+            page = self.client.get()
             self.assertFormError(page.context["form"], "user", "woops")
         """,
         settings,

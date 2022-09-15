@@ -68,6 +68,18 @@ def test_response_from_client_assigned_after():
     )
 
 
+def test_response_from_client_inner_async_func():
+    check_noop(
+        """\
+        def test_something():
+            async def f():
+                page = self.client.get()
+            self.assertFormError(page, "form", "user", "woops")
+        """,
+        settings,
+    )
+
+
 def test_response_from_client_inner_func():
     check_noop(
         """\
@@ -181,6 +193,22 @@ def test_response_from_client():
         def test_something():
             f()
             page = self.client.get()
+            self.assertFormError(page.context["form"], "user", "woops")
+        """,
+        settings,
+    )
+
+
+def test_response_from_client_async():
+    check_transformed(
+        """\
+        async def test_something():
+            page = await self.async_client.get()
+            self.assertFormError(page, "form", "user", "woops")
+        """,
+        """\
+        async def test_something():
+            page = await self.async_client.get()
             self.assertFormError(page.context["form"], "user", "woops")
         """,
         settings,

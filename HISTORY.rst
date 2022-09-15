@@ -10,7 +10,7 @@ History
 
 * Add Django 3.2+ fixer to rewrite admin display function attributes to use the ``@admin.display()`` decorator.
 
-* Add Django 4.1+ fixer to rewrite calls to ``assertFormError()`` from the old signature to the new one.
+* Add Django 4.1+ fixer to rewrite calls to test case methods ``assertFormError()`` and ``assertFormsetError()`` from their old signatures to the new ones.
 
 * Make fixers that erase lines also erase any trailing comments.
 

@@ -12,6 +12,8 @@ History
 
 * Add Django 4.1+ fixer to rewrite calls to test case methods ``assertFormError()`` and ``assertFormsetError()`` from their old signatures to the new ones.
 
+* Add Django 2.0+ fixer to drop assignments of ``allow_tags`` attributes to ``True``.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

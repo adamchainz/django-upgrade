@@ -9,7 +9,7 @@ settings = Settings(target_version=(2, 2))
 def test_not_header_access():
     check_noop(
         """\
-        request.META['CONTENT_LENGTH']
+        request.META['QUERY_STRING']
         """,
         settings,
     )
@@ -88,6 +88,26 @@ def test_get_simple():
         """,
         """\
         request.headers.get('Server')
+        """,
+        settings,
+    )
+def test_get_content_length():
+    check_transformed(
+        """\
+        request.META.get('CONTENT_LENGTH')
+        """,
+        """\
+        request.headers.get('Content-Length')
+        """,
+        settings,
+    )
+def test_get_content_type():
+    check_transformed(
+        """\
+        request.META.get('CONTENT_TYPE')
+        """,
+        """\
+        request.headers.get('Content-Type')
         """,
         settings,
     )

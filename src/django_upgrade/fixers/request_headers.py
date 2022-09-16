@@ -20,6 +20,17 @@ fixer = Fixer(
     min_version=(2, 2),
 )
 
+def get_http_header_name(meta_name: str) -> str | None:
+    """Extract HTTP header name, unless it isn't an HTTP header."""
+    http_prefix = "HTTP_"
+    if meta_name.startswith(http_prefix):
+        return meta_name[len(http_prefix):]
+    if meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
+        return meta_name
+    return None
+
+def is_http_header(meta_name: str) -> bool:
+    return get_http_header_name(meta_name) is not None
 
 @fixer.register(ast.Subscript)
 def visit_Subscript(
@@ -31,7 +42,7 @@ def visit_Subscript(
         not isinstance(parents[-1], ast.Assign)
         and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
-        and meta_name.startswith("HTTP_")
+        and is_http_header(meta_name)
     ):
         yield ast_start_offset(node), partial(
             rewrite_header_access, meta_name=meta_name
@@ -51,7 +62,7 @@ def visit_Call(
         and len(node.args) >= 1
         and isinstance(node.args[0], ast.Constant)
         and isinstance(meta_name := node.args[0].value, str)
-        and meta_name.startswith("HTTP_")
+        and is_http_header(meta_name)
     ):
         yield ast_start_offset(node), partial(
             rewrite_header_access, meta_name=meta_name
@@ -98,6 +109,6 @@ def rewrite_header_access(tokens: list[Token], i: int, *, meta_name: str) -> Non
     replace(tokens, meta_idx, src="headers")
 
     str_idx = find(tokens, meta_idx, name=STRING)
-    raw_header_name = meta_name[len("HTTP_") :]
+    raw_header_name = get_http_header_name(meta_name)
     header_name = "-".join(x.title() for x in raw_header_name.split("_"))
     replace(tokens, str_idx, src=repr(header_name))

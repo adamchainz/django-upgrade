@@ -18,7 +18,7 @@ django-upgrade
    :target: https://github.com/pre-commit/pre-commit
    :alt: pre-commit
 
-Automatically upgrade your Django projects.
+Automatically upgrade your Django project code.
 
 Installation
 ============

@@ -1,6 +1,6 @@
 - id: django-upgrade
   name: django-upgrade
-  description: Automatically upgrade your Django projects.
+  description: Automatically upgrade your Django project code.
   entry: django-upgrade
   language: python
   types: [python]

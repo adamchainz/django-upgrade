@@ -14,7 +14,7 @@ from tokenize_rt import Offset, Token, tokens_to_src
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import erase_node, extract_indent, find_final_token, insert
+from django_upgrade.tokens import erase_node, extract_indent, find_last_token, insert
 
 fixer = Fixer(
     __name__,
@@ -174,5 +174,5 @@ def store_value_src(
     name: str,
     funcdetails: FunctionDetails,
 ) -> None:
-    j = find_final_token(tokens, i, node=node)
-    funcdetails.values[name] = tokens_to_src(tokens[i:j])
+    j = find_last_token(tokens, i, node=node)
+    funcdetails.values[name] = tokens_to_src(tokens[i : j + 1])

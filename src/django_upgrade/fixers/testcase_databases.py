@@ -12,7 +12,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import CODE, find_final_token
+from django_upgrade.tokens import CODE, find_last_token
 
 fixer = Fixer(
     __name__,
@@ -48,5 +48,5 @@ def replace_assignment(
         new_src += '"__all__"'
     else:
         new_src += "[]"
-    j = find_final_token(tokens, i, node=node)
-    tokens[i:j] = [Token(name=CODE, src=new_src)]
+    j = find_last_token(tokens, i, node=node)
+    tokens[i : j + 1] = [Token(name=CODE, src=new_src)]

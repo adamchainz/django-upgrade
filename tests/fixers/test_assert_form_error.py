@@ -25,6 +25,38 @@ class TestForm:
             settings,
         )
 
+    def test_bad_signature_too_many_args(self):
+        check_noop(
+            """\
+            self.assertFormError(response, "form", "user", "woops", "!!!", None)
+            """,
+            settings,
+        )
+
+    def test_bad_signature_too_few_args(self):
+        check_noop(
+            """\
+            self.assertFormError(response, "form")
+            """,
+            settings,
+        )
+
+    def test_bad_signature_bad_errors_kwarg(self):
+        check_noop(
+            """\
+            self.assertFormError(response, "form", "user", err="woops")
+            """,
+            settings,
+        )
+
+    def test_bad_signature_bad_msg_prefix_kwarg(self):
+        check_noop(
+            """\
+            self.assertFormError(response, "form", "user", "woops", msg="!!!")
+            """,
+            settings,
+        )
+
     def test_unsupported_basic_name(self):
         check_noop(
             """\
@@ -303,7 +335,48 @@ class TestForm:
             settings,
         )
 
-    def test_error_none(self):
+    def test_kwarg_errors(self):
+        check_transformed(
+            """\
+            self.assertFormError(response, "form", "user", errors="woops")
+            """,
+            """\
+            self.assertFormError(response.context["form"], "user", errors="woops")
+            """,
+            settings,
+        )
+
+    def test_kwarg_msg_prefix(self):
+        check_transformed(
+            """\
+            self.assertFormError(
+                response, "form", "user", "woops", msg_prefix="!!!"
+            )
+            """,
+            """\
+            self.assertFormError(
+                response.context["form"], "user", "woops", msg_prefix="!!!"
+            )
+            """,
+            settings,
+        )
+
+    def test_kwarg_errors_msg_prefix(self):
+        check_transformed(
+            """\
+            self.assertFormError(
+                response, "form", "user", errors="woops", msg_prefix="!!!"
+            )
+            """,
+            """\
+            self.assertFormError(
+                response.context["form"], "user", errors="woops", msg_prefix="!!!"
+            )
+            """,
+            settings,
+        )
+
+    def test_errors_none(self):
         check_transformed(
             """\
             self.assertFormError(response, "form", "user", None)
@@ -314,12 +387,23 @@ class TestForm:
             settings,
         )
 
+    def test_errors_none_kwarg(self):
+        check_transformed(
+            """\
+            self.assertFormError(response, "form", "user", errors=None)
+            """,
+            """\
+            self.assertFormError(response.context["form"], "user", errors=[])
+            """,
+            settings,
+        )
+
 
 class TestFormset:
     def test_new_signature(self):
         check_noop(
             """\
-            self.assertFormsetError(formset, "user", "woops")
+            self.assertFormsetError(formset, "user", 0, "woops")
             """,
             settings,
         )
@@ -327,7 +411,7 @@ class TestFormset:
     def test_new_signature_msg_prefix(self):
         check_noop(
             """\
-            self.assertFormError(form, "user", "woops", "My form")
+            self.assertFormsetError(formset, "user", 0, "woops", "My form")
             """,
             settings,
         )
@@ -335,7 +419,41 @@ class TestFormset:
     def test_unsupported_basic_name(self):
         check_noop(
             """\
-            self.assertFormError(page, form, "user", "woops")
+            self.assertFormsetError(page, formset, 0, "user", "woops")
+            """,
+            settings,
+        )
+
+    def test_bad_signature_too_many_args(self):
+        check_noop(
+            """\
+            self.assertFormsetError(
+                response, "formset", 0, "user", "woops", "!!!", None
+            )
+            """,
+            settings,
+        )
+
+    def test_bad_signature_too_few_args(self):
+        check_noop(
+            """\
+            self.assertFormsetError(response, "formset", 0)
+            """,
+            settings,
+        )
+
+    def test_bad_signature_bad_errors_kwarg(self):
+        check_noop(
+            """\
+            self.assertFormsetError(response, "formset", 0, "user", err="woops")
+            """,
+            settings,
+        )
+
+    def test_bad_signature_bad_msg_prefix_kwarg(self):
+        check_noop(
+            """\
+            self.assertFormsetError(response, "formset", 0, "user", "woops", msg="!!!")
             """,
             settings,
         )
@@ -633,13 +751,69 @@ class TestFormset:
             settings,
         )
 
-    def test_error_none(self):
+    def test_kwarg_errors(self):
+        check_transformed(
+            """\
+            self.assertFormsetError(
+                response, "formset", 0, "user", errors="woops"
+            )
+            """,
+            """\
+            self.assertFormsetError(
+                response.context["formset"], 0, "user", errors="woops"
+            )
+            """,
+            settings,
+        )
+
+    def test_kwarg_msg_prefix(self):
+        check_transformed(
+            """\
+            self.assertFormsetError(
+                response, "formset", 0, "user", "woops", msg_prefix="!!!"
+            )
+            """,
+            """\
+            self.assertFormsetError(
+                response.context["formset"], 0, "user", "woops", msg_prefix="!!!"
+            )
+            """,
+            settings,
+        )
+
+    def test_kwarg_errors_msg_prefix(self):
+        check_transformed(
+            """\
+            self.assertFormsetError(
+                response, "formset", 0, "user", errors="woops", msg_prefix="!!!"
+            )
+            """,
+            """\
+            self.assertFormsetError(
+                response.context["formset"], 0, "user", errors="woops", msg_prefix="!!!"
+            )
+            """,
+            settings,
+        )
+
+    def test_errors_none(self):
         check_transformed(
             """\
             self.assertFormsetError(response, "formset", 0, "user", None)
             """,
             """\
             self.assertFormsetError(response.context["formset"], 0, "user", [])
+            """,
+            settings,
+        )
+
+    def test_errors_none_kwarg(self):
+        check_transformed(
+            """\
+            self.assertFormsetError(response, "formset", 0, "user", errors=None)
+            """,
+            """\
+            self.assertFormsetError(response.context["formset"], 0, "user", errors=[])
             """,
             settings,
         )

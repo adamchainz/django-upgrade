@@ -135,6 +135,22 @@ def test_py2_style_init_super_delayed():
     )
 
 
+def test_register_different_parent():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(admin.ModelAdmin):
+            ...
+
+        if True:
+            admin.site.register(Author, AuthorAdmin)
+        """,
+        settings=settings,
+    )
+
+
 def test_py2_style_init_super_with_inner_branching():
     check_transformed(
         """\

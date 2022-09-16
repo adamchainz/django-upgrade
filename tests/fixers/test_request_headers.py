@@ -91,6 +91,8 @@ def test_get_simple():
         """,
         settings,
     )
+
+
 def test_get_content_length():
     check_transformed(
         """\
@@ -101,6 +103,8 @@ def test_get_content_length():
         """,
         settings,
     )
+
+
 def test_get_content_type():
     check_transformed(
         """\

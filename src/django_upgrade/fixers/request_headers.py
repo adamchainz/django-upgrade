@@ -20,17 +20,20 @@ fixer = Fixer(
     min_version=(2, 2),
 )
 
+
 def get_http_header_name(meta_name: str) -> str | None:
     """Extract HTTP header name, unless it isn't an HTTP header."""
     http_prefix = "HTTP_"
     if meta_name.startswith(http_prefix):
-        return meta_name[len(http_prefix):]
+        return meta_name[len(http_prefix) :]
     if meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
         return meta_name
     return None
 
+
 def is_http_header(meta_name: str) -> bool:
     return get_http_header_name(meta_name) is not None
+
 
 @fixer.register(ast.Subscript)
 def visit_Subscript(

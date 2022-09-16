@@ -303,6 +303,17 @@ class TestForm:
             settings,
         )
 
+    def test_error_none(self):
+        check_transformed(
+            """\
+            self.assertFormError(response, "form", "user", None)
+            """,
+            """\
+            self.assertFormError(response.context["form"], "user", [])
+            """,
+            settings,
+        )
+
 
 class TestFormset:
     def test_new_signature(self):
@@ -618,6 +629,17 @@ class TestFormset:
                 "user",
                 "woops",
             )
+            """,
+            settings,
+        )
+
+    def test_error_none(self):
+        check_transformed(
+            """\
+            self.assertFormsetError(response, "formset", 0, "user", None)
+            """,
+            """\
+            self.assertFormsetError(response.context["formset"], 0, "user", [])
             """,
             settings,
         )

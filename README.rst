@@ -265,6 +265,26 @@ Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``func
     -from django.utils.functional import lru_cache
     +from functools import lru_cache
 
+``<func>.allow_tags = True``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Removes assignments of ``allow_tags`` attributes to ``True``.
+This was an admin feature to allow display functions to return HTML without marking it as unsafe,  deprecated in Django 1.9.
+In practice, most display functions that return HTML already use |format_html()|__ or similar, so the attribute wasn’t necessary.
+This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
+
+.. |format_html()| replace:: ``format_html()``
+__ https://docs.djangoproject.com/en/tsable/ref/utils/#django.utils.html.format_html
+
+.. code-block:: diff
+
+    from django.contrib import admin
+
+    def upper_case_name(obj):
+        ...
+
+   -upper_case_name.allow_tags = True
+
 Django 2.2
 ----------
 

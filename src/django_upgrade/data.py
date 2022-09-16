@@ -22,6 +22,8 @@ from django_upgrade import fixers
 
 
 class Settings:
+    __slots__ = ("target_version",)
+
     def __init__(self, target_version: tuple[int, int]) -> None:
         self.target_version = target_version
 
@@ -34,6 +36,8 @@ dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
 
 
 class State:
+    __slots__ = ("settings", "filename", "from_imports", "__weakref__")
+
     def __init__(
         self,
         settings: Settings,
@@ -137,6 +141,8 @@ def visit(
 
 
 class Fixer:
+    __slots__ = ("name", "min_version", "ast_funcs")
+
     def __init__(self, name: str, min_version: tuple[int, int]) -> None:
         self.name = name
         self.min_version = min_version

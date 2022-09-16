@@ -180,6 +180,8 @@ class Block:  # pragma: no cover
     MIT Licensed
     """
 
+    __slots__ = ("start", "colon", "block", "end", "line")
+
     def __init__(
         self, start: int, colon: int, block: int, end: int, line: bool
     ) -> None:

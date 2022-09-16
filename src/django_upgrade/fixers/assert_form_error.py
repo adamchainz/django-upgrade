@@ -29,11 +29,6 @@ fixer = Fixer(
     min_version=(4, 1),
 )
 
-OLD_ARG_COUNTS = {
-    "assertFormError": (4, 5),
-    "assertFormsetError": (5, 6),
-}
-
 
 @fixer.register(ast.Call)
 def visit_Call(
@@ -46,8 +41,7 @@ def visit_Call(
         and (func_name := node.func.attr) in ("assertFormError", "assertFormsetError")
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "self"
-        and len(node.args) in OLD_ARG_COUNTS[func_name]
-        and len(node.keywords) == 0
+        and arguments_match(node, func_name)
         and (
             (
                 isinstance((second_arg := node.args[1]), ast.Constant)
@@ -75,9 +69,46 @@ def visit_Call(
             errors_idx = 3
         else:
             errors_idx = 4
-        errors_arg = node.args[errors_idx]
+        try:
+            errors_arg = node.args[errors_idx]
+        except IndexError:
+            errors_arg = [k.value for k in node.keywords if k.arg == "errors"][0]
+
         if isinstance(errors_arg, ast.Constant) and errors_arg.value is None:
             yield ast_start_offset(errors_arg), partial(replace, src="[]")
+
+
+def arguments_match(node: ast.Call, func_name: str) -> bool:
+    arg_count = len(node.args)
+    kwarg_count = len(node.keywords)
+    total_args = arg_count + kwarg_count
+    kwarg_names = [k.arg for k in node.keywords]
+
+    if func_name == "assertFormError":
+        return (
+            total_args == 4
+            and (arg_count == 4 or (arg_count == 3 and kwarg_names == ["errors"]))
+        ) or (
+            total_args == 5
+            and (
+                arg_count == 5
+                or (arg_count == 4 and node.keywords[0].arg == "msg_prefix")
+                or (arg_count == 3 and kwarg_names == ["errors", "msg_prefix"])
+            )
+        )
+    else:
+        # assertFormsetError
+        return (
+            total_args == 5
+            and (arg_count == 5 or (arg_count == 4 and kwarg_names == ["errors"]))
+        ) or (
+            total_args == 6
+            and (
+                arg_count == 6
+                or (arg_count == 5 and kwarg_names == ["msg_prefix"])
+                or (arg_count == 4 and kwarg_names == ["errors", "msg_prefix"])
+            )
+        )
 
 
 CLIENT_REQUEST_METHODS = frozenset(

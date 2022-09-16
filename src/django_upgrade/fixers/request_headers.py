@@ -31,10 +31,6 @@ def get_http_header_name(meta_name: str) -> str | None:
     return None
 
 
-def is_http_header(meta_name: str) -> bool:
-    return get_http_header_name(meta_name) is not None
-
-
 @fixer.register(ast.Subscript)
 def visit_Subscript(
     state: State,
@@ -45,10 +41,10 @@ def visit_Subscript(
         not isinstance(parents[-1], ast.Assign)
         and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
-        and is_http_header(meta_name)
+        and (raw_header_name := get_http_header_name(meta_name) is not None)
     ):
         yield ast_start_offset(node), partial(
-            rewrite_header_access, meta_name=meta_name
+            rewrite_header_access, raw_header_name=raw_header_name
         )
 
 
@@ -65,10 +61,10 @@ def visit_Call(
         and len(node.args) >= 1
         and isinstance(node.args[0], ast.Constant)
         and isinstance(meta_name := node.args[0].value, str)
-        and is_http_header(meta_name)
+        and (raw_header_name := get_http_header_name(meta_name) is not None)
     ):
         yield ast_start_offset(node), partial(
-            rewrite_header_access, meta_name=meta_name
+            rewrite_header_access, raw_header_name=raw_header_name
         )
 
 
@@ -107,11 +103,10 @@ else:
         return None
 
 
-def rewrite_header_access(tokens: list[Token], i: int, *, meta_name: str) -> None:
+def rewrite_header_access(tokens: list[Token], i: int, *, raw_header_name: str) -> None:
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
 
     str_idx = find(tokens, meta_idx, name=STRING)
-    raw_header_name = get_http_header_name(meta_name)
     header_name = "-".join(x.title() for x in raw_header_name.split("_"))
     replace(tokens, str_idx, src=repr(header_name))

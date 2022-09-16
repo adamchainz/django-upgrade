@@ -635,8 +635,8 @@ Rewrites imports of ``utc`` from ``django.utils.timezone`` to use ``datetime.tim
     -calculate_some_datetime(utc)
     +calculate_some_datetime(timezone.utc)
 
-``assertFormError()``
-~~~~~~~~~~~~~~~~~~~~~
+``assertFormError()`` and ``assertFormsetError()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Rewrites calls to these assertion functions from the old signature to the new one.
 
@@ -644,3 +644,6 @@ Rewrites calls to these assertion functions from the old signature to the new on
 
     -self.assertFormError(response, "form", "username", ["Too long"])
     +self.assertFormError(response.context["form"], "username", ["Too long"])
+
+    -self.assertFormsetError(response, "formset", 0, "username", ["Too long"])
+    +self.assertFormsetError(response.context["formset"], 0, "username", ["Too long"])

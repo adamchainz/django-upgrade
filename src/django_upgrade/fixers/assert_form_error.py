@@ -28,6 +28,11 @@ fixer = Fixer(
     min_version=(4, 1),
 )
 
+OLD_ARG_COUNTS = {
+    "assertFormError": (4, 5),
+    "assertFormsetError": (5, 6),
+}
+
 
 @fixer.register(ast.Call)
 def visit_Call(
@@ -37,10 +42,10 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr == "assertFormError"
+        and (func_name := node.func.attr) in ("assertFormError", "assertFormsetError")
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "self"
-        and len(node.args) in (4, 5)
+        and len(node.args) in OLD_ARG_COUNTS[func_name]
         and len(node.keywords) == 0
         and (
             (

@@ -20,6 +20,7 @@ from django_upgrade.tokens import (
     consume,
     find_final_token,
     find_first_token,
+    replace,
     reverse_consume,
 )
 
@@ -69,6 +70,14 @@ def visit_Call(
             response_arg=first_arg,
             form_arg=second_arg,
         )
+
+        if func_name == "assertFormError":
+            errors_idx = 3
+        else:
+            errors_idx = 4
+        errors_arg = node.args[errors_idx]
+        if isinstance(errors_arg, ast.Constant) and errors_arg.value is None:
+            yield ast_start_offset(errors_arg), partial(replace, src="[]")
 
 
 CLIENT_REQUEST_METHODS = frozenset(

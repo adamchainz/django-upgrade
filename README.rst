@@ -645,5 +645,11 @@ Rewrites calls to these assertion functions from the old signature to the new on
     -self.assertFormError(response, "form", "username", ["Too long"])
     +self.assertFormError(response.context["form"], "username", ["Too long"])
 
+    -self.assertFormError(response, "form", "username", None)
+    +self.assertFormError(response.context["form"], "username", [])
+
     -self.assertFormsetError(response, "formset", 0, "username", ["Too long"])
     +self.assertFormsetError(response.context["formset"], 0, "username", ["Too long"])
+
+    -self.assertFormsetError(response, "formset", 0, "username", None)
+    +self.assertFormsetError(response.context["formset"], 0, "username", [])

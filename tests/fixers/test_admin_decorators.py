@@ -97,7 +97,7 @@ class TestActionFunctions:
             from django.contrib import admin
 
             @admin.action(
-                description='yada',
+                description='yada'
             )
             def make_published(modeladmin, request, queryset):
                 ...
@@ -120,7 +120,7 @@ class TestActionFunctions:
             from django.contrib import admin
 
             @admin.action(
-                description='yada',
+                description='yada'
             )
             def make_published(modeladmin, request, queryset, /):
                 ...
@@ -143,7 +143,7 @@ class TestActionFunctions:
             from django.contrib import admin
 
             @admin.action(
-                permissions=('change',),
+                permissions=('change',)
             )
             def make_published(modeladmin, request, queryset):
                 ...
@@ -197,7 +197,7 @@ class TestActionFunctions:
 
             @admin.action(
                 description='yada'
-                    'yada!',
+                    'yada!'
             )
             def make_published(modeladmin, request, queryset):
                 ...
@@ -222,7 +222,7 @@ class TestActionFunctions:
             from django.contrib import admin
 
             @admin.action(
-                description='yada',
+                description='yada'
             )
             def make_published(modeladmin, request, queryset):
                 ...
@@ -245,7 +245,7 @@ class TestActionFunctions:
             from django.contrib.gis import admin
 
             @admin.action(
-                description='yada',
+                description='yada'
             )
             def make_published(modeladmin, request, queryset):
                 ...
@@ -284,7 +284,7 @@ class TestActionFunctions:
 
             class BookAdmin(admin.ModelAdmin):
                 @admin.action(
-                    description="yada",
+                    description="yada"
                 )
                 def make_published(self, request, queryset):
                     ...
@@ -309,7 +309,7 @@ class TestActionFunctions:
 
             class BookAdmin(admin.ModelAdmin):
                 @admin.action(
-                    permissions=('change',),
+                    permissions=('change',)
                 )
                 def make_published(self, request, queryset):
                     ...
@@ -361,7 +361,7 @@ class TestActionFunctions:
 
             class BookAdmin(admin.ModelAdmin):
                 @admin.action(
-                    description='yada',
+                    description='yada'
                 )
                 def make_published(self, request, queryset):
                     ...
@@ -462,7 +462,7 @@ class TestDisplayFunctions:
             from django.contrib import admin
 
             @admin.display(
-                description='yada',
+                description='yada'
             )
             def upper_case_name(obj):
                 ...
@@ -485,7 +485,7 @@ class TestDisplayFunctions:
             from django.contrib import admin
 
             @admin.display(
-                boolean=True,
+                boolean=True
             )
             def upper_case_name(obj):
                 ...
@@ -508,7 +508,7 @@ class TestDisplayFunctions:
             from django.contrib import admin
 
             @admin.display(
-                empty_value="xxx",
+                empty_value="xxx"
             )
             def upper_case_name(obj):
                 ...
@@ -531,7 +531,7 @@ class TestDisplayFunctions:
             from django.contrib import admin
 
             @admin.display(
-                ordering="name",
+                ordering="name"
             )
             def upper_case_name(obj):
                 ...
@@ -585,7 +585,7 @@ class TestDisplayFunctions:
             from django.contrib.gis import admin
 
             @admin.display(
-                description='yada',
+                description='yada'
             )
             def upper_case_name(obj):
                 ...
@@ -626,7 +626,7 @@ class TestDisplayFunctions:
             @admin.register(Book)
             class BookAdmin(admin.ModelAdmin):
                 @admin.display(
-                    description='yada',
+                    description='yada'
                 )
                 def is_published(self, obj):
                     ...
@@ -653,7 +653,7 @@ class TestDisplayFunctions:
             @admin.register(Book)
             class BookAdmin(admin.ModelAdmin):
                 @admin.display(
-                    boolean=True,
+                    boolean=True
                 )
                 def is_published(self, obj):
                     ...
@@ -680,7 +680,7 @@ class TestDisplayFunctions:
             @admin.register(Book)
             class BookAdmin(admin.ModelAdmin):
                 @admin.display(
-                    empty_value="xxx",
+                    empty_value="xxx"
                 )
                 def is_published(self, obj):
                     ...
@@ -707,7 +707,7 @@ class TestDisplayFunctions:
             @admin.register(Book)
             class BookAdmin(admin.ModelAdmin):
                 @admin.display(
-                    ordering="-publish_date",
+                    ordering="-publish_date"
                 )
                 def is_published(self, obj):
                     ...
@@ -765,7 +765,7 @@ class TestDisplayFunctions:
             @admin.register(Book)
             class BookAdmin(admin.ModelAdmin):
                 @admin.display(
-                    description='Is Published?',
+                    description='Is Published?'
                 )
                 def is_published(self, obj):
                     ...

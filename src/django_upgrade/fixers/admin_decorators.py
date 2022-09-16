@@ -154,14 +154,18 @@ def decorate_function(
 ) -> None:
     j, indent = extract_indent(tokens, i)
     dec_src = f"{indent}@admin.{funcdetails.decorator}(\n"
+
+    # Pull args in predefined order
     names = NAME_MAPS[funcdetails.decorator]
-    for name in names.values():  # Use predefined order
-        if name not in funcdetails.values:
-            continue
-        source = funcdetails.values[name]
-        assert isinstance(source, str)
+    args = [
+        (name, funcdetails.values[name])
+        for name in names.values()
+        if name in funcdetails.values
+    ]
+    comma = "," if len(args) > 1 else ""
+    for name, source in args:
         source = source.replace("\n", f"\n{indent}    ")
-        dec_src += f"{indent}    {name}={source},\n"
+        dec_src += f"{indent}    {name}={source}{comma}\n"
     dec_src += f"{indent})\n"
     insert(tokens, j, new_src=dec_src)
 

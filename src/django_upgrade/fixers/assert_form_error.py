@@ -18,8 +18,8 @@ from django_upgrade.tokens import (
     OP,
     PHYSICAL_NEWLINE,
     consume,
-    find_final_token,
     find_first_token,
+    find_last_token,
     replace,
     reverse_consume,
 )
@@ -224,8 +224,8 @@ def rewrite_args(
     form_arg: ast.Constant | ast.Name,
 ) -> None:
     j = find_first_token(tokens, i, node=form_arg)
-    k = find_final_token(tokens, j, node=form_arg)
-    ftokens = tokens[j:k]
+    k = find_last_token(tokens, j, node=form_arg)
+    ftokens = tokens[j : k + 1]
     k = consume(tokens, k, name=OP, src=",")
     k = consume(tokens, k, name=UNIMPORTANT_WS)
     if tokens[k + 1].name == PHYSICAL_NEWLINE:

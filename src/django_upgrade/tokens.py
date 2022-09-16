@@ -75,7 +75,7 @@ def find_first_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     return j
 
 
-def find_final_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
+def find_last_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     """
     Find the last token corresponding to the given ast node.
     """
@@ -87,7 +87,7 @@ def find_final_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
         or tokens[j].utf8_byte_offset < node.end_col_offset
     ):
         j += 1
-    return j
+    return j - 1
 
 
 def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
@@ -335,15 +335,15 @@ def erase_node(tokens: list[Token], i: int, *, node: ast.AST) -> None:
     """
     Erase all tokens corresponding to the given ast node.
     """
-    j = find_final_token(tokens, i, node=node)
-    if tokens[j].name == UNIMPORTANT_WS:
+    j = find_last_token(tokens, i, node=node)
+    if tokens[j + 1].name == UNIMPORTANT_WS:
         j += 1
-    if tokens[j].name == COMMENT:
+    if tokens[j + 1].name == COMMENT:
         j += 1
-    if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
+    if tokens[j + 1].name == LOGICAL_NEWLINE:  # pragma: no branch
         j += 1
     i, _ = extract_indent(tokens, i)
-    del tokens[i:j]
+    del tokens[i : j + 1]
 
 
 def find_and_replace_name(tokens: list[Token], i: int, *, name: str, new: str) -> None:

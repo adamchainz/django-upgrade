@@ -21,9 +21,17 @@ fixer = Fixer(
 )
 
 # Keep track of classes that could be decorated with `@admin.register()`
-# For each class name, store the associated custom ModelAdmin class
-# inferred from eligible `admin.site.register` calls.
-decorable_admins: MutableMapping[State, dict[str, set[str]]] = WeakKeyDictionary()
+# For each class name, store the associated model class names inferred from
+# eligible `admin.site.register` calls.
+
+
+class AdminDetails:
+    def __init__(self, parent: ast.AST) -> None:
+        self.parent = parent
+        self.model_names: set[str] = set()
+
+
+decorable_admins: MutableMapping[State, dict[str, AdminDetails]] = WeakKeyDictionary()
 
 
 def _is_django_admin_imported(state: State) -> bool:
@@ -40,7 +48,7 @@ def visit_ClassDef(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if _is_django_admin_imported(state) and not uses_full_super_in_init_or_new(node):
-        decorable_admins.setdefault(state, {})[node.name] = set()
+        decorable_admins.setdefault(state, {})[node.name] = AdminDetails(parents[-1])
         if not node.decorator_list:
             offset = ast_start_offset(node)
             decorated = False
@@ -85,14 +93,14 @@ def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
 def update_class_def(
     tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
 ) -> None:
-    model_names = decorable_admins.get(state, {}).pop(name, set())
-    if not model_names:
+    admin_details = decorable_admins.get(state, {})[name]
+    if not admin_details.model_names:
         return
 
     if decorated:
         i = reverse_find(tokens, i, name=OP, src="@")
     j, indent = extract_indent(tokens, i)
-    joined_names = ", ".join(sorted(model_names))
+    joined_names = ", ".join(sorted(admin_details.model_names))
     new_src = f"{indent}@admin.register({joined_names})\n"
     insert(tokens, j, new_src=new_src)
 
@@ -105,6 +113,7 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         _is_django_admin_imported(state)
+        and isinstance(parents[-1], ast.Expr)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "register"
         and isinstance(node.func.value, ast.Attribute)
@@ -141,8 +150,8 @@ def visit_Call(
             return
 
         admin_name = admin_arg.id
-        to_decorate = decorable_admins.get(state, {})
+        admin_details = decorable_admins.get(state, {}).get(admin_name, None)
 
-        if admin_name in to_decorate:
-            to_decorate[admin_name].update(model_names)
+        if admin_details is not None and admin_details.parent == parents[-2]:
+            admin_details.model_names.update(model_names)
             yield ast_start_offset(node), partial(erase_node, node=parents[-1])

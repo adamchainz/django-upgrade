@@ -41,7 +41,7 @@ def visit_Subscript(
         not isinstance(parents[-1], ast.Assign)
         and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
-        and (raw_header_name := get_http_header_name(meta_name) is not None)
+        and (raw_header_name := get_http_header_name(meta_name)) is not None
     ):
         yield ast_start_offset(node), partial(
             rewrite_header_access, raw_header_name=raw_header_name
@@ -61,7 +61,7 @@ def visit_Call(
         and len(node.args) >= 1
         and isinstance(node.args[0], ast.Constant)
         and isinstance(meta_name := node.args[0].value, str)
-        and (raw_header_name := get_http_header_name(meta_name) is not None)
+        and (raw_header_name := get_http_header_name(meta_name)) is not None
     ):
         yield ast_start_offset(node), partial(
             rewrite_header_access, raw_header_name=raw_header_name

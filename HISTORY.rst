@@ -14,6 +14,10 @@ History
 
 * Add Django 2.0+ fixer to drop assignments of ``allow_tags`` attributes to ``True``.
 
+* Make ``request.headers`` fixer also rewrite accesses of the ``Content-Length`` and ``Content-Type`` headers.
+
+  Thanks to Christian Bundy in `PR #226 <https://github.com/adamchainz/django-upgrade/pull/226>`__.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

@@ -21,16 +21,6 @@ fixer = Fixer(
 )
 
 
-def get_http_header_name(meta_name: str) -> str | None:
-    """Extract HTTP header name, unless it isn't an HTTP header."""
-    http_prefix = "HTTP_"
-    if meta_name.startswith(http_prefix):
-        return meta_name[len(http_prefix) :]
-    if meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
-        return meta_name
-    return None
-
-
 @fixer.register(ast.Subscript)
 def visit_Subscript(
     state: State,
@@ -101,6 +91,16 @@ else:
         ):
             return node.value.value
         return None
+
+
+def get_http_header_name(meta_name: str) -> str | None:
+    """Extract HTTP header name, unless it isn't an HTTP header."""
+    http_prefix = "HTTP_"
+    if meta_name.startswith(http_prefix):
+        return meta_name[len(http_prefix) :]
+    if meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
+        return meta_name
+    return None
 
 
 def rewrite_header_access(tokens: list[Token], i: int, *, raw_header_name: str) -> None:

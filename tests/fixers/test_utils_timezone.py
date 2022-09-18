@@ -175,3 +175,21 @@ def test_attr_reuse_datetime_import_aliased():
         """,
         settings,
     )
+
+
+def test_attr_insert_import_after_from():
+    check_transformed(
+        """\
+        from __future__ import annotations
+        from django.utils import timezone
+
+        foo(timezone.utc)
+        """,
+        """\
+        from __future__ import annotations
+        from datetime import timezone
+
+        foo(timezone.utc)
+        """,
+        settings,
+    )

@@ -13,7 +13,14 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import find_last_token, insert, replace, update_import_names
+from django_upgrade.tokens import (
+    LOGICAL_NEWLINE,
+    find,
+    find_last_token,
+    insert,
+    replace,
+    update_import_names,
+)
 
 fixer = Fixer(
     __name__,
@@ -145,7 +152,8 @@ def maybe_rewrite_import(
     elif not details.datetime_module:
         assert details.first_import is not None
         yield ast_start_offset(details.first_import), partial(
-            insert, new_src="from datetime import timezone\n"
+            add_new_timezone_import,
+            node=details.first_import,
         )
 
     details.rewrite_scheduled = True
@@ -154,3 +162,16 @@ def maybe_rewrite_import(
 def add_timezone_to_from(tokens: list[Token], i: int, *, node: ast.ImportFrom) -> None:
     j = find_last_token(tokens, i, node=node)
     insert(tokens, j + 1, new_src=", timezone")
+
+
+def add_new_timezone_import(
+    tokens: list[Token], i: int, *, node: ast.Import | ast.ImportFrom
+) -> None:
+    new_src = "from datetime import timezone\n"
+    if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+        # insert after
+        j = find_last_token(tokens, i, node=node)
+        j = find(tokens, i, name=LOGICAL_NEWLINE)
+        insert(tokens, j + 1, new_src=new_src)
+    else:
+        insert(tokens, i, new_src=new_src)

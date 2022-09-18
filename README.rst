@@ -151,6 +151,23 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-deco
     -admin.site.register(MyModel1, MyCustomAdmin)
     -admin.site.register(MyModel2, MyCustomAdmin)
 
+
+This also works with custom admin sites.
+We are detecting them heuristically by matching object names ending with ``site``, registered admin models ending with ``Admin`` and filenames called ``admin.py`` (or in an ``admin`` directory).
+
+.. code-block:: diff
+
+    from myapp.admin import custom_site
+    from django.contrib import admin
+
+    +@admin.register(MyModel)
+    +@admin.register(MyModel, site=custom_site)
+    class MyModelAdmin(admin.ModelAdmin):
+        pass
+
+    -custom_site.register(MyModel, MyModelAdmin)
+    -admin.site.register(MyModel, MyModelAdmin)
+
 Django 1.9
 -----------
 

@@ -28,7 +28,7 @@ fixer = Fixer(
 class AdminDetails:
     def __init__(self, parent: ast.AST) -> None:
         self.parent = parent
-        self.model_names: set[str] = set()
+        self.model_names_per_site: dict[str, set[str]] = {}
 
 
 decorable_admins: MutableMapping[State, dict[str, AdminDetails]] = WeakKeyDictionary()
@@ -94,14 +94,19 @@ def update_class_def(
     tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
 ) -> None:
     admin_details = decorable_admins.get(state, {})[name]
-    if not admin_details.model_names:
+    if not admin_details.model_names_per_site:
         return
 
     if decorated:
         i = reverse_find(tokens, i, name=OP, src="@")
     j, indent = extract_indent(tokens, i)
-    joined_names = ", ".join(sorted(admin_details.model_names))
-    new_src = f"{indent}@admin.register({joined_names})\n"
+
+    new_src = ""
+    for custom_site, model_names in sorted(admin_details.model_names_per_site.items()):
+        joined_names = ", ".join(sorted(model_names))
+        custom_site_src = f", site={custom_site}" if custom_site else ""
+        new_src += f"{indent}@admin.register({joined_names}{custom_site_src})\n"
+
     insert(tokens, j, new_src=new_src)
 
 
@@ -111,15 +116,24 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
+    custom_site = ""
     if (
         _is_django_admin_imported(state)
         and isinstance(parents[-1], ast.Expr)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "register"
-        and isinstance(node.func.value, ast.Attribute)
-        and node.func.value.attr == "site"
-        and isinstance(node.func.value.value, ast.Name)
-        and node.func.value.value.id == "admin"
+    ) and (
+        (  # admin.site.register(...)
+            isinstance(node.func.value, ast.Attribute)
+            and node.func.value.attr == "site"
+            and isinstance(node.func.value.value, ast.Name)
+            and node.func.value.value.id == "admin"
+        )
+        or (  # custom_site.register(...)
+            isinstance(node.func.value, ast.Name)
+            and (custom_site := node.func.value.id).endswith("site")
+            and state.looks_like_admin_file()
+        )
     ):
         if (  # admin.site.register(MyModel, MyCustomAdmin)
             len(node.args) == 2
@@ -152,6 +166,12 @@ def visit_Call(
         admin_name = admin_arg.id
         admin_details = decorable_admins.get(state, {}).get(admin_name, None)
 
-        if admin_details is not None and admin_details.parent == parents[-2]:
-            admin_details.model_names.update(model_names)
+        if (
+            admin_details is not None
+            and admin_details.parent == parents[-2]
+            and not (custom_site and not admin_name.endswith("Admin"))
+        ):
+            admin_details.model_names_per_site.setdefault(custom_site, set()).update(
+                model_names
+            )
             yield ast_start_offset(node), partial(erase_node, node=parents[-1])

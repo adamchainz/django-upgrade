@@ -125,3 +125,41 @@ def test_looks_like_dunder_init_file_false(filename: str) -> None:
         from_imports=defaultdict(set),
     )
     assert not state.looks_like_dunder_init_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "admin.py",
+        "myapp/admin.py",
+        "myapp/admin/file.py",
+        "myapp/blog/admin/article.py",
+        "myapp/custom_admin.py",
+        "myapp/custom_admin/file.py",
+        "myapp/admin_custom.py",
+        "myapp/admin_custom/file.py",
+    ),
+)
+def test_looks_like_admin_file_true(filename: str) -> None:
+    state = State(
+        settings=Settings(target_version=(4, 0)),
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert state.looks_like_admin_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "administrator.py",
+        "blog/adm/article.py",
+    ),
+)
+def test_looks_like_admin_file_false(filename: str) -> None:
+    state = State(
+        settings=Settings(target_version=(4, 0)),
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert not state.looks_like_admin_file()

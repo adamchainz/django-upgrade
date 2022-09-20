@@ -651,3 +651,159 @@ def test_complete():
         """,
         settings=settings,
     )
+
+
+def test_custom_admin_not_an_admin_file():
+    check_noop(
+        """\
+        from myapp.admin import MyModel, CustomModelAdmin, custom_site
+        from django.contrib import admin
+
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        custom_site.register(MyModel, MyModelAdmin)
+        """,
+        settings,
+        filename="a_d_m_i_n.py",
+    )
+
+
+def test_custom_admin_not_an_admin_model():
+    check_noop(
+        """\
+        from myapp.admin import MyModel, CustomModel, custom_site
+        from django.contrib import admin
+
+        class Custom(MyModel):
+            pass
+
+        custom_site.register(MyModel, Custom)
+        """,
+        settings,
+        filename="admin.py",
+    )
+
+
+def test_custom_admin_doesnt_end_with_site():
+    check_noop(
+        """\
+        from myapp.admin import MyModel, CustomModelAdmin, app
+        from django.contrib import admin
+
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        app.register(MyModel, MyModelAdmin)
+        """,
+        settings,
+        filename="admin.py",
+    )
+
+
+def test_custom_admin_site():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site, CustomModelAdmin
+        from django.contrib import admin
+
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        custom_site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site, CustomModelAdmin
+        from django.contrib import admin
+
+        @admin.register(MyModel, site=custom_site)
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_multiple_admin_sites():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site
+        from django.contrib import admin
+
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        custom_site.register(MyModel, MyModelAdmin)
+        admin.site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site
+        from django.contrib import admin
+
+        @admin.register(MyModel)
+        @admin.register(MyModel, site=custom_site)
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_multiple_admin_sites_not_admin_file():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site
+        from django.contrib import admin
+
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        custom_site.register(MyModel, MyModelAdmin)
+        admin.site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site
+        from django.contrib import admin
+
+        @admin.register(MyModel)
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        custom_site.register(MyModel, MyModelAdmin)
+        """,
+        settings=settings,
+        filename="a_d_m_i_n.py",
+    )
+
+
+def test_multiple_admin_sites_sorted():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site, secret_site
+        from django.contrib import admin
+
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(MyModel, MyModelAdmin)
+        custom_site.register(MyModel, MyModelAdmin)
+        secret_site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site, secret_site
+        from django.contrib import admin
+
+        @admin.register(MyModel)
+        @admin.register(MyModel, site=custom_site)
+        @admin.register(MyModel, site=secret_site)
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        """,
+        settings=settings,
+        filename="admin.py",
+    )

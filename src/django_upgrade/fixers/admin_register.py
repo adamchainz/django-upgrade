@@ -116,7 +116,6 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    custom_site = ""
     if (
         _is_django_admin_imported(state)
         and isinstance(parents[-1], ast.Expr)
@@ -128,10 +127,11 @@ def visit_Call(
             and node.func.value.attr == "site"
             and isinstance(node.func.value.value, ast.Name)
             and node.func.value.value.id == "admin"
+            and (site_name := "") == ""  # force walrus
         )
         or (  # custom_site.register(...)
             isinstance(node.func.value, ast.Name)
-            and (custom_site := node.func.value.id).endswith("site")
+            and (site_name := node.func.value.id).endswith("site")
             and state.looks_like_admin_file()
         )
     ):
@@ -169,9 +169,9 @@ def visit_Call(
         if (
             admin_details is not None
             and admin_details.parent == parents[-2]
-            and not (custom_site and not admin_name.endswith("Admin"))
+            and not (site_name and not admin_name.endswith("Admin"))
         ):
-            admin_details.model_names_per_site.setdefault(custom_site, set()).update(
+            admin_details.model_names_per_site.setdefault(site_name, set()).update(
                 model_names
             )
             yield ast_start_offset(node), partial(erase_node, node=parents[-1])

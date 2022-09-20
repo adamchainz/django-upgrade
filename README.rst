@@ -151,7 +151,6 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-deco
     -admin.site.register(MyModel1, MyCustomAdmin)
     -admin.site.register(MyModel2, MyCustomAdmin)
 
-
 This also works with custom admin sites.
 Such calls are detected heuristically based on three criteria:
 

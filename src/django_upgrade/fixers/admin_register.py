@@ -63,7 +63,20 @@ def visit_ClassDef(
         )
 
 
+def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
+    """
+    We cannot convert classes using py2 style `super(MyAdmin, self)`
+    in the `__init__` or `__new__` method.
+    https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-decorator
+    """
+    visitor = FullSuperVisitor()
+    visitor.generic_visit(node)
+    return visitor.found_full_super
+
+
 class FullSuperVisitor(ast.NodeVisitor):
+    __slots__ = ("found_full_super",)
+
     def __init__(self) -> None:
         self.found_full_super = False
 
@@ -78,16 +91,13 @@ class FullSuperVisitor(ast.NodeVisitor):
                 ):
                     self.found_full_super = True
 
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        # Avoid descending into a new scope
+        return None
 
-def uses_full_super_in_init_or_new(node: ast.ClassDef) -> bool:
-    """
-    We cannot convert classes using py2 style `super(MyAdmin, self)`
-    in the `__init__` or `__new__` method.
-    https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-decorator
-    """
-    visitor = FullSuperVisitor()
-    visitor.visit(node)
-    return visitor.found_full_super
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        # Avoid descending into a new scope
+        return None
 
 
 def update_class_def(

@@ -468,6 +468,62 @@ def test_multiple_rewrite():
     )
 
 
+def test_py2_style_init_inside_async_function():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(admin.ModelAdmin):
+            async def whatever():
+                def __init__(self, *args, **kwargs):
+                    super(AuthorAdmin, self).__init__(*args, **kwargs)
+
+        admin.site.register(Author, AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        @admin.register(Author)
+        class AuthorAdmin(admin.ModelAdmin):
+            async def whatever():
+                def __init__(self, *args, **kwargs):
+                    super(AuthorAdmin, self).__init__(*args, **kwargs)
+
+        """,
+        settings=settings,
+    )
+
+
+def test_py2_style_init_inside_inner_class():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(admin.ModelAdmin):
+            class Inner:
+                def __init__(self, *args, **kwargs):
+                    super(AuthorAdmin, self).__init__(*args, **kwargs)
+
+        admin.site.register(Author, AuthorAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        @admin.register(Author)
+        class AuthorAdmin(admin.ModelAdmin):
+            class Inner:
+                def __init__(self, *args, **kwargs):
+                    super(AuthorAdmin, self).__init__(*args, **kwargs)
+
+        """,
+        settings=settings,
+    )
+
+
 def test_custom_model_admin_base_class():
     check_transformed(
         """\

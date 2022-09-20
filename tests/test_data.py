@@ -134,6 +134,10 @@ def test_looks_like_dunder_init_file_false(filename: str) -> None:
         "myapp/admin.py",
         "myapp/admin/file.py",
         "myapp/blog/admin/article.py",
+        "myapp/custom_admin.py",
+        "myapp/custom_admin/file.py",
+        "myapp/admin_custom.py",
+        "myapp/admin_custom/file.py",
     ),
 )
 def test_looks_like_admin_file_true(filename: str) -> None:

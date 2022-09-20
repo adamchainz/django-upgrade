@@ -665,7 +665,7 @@ def test_custom_admin_not_an_admin_file():
         custom_site.register(MyModel, MyModelAdmin)
         """,
         settings,
-        filename="definitely_not_an_admin_file.py",
+        filename="a_d_m_i_n.py",
     )
 
 
@@ -776,7 +776,7 @@ def test_multiple_admin_sites_not_admin_file():
         custom_site.register(MyModel, MyModelAdmin)
         """,
         settings=settings,
-        filename="definitely_not_an_admin_file.py",
+        filename="a_d_m_i_n.py",
     )
 
 

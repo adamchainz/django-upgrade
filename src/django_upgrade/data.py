@@ -30,7 +30,7 @@ class Settings:
 
 settings_re = re.compile(r"\bsettings\b")
 
-admin_re = re.compile(r"\badmin\b")
+admin_re = re.compile(r"(\b|_)admin(\b|_)")
 
 test_re = re.compile(r"(\b|_)tests?(\b|_)")
 

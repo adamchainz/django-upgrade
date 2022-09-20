@@ -153,7 +153,11 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-deco
 
 
 This also works with custom admin sites.
-We are detecting them heuristically by matching object names ending with ``site``, registered admin models ending with ``Admin`` and filenames called ``admin.py`` (or in an ``admin`` directory).
+Such calls are detected heuristically based on three criteria:
+
+1. The object whose ``register()`` method is called has a name ending with ``site``.
+2. The registered class has a name ending with ``Admin``.
+3. The filename has the word ``admin`` somewhere in its path.
 
 .. code-block:: diff
 

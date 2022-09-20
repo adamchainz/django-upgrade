@@ -28,13 +28,10 @@ class Settings:
         self.target_version = target_version
 
 
-settings_re = re.compile(r"\bsettings\b")
-
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
-
-test_re = re.compile(r"(\b|_)tests?(\b|_)")
-
 dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
+settings_re = re.compile(r"(\b|_)settings(\b|_)")
+test_re = re.compile(r"(\b|_)tests?(\b|_)")
 
 
 class State:
@@ -50,8 +47,8 @@ class State:
         self.filename = filename
         self.from_imports = from_imports
 
-    def looks_like_migrations_file(self) -> bool:
-        return "migrations" in self.filename.split(os.path.sep)
+    def looks_like_admin_file(self) -> bool:
+        return admin_re.search(self.filename) is not None
 
     def looks_like_command_file(self) -> bool:
         parts = self.filename.split(os.path.sep)
@@ -61,17 +58,17 @@ class State:
             return False
         return i > 0 and i < (len(parts) - 1) and parts[i - 1] == "management"
 
+    def looks_like_dunder_init_file(self) -> bool:
+        return dunder_init_re.search(self.filename) is not None
+
+    def looks_like_migrations_file(self) -> bool:
+        return "migrations" in self.filename.split(os.path.sep)
+
     def looks_like_settings_file(self) -> bool:
         return settings_re.search(self.filename) is not None
 
-    def looks_like_admin_file(self) -> bool:
-        return admin_re.search(self.filename) is not None
-
     def looks_like_test_file(self) -> bool:
         return test_re.search(self.filename) is not None
-
-    def looks_like_dunder_init_file(self) -> bool:
-        return dunder_init_re.search(self.filename) is not None
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)

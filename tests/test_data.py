@@ -6,6 +6,46 @@ import pytest
 
 from django_upgrade.data import Settings, State
 
+settings = Settings(target_version=(4, 0))
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "admin.py",
+        "myapp/admin.py",
+        "myapp/admin/file.py",
+        "myapp/blog/admin/article.py",
+        "myapp/custom_admin.py",
+        "myapp/custom_admin/file.py",
+        "myapp/admin_custom.py",
+        "myapp/admin_custom/file.py",
+    ),
+)
+def test_looks_like_admin_file_true(filename: str) -> None:
+    state = State(
+        settings=settings,
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert state.looks_like_admin_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "administrator.py",
+        "blog/adm/article.py",
+    ),
+)
+def test_looks_like_admin_file_false(filename: str) -> None:
+    state = State(
+        settings=settings,
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert not state.looks_like_admin_file()
+
 
 @pytest.mark.parametrize(
     "filename",
@@ -18,7 +58,7 @@ from django_upgrade.data import Settings, State
 )
 def test_looks_like_command_file_true(filename: str) -> None:
     state = State(
-        settings=Settings(target_version=(4, 0)),
+        settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
@@ -38,11 +78,50 @@ def test_looks_like_command_file_true(filename: str) -> None:
 )
 def test_looks_like_command_file_false(filename: str) -> None:
     state = State(
-        settings=Settings(target_version=(4, 0)),
+        settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
     assert not state.looks_like_command_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "__init__.py",
+        "package/__init__.py",
+        r"package\__init__.py",
+        "project/package/__init__.py",
+        r"project\package\__init__.py",
+    ),
+)
+def test_looks_like_dunder_init_file_true(filename: str) -> None:
+    state = State(
+        settings=settings,
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert state.looks_like_dunder_init_file()
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "__thing__init__.py",
+        "thing-__init__.py",
+        "__init___py",
+        "_init_.py",
+        "__init.py",
+        "init__.py",
+    ),
+)
+def test_looks_like_dunder_init_file_false(filename: str) -> None:
+    state = State(
+        settings=settings,
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert not state.looks_like_dunder_init_file()
 
 
 @pytest.mark.parametrize(
@@ -64,7 +143,7 @@ def test_looks_like_command_file_false(filename: str) -> None:
 )
 def test_looks_like_test_file_true(filename: str) -> None:
     state = State(
-        settings=Settings(target_version=(4, 0)),
+        settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
@@ -81,7 +160,7 @@ def test_looks_like_test_file_true(filename: str) -> None:
 )
 def test_looks_like_test_file_false(filename: str) -> None:
     state = State(
-        settings=Settings(target_version=(4, 0)),
+        settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
@@ -91,75 +170,34 @@ def test_looks_like_test_file_false(filename: str) -> None:
 @pytest.mark.parametrize(
     "filename",
     (
-        "__init__.py",
-        "package/__init__.py",
-        r"package\__init__.py",
-        "project/package/__init__.py",
-        r"project\package\__init__.py",
+        "settings.py",
+        "myapp/settings.py",
+        "myapp/settings/prod.py",
+        "myapp/prod_settings.py",
+        "myapp/local_settings.py",
+        "myapp/settings_tests.py",
     ),
 )
-def test_looks_like_dunder_init_file_true(filename: str) -> None:
+def test_looks_like_settings_file_true(filename: str) -> None:
     state = State(
-        settings=Settings(target_version=(4, 0)),
+        settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert state.looks_like_dunder_init_file()
+    assert state.looks_like_settings_file()
 
 
 @pytest.mark.parametrize(
     "filename",
     (
-        "__thing__init__.py",
-        "thing-__init__.py",
-        "__init___py",
-        "_init_.py",
-        "__init.py",
-        "init__.py",
+        "upsettings.py",
+        "settingsprod.py",
     ),
 )
-def test_looks_like_dunder_init_file_false(filename: str) -> None:
+def test_looks_like_settings_file_false(filename: str) -> None:
     state = State(
-        settings=Settings(target_version=(4, 0)),
+        settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert not state.looks_like_dunder_init_file()
-
-
-@pytest.mark.parametrize(
-    "filename",
-    (
-        "admin.py",
-        "myapp/admin.py",
-        "myapp/admin/file.py",
-        "myapp/blog/admin/article.py",
-        "myapp/custom_admin.py",
-        "myapp/custom_admin/file.py",
-        "myapp/admin_custom.py",
-        "myapp/admin_custom/file.py",
-    ),
-)
-def test_looks_like_admin_file_true(filename: str) -> None:
-    state = State(
-        settings=Settings(target_version=(4, 0)),
-        filename=filename,
-        from_imports=defaultdict(set),
-    )
-    assert state.looks_like_admin_file()
-
-
-@pytest.mark.parametrize(
-    "filename",
-    (
-        "administrator.py",
-        "blog/adm/article.py",
-    ),
-)
-def test_looks_like_admin_file_false(filename: str) -> None:
-    state = State(
-        settings=Settings(target_version=(4, 0)),
-        filename=filename,
-        from_imports=defaultdict(set),
-    )
-    assert not state.looks_like_admin_file()
+    assert not state.looks_like_settings_file()

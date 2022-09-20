@@ -22,6 +22,8 @@ History
 
 * Fix leaving a trailing comma when editing imports in certain cases.
 
+* Expand the range of files considered settings files.
+
 1.10.0 (2022-09-07)
 -------------------
 

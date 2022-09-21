@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable, MutableMapping
+from typing import Iterable, MutableMapping, cast
 from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
@@ -131,48 +131,46 @@ def visit_Call(
         and isinstance(parents[-1], ast.Expr)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "register"
-    ) and (
-        (  # admin.site.register(...)
-            isinstance(node.func.value, ast.Attribute)
-            and node.func.value.attr == "site"
-            and isinstance(node.func.value.value, ast.Name)
-            and node.func.value.value.id == "admin"
-            and (site_name := "") == ""  # force walrus
+        and (
+            (  # admin.site.register(...)
+                isinstance(node.func.value, ast.Attribute)
+                and node.func.value.attr == "site"
+                and isinstance(node.func.value.value, ast.Name)
+                and node.func.value.value.id == "admin"
+                and (site_name := "") == ""  # force walrus
+            )
+            or (  # custom_site.register(...)
+                isinstance(node.func.value, ast.Name)
+                and (site_name := node.func.value.id).endswith("site")
+                and state.looks_like_admin_file()
+            )
         )
-        or (  # custom_site.register(...)
-            isinstance(node.func.value, ast.Name)
-            and (site_name := node.func.value.id).endswith("site")
-            and state.looks_like_admin_file()
+        and (
+            (
+                len(node.args) == 2
+                and len(node.keywords) == 0
+                and isinstance((admin_arg := node.args[1]), ast.Name)
+            )
+            or (
+                len(node.args) == 1
+                and len(node.keywords) == 1
+                and node.keywords[0].arg == "admin_class"
+                and isinstance((admin_arg := node.keywords[0].value), ast.Name)
+            )
+        )
+        and (
+            isinstance((first_arg := node.args[0]), ast.Name)
+            or (
+                isinstance(first_arg, (ast.Tuple, ast.List))
+                and all(isinstance(elt, ast.Name) for elt in first_arg.elts)
+            )
         )
     ):
-        if (  # admin.site.register(MyModel, MyCustomAdmin)
-            len(node.args) == 2
-            and isinstance((model_arg := node.args[0]), ast.Name)
-            and isinstance((admin_arg := node.args[1]), ast.Name)
-            and not node.keywords
-        ) or (  # admin.site.register(MyModel, admin_class=MyCustomAdmin)
-            len(node.args) == 1
-            and isinstance((model_arg := node.args[0]), ast.Name)
-            and len(node.keywords) == 1
-            and node.keywords[0].arg == "admin_class"
-            and isinstance((admin_arg := node.keywords[0].value), ast.Name)
-        ):
-            model_names = {model_arg.id}
-
-        elif (  # admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
-            len(node.args) == 2
-            and isinstance((model_tuple := node.args[0]), (ast.Tuple, ast.List))
-            and all(isinstance(elt, ast.Name) for elt in model_tuple.elts)
-            and isinstance((admin_arg := node.args[1]), ast.Name)
-            and not node.keywords
-        ):
-            model_names = {
-                elt.id for elt in model_tuple.elts if isinstance(elt, ast.Name)
-            }
-
+        if isinstance(first_arg, ast.Name):
+            model_names = {first_arg.id}
         else:
-            return
-
+            # cast() could be removed by using TypeGuard func above
+            model_names = {cast(ast.Name, elt).id for elt in first_arg.elts}
         admin_name = admin_arg.id
         admin_details = decorable_admins.get(state, {}).get(admin_name, None)
 

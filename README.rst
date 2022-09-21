@@ -241,11 +241,6 @@ Rewrites imports of ``include()`` and ``url()`` from ``django.conf.urls`` to ``d
 .. |new path() syntax| replace:: new ``path()`` syntax
 __ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 
-For some cases, this change alters the type of the arguments passed to the view, from ``str`` to the converted type (e.g. ``int``).
-This is not guaranteed backwards compatible: there is a chance that the view expects a string, rather than the converted type.
-But, pragmatically, it seems 99.9% of views do not require strings, and instead work with either strings or the converted type.
-Thus, you should test affected paths after this fixer makes any changes.
-
 .. code-block:: diff
 
     -from django.conf.urls import include, url
@@ -272,8 +267,26 @@ Existing ``re_path()`` calls are also rewritten to the ``path()`` syntax when el
      urlpatterns = [
     -    re_path(r'^about/$', views.about, name='about'),
     +    path('about/', views.about, name='about'),
-         re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
+         re_path(r'^post/(?P<slug>[\w-]+)/$', views.post, name='post'),
      ]
+
+The compatible regexes that will be converted to use `django paths converters`_. are the following:
+
+.. _django paths converters: https://docs.djangoproject.com/en/stable/topics/http/urls/#path-converters
+
+* **str** - ``"[^/]+"``
+* **int** - ``"[0-9]+"``
+* **slug** - ``"[-a-zA-Z0-9_]+"``
+* **uuid** - ``"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"``
+* **path** - ``".+"``
+
+For some cases, this change alters the type of the arguments passed to the view, from ``str`` to the converted type (e.g. ``int``).
+This is not guaranteed backwards compatible: there is a chance that the view expects a string, rather than the converted type.
+But, pragmatically, it seems 99.9% of views do not require strings, and instead work with either strings or the converted type.
+Thus, you should test affected paths after this fixer makes any changes.
+
+Note that ``[\w-]`` is sometimes used for slugs but is not converted because it might be incompatible.
+Indeed, it matches all unicode characters (``α`` for ex) unlike django's SlugConverter which only matches latin characters.
 
 ``lru_cache``
 ~~~~~~~~~~~~~
@@ -294,7 +307,7 @@ In practice, most display functions that return HTML already use |format_html()|
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |format_html()| replace:: ``format_html()``
-__ https://docs.djangoproject.com/en/tsable/ref/utils/#django.utils.html.format_html
+__ https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.html.format_html
 
 .. code-block:: diff
 

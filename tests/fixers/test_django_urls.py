@@ -398,7 +398,7 @@ def test_complete():
             url(r'^$', views.index, name='index'),
             url(r'^about/$', views.about, name='about'),
             url(r'^post/(?P<slug>[-a-zA-Z0-9_]+)/$', views.post, name='post'),
-            url(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
+            url(r'^post/(?P<slug>[\\w-]+)/$', views.post, name='post'),
             url(r'^weblog/', include('blog.urls')),
         ]
         """,
@@ -409,7 +409,7 @@ def test_complete():
             path('', views.index, name='index'),
             path('about/', views.about, name='about'),
             path('post/<slug:slug>/', views.post, name='post'),
-            re_path(r'^post/(?P<slug>[w-]+)/$', views.post, name='post'),
+            re_path(r'^post/(?P<slug>[\\w-]+)/$', views.post, name='post'),
             re_path(r'^weblog/', include('blog.urls')),
         ]
         """,

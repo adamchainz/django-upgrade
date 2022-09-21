@@ -646,6 +646,30 @@ def test_multiple_model_list_registration():
     )
 
 
+def test_multiple_model_registration_with_kwarg():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.register([MyModel1, MyModel2], admin_class=MyCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        @admin.register(MyModel1, MyModel2)
+        class MyCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+    )
+
+
 def test_multiple_model_mixed_registration():
     check_transformed(
         """\

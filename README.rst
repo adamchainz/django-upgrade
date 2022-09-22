@@ -189,6 +189,18 @@ Add ``on_delete=models.CASCADE`` to ``ForeignKey`` and ``OneToOneField``:
     -models.OneToOneField("auth.User")
     +models.OneToOneField("auth.User", on_delete=models.CASCADE)
 
+This fixer also support import from ``django.db.models``:
+
+.. code-block:: diff
+
+    -from django.db.models import ForeignKey, OneToOneField
+    +from django.db.models import CASCADE, ForeignKey, OneToOneField
+
+    -ForeignKey("auth.User")
+    +ForeignKey("auth.User", on_delete=CASCADE)
+    -OneToOneField("auth.User")
+    +OneToOneField("auth.User", on_delete=CASCADE)
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

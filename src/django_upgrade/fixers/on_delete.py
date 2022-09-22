@@ -6,18 +6,65 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable
+from typing import Iterable, MutableMapping
+from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import OP, find, insert, parse_call_args
+from django_upgrade.tokens import (
+    OP,
+    erase_node,
+    extract_indent,
+    find,
+    insert,
+    parse_call_args,
+)
 
 fixer = Fixer(
     __name__,
     min_version=(1, 9),
 )
+
+
+@fixer.register(ast.ImportFrom)
+def visit_ImportFrom(
+    state: State,
+    node: ast.ImportFrom,
+    parents: list[ast.AST],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        node.module == "django.db.models"
+        and is_rewritable_import_from(node)
+        and any(alias.name in {"ForeignKey", "OneToOneField"} for alias in node.names)
+    ):
+        yield ast_start_offset(node), partial(
+            update_django_models_import,
+            node=node,
+            state=state,
+        )
+
+
+# Track if we need to update `from django.db.models` import to add CASCADE.
+should_update_import: MutableMapping[State, bool] = WeakKeyDictionary()
+
+
+def update_django_models_import(
+    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
+) -> None:
+    if should_update_import.pop(state, False):
+        used_names = state.from_imports["django.db.models"]
+        used_names.add("CASCADE")
+
+        j, indent = extract_indent(tokens, i)
+        erase_node(tokens, i, node=node)
+        joined_names = ", ".join(sorted(used_names))
+        insert(
+            tokens,
+            j,
+            new_src=f"{indent}from django.db.models import {joined_names}\n",
+        )
 
 
 @fixer.register(ast.Call)
@@ -27,40 +74,57 @@ def visit_Call(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node.func, ast.Attribute)
-        and node.func.attr in {"ForeignKey", "OneToOneField"}
-        and "models" in state.from_imports["django.db"]
-        and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "models"
+        (
+            (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr in {"ForeignKey", "OneToOneField"}
+                and (models_imported := "models" in state.from_imports["django.db"])
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "models"
+            )
+            or (
+                isinstance(node.func, ast.Name)
+                and node.func.id in {"ForeignKey", "OneToOneField"}
+                and node.func.id in state.from_imports["django.db.models"]
+                and (models_imported := False) is False  # force walrus
+            )
+        )
         and len(node.args) < 2
         and all(kw.arg != "on_delete" for kw in node.keywords)
     ):
+        should_update_import[state] = not models_imported
         yield ast_start_offset(node), partial(
-            add_on_delete_keyword, num_pos_args=len(node.args)
+            add_on_delete_keyword,
+            num_pos_args=len(node.args),
+            models_imported=models_imported,
         )
 
 
-def add_on_delete_keyword(tokens: list[Token], i: int, *, num_pos_args: int) -> None:
+def add_on_delete_keyword(
+    tokens: list[Token], i: int, *, num_pos_args: int, models_imported: bool
+) -> None:
     open_idx = find(tokens, i, name=OP, src="(")
     func_args, close_idx = parse_call_args(tokens, open_idx)
 
-    new_src = "on_delete=models.CASCADE"
-    if num_pos_args < len(func_args):
-        new_src += ", "
+    if models_imported:
+        new_src = "on_delete=models.CASCADE"
+    else:
+        new_src = "on_delete=CASCADE"
 
     if num_pos_args == 0:
+        if len(func_args) > 0:
+            new_src += ", "
         insert_idx = open_idx + 1
     else:
-        new_src = " " + new_src
         pos_start_idx, pos_end_idx = func_args[num_pos_args - 1]
-
         insert_idx = pos_end_idx + 1
 
-        arg_has_comma = (
-            tokens[pos_end_idx].name == OP and tokens[pos_end_idx].src == ","
-        )
-        if not arg_has_comma:
-            new_src = "," + new_src
+        if tokens[pos_end_idx].src == ")":
             insert_idx -= 1
+            new_src = f", {new_src}"
+        elif len(func_args) == 1:
+            new_src = f" {new_src}"
+        else:
+            new_src = f" {new_src},"
 
     insert(tokens, insert_idx, new_src=new_src)

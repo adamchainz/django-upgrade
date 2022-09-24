@@ -58,8 +58,28 @@ def test_field_class_imported(field_class: str) -> None:
         {field_class}("auth.User")
         """,
         f"""\
-        from django.db.models import CASCADE, {field_class}
+        from django.db.models import CASCADE
+        from django.db.models import {field_class}
         {field_class}("auth.User", on_delete=CASCADE)
+        """,
+        settings,
+    )
+
+
+def test_both_field_classes_imported() -> None:
+    check_transformed(
+        """\
+        from django.db.models import ForeignKey
+        from django.db.models import OneToOneField
+        ForeignKey("auth.User")
+        OneToOneField("auth.User")
+        """,
+        """\
+        from django.db.models import ForeignKey
+        from django.db.models import CASCADE
+        from django.db.models import OneToOneField
+        ForeignKey("auth.User", on_delete=CASCADE)
+        OneToOneField("auth.User", on_delete=CASCADE)
         """,
         settings,
     )
@@ -223,27 +243,10 @@ def test_mixed_imports():
         """,
         """\
         from django.db import models
-        from django.db.models import CASCADE, ForeignKey
+        from django.db.models import CASCADE
+        from django.db.models import ForeignKey
 
         models.OneToOneField(on_delete=models.CASCADE, to="auth.User")
-        ForeignKey(on_delete=CASCADE, to="auth.User", null=True, blank=True)
-        """,
-        settings,
-    )
-
-
-def test_sorted_imports():
-    check_transformed(
-        """\
-        from django.db.models import OneToOneField, ForeignKey
-
-        OneToOneField(to="auth.User")
-        ForeignKey(to="auth.User", null=True, blank=True)
-        """,
-        """\
-        from django.db.models import CASCADE, ForeignKey, OneToOneField
-
-        OneToOneField(on_delete=CASCADE, to="auth.User")
         ForeignKey(on_delete=CASCADE, to="auth.User", null=True, blank=True)
         """,
         settings,

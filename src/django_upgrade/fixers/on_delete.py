@@ -13,14 +13,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import (
-    OP,
-    erase_node,
-    extract_indent,
-    find,
-    insert,
-    parse_call_args,
-)
+from django_upgrade.tokens import OP, extract_indent, find, insert, parse_call_args
 
 fixer = Fixer(
     __name__,
@@ -53,17 +46,13 @@ should_update_import: MutableMapping[State, bool] = WeakKeyDictionary()
 def update_django_models_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
-    if should_update_import.pop(state, False):
-        used_names = state.from_imports["django.db.models"]
-        used_names.add("CASCADE")
-
+    if should_update_import.get(state, False):
+        should_update_import[state] = False
         j, indent = extract_indent(tokens, i)
-        erase_node(tokens, i, node=node)
-        joined_names = ", ".join(sorted(used_names))
         insert(
             tokens,
             j,
-            new_src=f"{indent}from django.db.models import {joined_names}\n",
+            new_src=f"{indent}from django.db.models import CASCADE\n",
         )
 
 

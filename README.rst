@@ -748,6 +748,14 @@ Rewrites imports of ``utc`` from ``django.utils.timezone`` to use ``datetime.tim
     -calculate_some_datetime(utc)
     +calculate_some_datetime(timezone.utc)
 
+.. code-block:: diff
+
+     import datetime as dt
+    -from django.utils import timezone
+
+    -do_a_thing(timezone.utc)
+    +do_a_thing(dt.timezone.utc)
+
 ``assertFormError()`` and ``assertFormsetError()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

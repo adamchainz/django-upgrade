@@ -46,7 +46,7 @@ def test_not_imported_utc_name():
 def test_not_imported_utc_attr():
     check_noop(
         """\
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         settings,
     )
@@ -56,11 +56,11 @@ def test_basic():
     check_transformed(
         """\
         from django.utils.timezone import utc
-        foo(utc)
+        do_a_thing(utc)
         """,
         """\
         from datetime import timezone
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         settings,
     )
@@ -71,11 +71,11 @@ def test_reuse_datetime_import():
         """\
         import datetime
         from django.utils.timezone import utc
-        foo(utc)
+        do_a_thing(utc)
         """,
         """\
         import datetime
-        foo(datetime.timezone.utc)
+        do_a_thing(datetime.timezone.utc)
         """,
         settings,
     )
@@ -86,11 +86,11 @@ def test_reuse_datetime_aliased_import():
         """\
         import datetime as dt
         from django.utils.timezone import utc
-        foo(utc)
+        do_a_thing(utc)
         """,
         """\
         import datetime as dt
-        foo(dt.timezone.utc)
+        do_a_thing(dt.timezone.utc)
         """,
         settings,
     )
@@ -101,11 +101,11 @@ def test_extend_datetime_import():
         """\
         from datetime import datetime
         from django.utils.timezone import utc
-        foo(utc)
+        do_a_thing(utc)
         """,
         """\
         from datetime import datetime, timezone
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         settings,
     )
@@ -132,12 +132,12 @@ def test_attr():
         """\
         from django.utils import timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         """\
         from datetime import timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         settings,
     )
@@ -148,13 +148,13 @@ def test_attr_other_import():
         """\
         from django.utils import html, timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         """\
         from datetime import timezone
         from django.utils import html
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         settings,
     )
@@ -166,12 +166,12 @@ def test_attr_reuse_datetime_import():
         import datetime
         from django.utils import timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         """\
         import datetime
 
-        foo(datetime.timezone.utc)
+        do_a_thing(datetime.timezone.utc)
         """,
         settings,
     )
@@ -183,12 +183,12 @@ def test_attr_reuse_datetime_import_aliased():
         import datetime as dt
         from django.utils import timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         """\
         import datetime as dt
 
-        foo(dt.timezone.utc)
+        do_a_thing(dt.timezone.utc)
         """,
         settings,
     )
@@ -200,13 +200,13 @@ def test_attr_insert_import_after_from():
         from __future__ import annotations
         from django.utils import timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         """\
         from __future__ import annotations
         from datetime import timezone
 
-        foo(timezone.utc)
+        do_a_thing(timezone.utc)
         """,
         settings,
     )

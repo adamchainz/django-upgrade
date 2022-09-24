@@ -339,6 +339,9 @@ __ https://docs.djangoproject.com/en/2.2/ref/request-response/#django.http.HttpR
     -self.request.META.get('HTTP_SERVER', '')
     +self.request.headers.get('Server', '')
 
+    -request.META.get('CONTENT_LENGTH')
+    +request.headers.get('Content-Length')
+
 ``QuerySetPaginator``
 ~~~~~~~~~~~~~~~~~~~~~
 

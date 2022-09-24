@@ -204,7 +204,6 @@ If a ``register()`` call is preceded by an ``unregister()`` call that includes t
     admin.site.unregister(MyModel1)
     admin.site.register(MyModel1, MyCustomAdmin)
 
-
 Django 1.9
 -----------
 

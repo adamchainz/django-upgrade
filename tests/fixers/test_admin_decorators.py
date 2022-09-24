@@ -177,6 +177,33 @@ class TestActionFunctions:
             settings,
         )
 
+    def test_module_both_existing_decorator(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            @some_decorator
+            def make_published(modeladmin, request, queryset):
+                ...
+
+            make_published.allowed_permissions = ('change',)
+            make_published.short_description = 'yada'
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.action(
+                description='yada',
+                permissions=('change',),
+            )
+            @some_decorator
+            def make_published(modeladmin, request, queryset):
+                ...
+
+            """,
+            settings,
+        )
+
     def test_module_description_multiline(self):
         # We don't really care about parenthesizing this nicely, just that it's
         # valid syntax
@@ -338,6 +365,35 @@ class TestActionFunctions:
                     description='yada',
                     permissions=('change',),
                 )
+                def make_published(self, request, queryset):
+                    ...
+
+            """,
+            settings,
+        )
+
+    def test_class_both_existing_decorator(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            class BookAdmin(admin.ModelAdmin):
+                @some_decorator
+                def make_published(self, request, queryset):
+                    ...
+
+                make_published.allowed_permissions = ('change',)
+                make_published.short_description = 'yada'
+            """,
+            """\
+            from django.contrib import admin
+
+            class BookAdmin(admin.ModelAdmin):
+                @admin.action(
+                    description='yada',
+                    permissions=('change',),
+                )
+                @some_decorator
                 def make_published(self, request, queryset):
                     ...
 
@@ -571,6 +627,39 @@ class TestDisplayFunctions:
             settings,
         )
 
+    def test_module_all_existing_decorator(self):
+        # boolean and empty_value are mutually exclusive but we don't check
+        # that here, let it crash at runtime
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            @some_decorator
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.empty_value_display = "xxx"
+            upper_case_name.short_description = 'yada'
+            upper_case_name.admin_order_field = "name"
+            upper_case_name.boolean = True
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.display(
+                description='yada',
+                boolean=True,
+                empty_value="xxx",
+                ordering="name",
+            )
+            @some_decorator
+            def upper_case_name(obj):
+                ...
+
+            """,
+            settings,
+        )
+
     def test_module_gis(self):
         check_transformed(
             """\
@@ -740,6 +829,39 @@ class TestDisplayFunctions:
                     boolean=True,
                     ordering='-publish_date',
                 )
+                def is_published(self, obj):
+                    ...
+
+            """,
+            settings,
+        )
+
+    def test_class_many_existing_decorator(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            @admin.register(Book)
+            class BookAdmin(admin.ModelAdmin):
+                @some_decorator
+                def is_published(self, obj):
+                    ...
+
+                is_published.boolean = True
+                is_published.admin_order_field = '-publish_date'
+                is_published.short_description = 'Is Published?'
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.register(Book)
+            class BookAdmin(admin.ModelAdmin):
+                @admin.display(
+                    description='Is Published?',
+                    boolean=True,
+                    ordering='-publish_date',
+                )
+                @some_decorator
                 def is_published(self, obj):
                     ...
 

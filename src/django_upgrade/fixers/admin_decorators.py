@@ -14,7 +14,14 @@ from tokenize_rt import Offset, Token, tokens_to_src
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import erase_node, extract_indent, find_last_token, insert
+from django_upgrade.tokens import (
+    OP,
+    erase_node,
+    extract_indent,
+    find_last_token,
+    insert,
+    reverse_find,
+)
 
 fixer = Fixer(
     __name__,
@@ -136,8 +143,14 @@ def visit_Module_or_ClassDef(
 
     for name, funcdetails in funcs.items():
         if funcdetails.assignments:
-            yield ast_start_offset(funcdetails.node), partial(
-                decorate_function, funcdetails=funcdetails
+            if funcdetails.node.decorator_list:
+                offset = ast_start_offset(funcdetails.node.decorator_list[0])
+                decorated = True
+            else:
+                offset = ast_start_offset(funcdetails.node)
+                decorated = False
+            yield offset, partial(
+                decorate_function, funcdetails=funcdetails, decorated=decorated
             )
             for name, assignnode in funcdetails.assignments.items():
                 yield ast_start_offset(assignnode), partial(erase_node, node=assignnode)
@@ -150,8 +163,10 @@ def visit_Module_or_ClassDef(
 
 
 def decorate_function(
-    tokens: list[Token], i: int, *, funcdetails: FunctionDetails
+    tokens: list[Token], i: int, *, funcdetails: FunctionDetails, decorated: bool
 ) -> None:
+    if decorated:
+        i = reverse_find(tokens, i, name=OP, src="@")
     j, indent = extract_indent(tokens, i)
     dec_src = f"{indent}@admin.{funcdetails.decorator}(\n"
 

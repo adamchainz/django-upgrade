@@ -197,14 +197,11 @@ If a ``register()`` call is preceded by an ``unregister()`` call that includes t
 
     from django.contrib import admin
 
-
     class MyCustomAdmin(admin.ModelAdmin):
         ...
 
-
     admin.site.unregister(MyModel1)
     admin.site.register(MyModel1, MyCustomAdmin)
-
 
 
 Django 1.9

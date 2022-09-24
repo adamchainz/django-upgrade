@@ -906,6 +906,25 @@ def test_unregister():
     )
 
 
+def test_unregister_reoccurring():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
 def test_unregister_no_effect_if_register_precedes():
     check_transformed(
         """\

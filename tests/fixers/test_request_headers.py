@@ -33,6 +33,24 @@ def test_assignment():
     )
 
 
+def test_in_not_header():
+    check_noop(
+        """\
+        'QUERY_STRING' in request.META
+        """,
+        settings,
+    )
+
+
+def test_not_in_not_header():
+    check_noop(
+        """\
+        'QUERY_STRING' not in request.META
+        """,
+        settings,
+    )
+
+
 def test_subscript_simple():
     check_transformed(
         """\
@@ -141,7 +159,7 @@ def test_get_self_request():
     )
 
 
-def test_http_in_meta():
+def test_in():
     check_transformed(
         """\
         'HTTP_AUTHORIZATION' in request.META
@@ -153,7 +171,7 @@ def test_http_in_meta():
     )
 
 
-def test_http_in_meta_if_statement():
+def test_in_within_if():
     check_transformed(
         """\
         if 'HTTP_AUTHORIZATION' in request.META:
@@ -167,7 +185,7 @@ def test_http_in_meta_if_statement():
     )
 
 
-def test_http_in_meta_if_statement_combined():
+def test_in_get_combined():
     check_transformed(
         """\
         if 'HTTP_AUTHORIZATION' in request.META:
@@ -181,7 +199,7 @@ def test_http_in_meta_if_statement_combined():
     )
 
 
-def test_http_in_meta_double_if_statement():
+def test_in_double_statement():
     check_transformed(
         """\
         if 'HTTP_AUTHORIZATION' in request.META and 'HTTP_SERVER' in request.META:
@@ -195,7 +213,7 @@ def test_http_in_meta_double_if_statement():
     )
 
 
-def test_http_not_in_meta():
+def test_not_in():
     check_transformed(
         """\
         'HTTP_SERVER' not in request.META
@@ -207,7 +225,7 @@ def test_http_not_in_meta():
     )
 
 
-def test_http_not_in_meta_if_statement():
+def test_not_in_within_if():
     check_transformed(
         """\
         if 'HTTP_AUTHORIZATION' not in request.META:
@@ -221,7 +239,7 @@ def test_http_not_in_meta_if_statement():
     )
 
 
-def test_http_not_in_meta_if_statement_combined():
+def test_not_in_get_combined():
     check_transformed(
         """\
         if 'HTTP_AUTHORIZATION' not in request.META:
@@ -235,7 +253,7 @@ def test_http_not_in_meta_if_statement_combined():
     )
 
 
-def test_http_not_in_meta_double_if_statement():
+def test_not_in_double_statement():
     check_transformed(
         """\
         if 'HTTP_AUTHORIZATION' not in request.META and \
@@ -246,24 +264,6 @@ def test_http_not_in_meta_double_if_statement():
         if 'Authorization' not in request.headers and \
               'Server' not in request.headers:
             print('hi')
-        """,
-        settings,
-    )
-
-
-def test_no_http_value_in_meta():
-    check_noop(
-        """\
-        'QUERY_STRING' in request.META
-        """,
-        settings,
-    )
-
-
-def test_no_http_value_not_in_meta():
-    check_noop(
-        """\
-        'QUERY_STRING' not in request.META
         """,
         settings,
     )

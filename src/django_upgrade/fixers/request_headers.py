@@ -13,7 +13,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import NAME, STRING, find, replace
+from django_upgrade.tokens import NAME, STRING, find, replace, reverse_find
 
 fixer = Fixer(
     __name__,
@@ -55,6 +55,25 @@ def visit_Call(
     ):
         yield ast_start_offset(node), partial(
             rewrite_header_access, raw_header_name=raw_header_name
+        )
+
+
+@fixer.register(ast.Compare)
+def visit_Compare(
+    state: State,
+    node: ast.Compare,
+    parents: list[ast.AST],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        isinstance(node, ast.Compare)
+        and isinstance(node.ops[0], (ast.In, ast.NotIn))
+        and len(node.comparators) == 1
+        and is_request_or_self_request_meta(node.comparators[0])
+        and isinstance(node.left, ast.Constant)
+        and (raw_header_name := get_http_header_name(node.left.value)) is not None
+    ):
+        yield ast_start_offset(node), partial(
+            rewrite_in_statement, raw_header_name=raw_header_name
         )
 
 
@@ -103,10 +122,21 @@ def get_http_header_name(meta_name: str) -> str | None:
     return None
 
 
+def make_header_name(raw_header_name: str) -> str:
+    return "-".join(x.title() for x in raw_header_name.split("_"))
+
+
 def rewrite_header_access(tokens: list[Token], i: int, *, raw_header_name: str) -> None:
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
-
     str_idx = find(tokens, meta_idx, name=STRING)
-    header_name = "-".join(x.title() for x in raw_header_name.split("_"))
+    header_name = make_header_name(raw_header_name)
+    replace(tokens, str_idx, src=repr(header_name))
+
+
+def rewrite_in_statement(tokens: list[Token], i: int, *, raw_header_name: str) -> None:
+    meta_idx = find(tokens, i, name=NAME, src="META")
+    replace(tokens, meta_idx, src="headers")
+    str_idx = reverse_find(tokens, meta_idx, name=STRING)
+    header_name = make_header_name(raw_header_name)
     replace(tokens, str_idx, src=repr(header_name))

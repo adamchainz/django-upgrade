@@ -36,6 +36,10 @@ History
 
   Thanks to Daan Vielen in `Issue #240 <https://github.com/adamchainz/django-upgrade/issues/240>`__.
 
+* Extend ``request.headers`` fixer to rewrite ``in`` and ``not in`` comparisons on ``request.META``.
+
+  Thanks to Daan Vielen in `Issue #234 <https://github.com/adamchainz/django-upgrade/issues/234>`__.
+
 1.10.0 (2022-09-07)
 -------------------
 

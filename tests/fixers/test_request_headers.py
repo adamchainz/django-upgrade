@@ -139,3 +139,131 @@ def test_get_self_request():
         """,
         settings,
     )
+
+
+def test_http_in_meta():
+    check_transformed(
+        """\
+        'HTTP_AUTHORIZATION' in request.META
+        """,
+        """\
+        'Authorization' in request.headers
+        """,
+        settings,
+    )
+
+
+def test_http_in_meta_if_statement():
+    check_transformed(
+        """\
+        if 'HTTP_AUTHORIZATION' in request.META:
+            print('hi')
+        """,
+        """\
+        if 'Authorization' in request.headers:
+            print('hi')
+        """,
+        settings,
+    )
+
+
+def test_http_in_meta_if_statement_combined():
+    check_transformed(
+        """\
+        if 'HTTP_AUTHORIZATION' in request.META:
+            print(request.META.get('HTTP_AUTHORIZATION'))
+        """,
+        """\
+        if 'Authorization' in request.headers:
+            print(request.headers.get('Authorization'))
+        """,
+        settings,
+    )
+
+
+def test_http_in_meta_double_if_statement():
+    check_transformed(
+        """\
+        if 'HTTP_AUTHORIZATION' in request.META and 'HTTP_SERVER' in request.META:
+            print('hi')
+        """,
+        """\
+        if 'Authorization' in request.headers and 'Server' in request.headers:
+            print('hi')
+        """,
+        settings,
+    )
+
+
+def test_http_not_in_meta():
+    check_transformed(
+        """\
+        'HTTP_SERVER' not in request.META
+        """,
+        """\
+        'Server' not in request.headers
+        """,
+        settings,
+    )
+
+
+def test_http_not_in_meta_if_statement():
+    check_transformed(
+        """\
+        if 'HTTP_AUTHORIZATION' not in request.META:
+            print('hi')
+        """,
+        """\
+        if 'Authorization' not in request.headers:
+            print('hi')
+        """,
+        settings,
+    )
+
+
+def test_http_not_in_meta_if_statement_combined():
+    check_transformed(
+        """\
+        if 'HTTP_AUTHORIZATION' not in request.META:
+            print(request.META.get('HTTP_AUTHORIZATION'))
+        """,
+        """\
+        if 'Authorization' not in request.headers:
+            print(request.headers.get('Authorization'))
+        """,
+        settings,
+    )
+
+
+def test_http_not_in_meta_double_if_statement():
+    check_transformed(
+        """\
+        if 'HTTP_AUTHORIZATION' not in request.META and \
+              'HTTP_SERVER' not in request.META:
+            print('hi')
+        """,
+        """\
+        if 'Authorization' not in request.headers and \
+              'Server' not in request.headers:
+            print('hi')
+        """,
+        settings,
+    )
+
+
+def test_no_http_value_in_meta():
+    check_noop(
+        """\
+        'QUERY_STRING' in request.META
+        """,
+        settings,
+    )
+
+
+def test_no_http_value_not_in_meta():
+    check_noop(
+        """\
+        'QUERY_STRING' not in request.META
+        """,
+        settings,
+    )

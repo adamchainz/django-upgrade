@@ -183,7 +183,8 @@ def visit_Call(
             )
             num_intersections = len(model_names & unregistered_models)
             if (
-                # We do not rewrite register calls that contain at least one unregistered model.
+                # We do not rewrite register calls that contain at least one
+                # unregistered model.
                 num_intersections == 0
                 and admin_details is not None
                 and admin_details.parent == parents[-2]
@@ -209,7 +210,7 @@ def visit_Call(
                     and state.looks_like_admin_file()
                 )
             )
-            and (  # unregister(…) has only one parameter, a model or a sequence of models
+            and (  # unregister(…) has only one parameter
                 isinstance((first_arg := node.args[0]), ast.Name)
                 or (
                     isinstance(first_arg, (ast.Tuple, ast.List))

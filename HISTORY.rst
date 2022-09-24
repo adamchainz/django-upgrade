@@ -32,6 +32,10 @@ History
 
   Thanks to Daan Vielen in `Issue #238 <https://github.com/adamchainz/django-upgrade/issues/238>`__.
 
+* Update README with info on how to run an upgrade on entire project.
+
+  Thanks to Daan Vielen in `Issue #240 <https://github.com/adamchainz/django-upgrade/issues/240>`__.
+
 1.10.0 (2022-09-07)
 -------------------
 

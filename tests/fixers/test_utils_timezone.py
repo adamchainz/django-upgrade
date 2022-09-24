@@ -6,6 +6,13 @@ from tests.fixers.tools import check_noop, check_transformed
 settings = Settings(target_version=(4, 1))
 
 
+def test_empty():
+    check_noop(
+        "",
+        settings,
+    )
+
+
 def test_unmatched_import():
     check_noop(
         """\
@@ -59,6 +66,22 @@ def test_basic():
         do_a_thing(utc)
         """,
         """\
+        from datetime import timezone
+        do_a_thing(timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_docstring():
+    check_transformed(
+        """\
+        '''my module'''
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        '''my module'''
         from datetime import timezone
         do_a_thing(timezone.utc)
         """,

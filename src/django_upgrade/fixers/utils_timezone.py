@@ -89,7 +89,11 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
     details = ImportDetails()
 
     for node in module.body:
-        if isinstance(node, ast.Constant):
+        if (
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        ):
             # docstring
             continue
         elif isinstance(node, ast.Import):

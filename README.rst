@@ -270,23 +270,23 @@ Existing ``re_path()`` calls are also rewritten to the ``path()`` syntax when el
          re_path(r'^post/(?P<slug>[\w-]+)/$', views.post, name='post'),
      ]
 
-The compatible regexes that will be converted to use `django paths converters`_. are the following:
+The compatible regexes that will be converted to use `path converters <https://docs.djangoproject.com/en/stable/topics/http/urls/#path-converters>`__ are the following:
 
-.. _django paths converters: https://docs.djangoproject.com/en/stable/topics/http/urls/#path-converters
+* ``[^/]+`` → ``str``
+* ``[0-9]+`` → ``int``
+* ``[-a-zA-Z0-9_]+`` → ``slug``
+* ``[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`` → ``uuid``
+* ``.+`` → ``path``
 
-* **str** - ``"[^/]+"``
-* **int** - ``"[0-9]+"``
-* **slug** - ``"[-a-zA-Z0-9_]+"``
-* **uuid** - ``"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"``
-* **path** - ``".+"``
+These are taken from the path converter classes.
 
 For some cases, this change alters the type of the arguments passed to the view, from ``str`` to the converted type (e.g. ``int``).
 This is not guaranteed backwards compatible: there is a chance that the view expects a string, rather than the converted type.
 But, pragmatically, it seems 99.9% of views do not require strings, and instead work with either strings or the converted type.
 Thus, you should test affected paths after this fixer makes any changes.
 
-Note that ``[\w-]`` is sometimes used for slugs but is not converted because it might be incompatible.
-Indeed, it matches all unicode characters (``α`` for ex) unlike django's SlugConverter which only matches latin characters.
+Note that ``[\w-]`` is sometimes used for slugs, but is not converted because it might be incompatible.
+That pattern matches all Unicode word characters, such as “α”, unlike Django's ``slug`` converter, which only matches Latin characters.
 
 ``lru_cache``
 ~~~~~~~~~~~~~

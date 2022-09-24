@@ -143,6 +143,23 @@ def test_attr():
     )
 
 
+def test_attr_other_import():
+    check_transformed(
+        """\
+        from django.utils import html, timezone
+
+        foo(timezone.utc)
+        """,
+        """\
+        from datetime import timezone
+        from django.utils import html
+
+        foo(timezone.utc)
+        """,
+        settings,
+    )
+
+
 def test_attr_reuse_datetime_import():
     check_transformed(
         """\

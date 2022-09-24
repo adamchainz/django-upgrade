@@ -18,6 +18,10 @@ History
 
   Thanks to Christian Bundy in `PR #226 <https://github.com/adamchainz/django-upgrade/pull/226>`__.
 
+* Extend ``request.headers`` fixer to rewrite ``in`` and ``not in`` comparisons on ``request.META``.
+
+  Thanks to Daan Vielen in `Issue #234 <https://github.com/adamchainz/django-upgrade/issues/234>`__.
+
 * Make ``on_delete`` fixer also support ``ForeignKey`` and ``OneToOneField`` imported from ``django.db.models``.
 
   Thanks to Thibaut Decombe in `PR #236 <https://github.com/adamchainz/django-upgrade/pull/236>`__.

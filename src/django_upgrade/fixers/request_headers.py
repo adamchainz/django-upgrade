@@ -13,7 +13,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import NAME, STRING, find, replace, reverse_find
+from django_upgrade.tokens import NAME, STRING, find, replace
 
 fixer = Fixer(
     __name__,
@@ -133,7 +133,6 @@ def rewrite_header_access(tokens: list[Token], i: int, *, header_name: str) -> N
 
 
 def rewrite_in_statement(tokens: list[Token], i: int, *, header_name: str) -> None:
+    replace(tokens, i, src=repr(header_name))
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
-    str_idx = reverse_find(tokens, meta_idx, name=STRING)
-    replace(tokens, str_idx, src=repr(header_name))

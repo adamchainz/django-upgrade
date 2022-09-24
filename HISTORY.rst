@@ -34,6 +34,8 @@ History
 
   Thanks to Joseph Zammit in `Issue #245 <https://github.com/adamchainz/django-upgrade/issues/245>`__.
 
+* Extend ``timezone.utc`` fixer to reuse existing ``datetime`` module imports.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

@@ -20,7 +20,7 @@ History
 
 * Make ``on_delete`` fixer also support ``ForeignKey`` and ``OneToOneField`` imported from ``django.db.models``.
 
-  Thanks to Thibaut Decombe in `PR #234 <https://github.com/adamchainz/django-upgrade/pull/234>`__.
+  Thanks to Thibaut Decombe in `PR #236 <https://github.com/adamchainz/django-upgrade/pull/236>`__.
 
 * Make fixers that erase lines also erase any trailing comments.
 

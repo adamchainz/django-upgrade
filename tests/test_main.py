@@ -14,8 +14,17 @@ from django_upgrade.main import fixup_dedent_tokens, main
 from django_upgrade.tokens import DEDENT
 
 
-def test_main_trivial():
-    assert main([]) == 0
+def test_main_no_files(capsys):
+    """
+    Main should fail without any files as argument
+    """
+    with pytest.raises(SystemExit) as excinfo:
+        main([])
+
+    assert excinfo.value.code == 2
+    out, err = capsys.readouterr()
+    assert "error: the following arguments are required: filenames\n" in err
+    assert out == ""
 
 
 def test_main_help():

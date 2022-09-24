@@ -31,10 +31,10 @@ def visit_Subscript(
         not isinstance(parents[-1], ast.Assign)
         and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
-        and (raw_header_name := get_http_header_name(meta_name)) is not None
+        and (header_name := get_header_name(meta_name)) is not None
     ):
         yield ast_start_offset(node), partial(
-            rewrite_header_access, raw_header_name=raw_header_name
+            rewrite_header_access, header_name=header_name
         )
 
 
@@ -51,10 +51,10 @@ def visit_Call(
         and len(node.args) >= 1
         and isinstance(node.args[0], ast.Constant)
         and isinstance(meta_name := node.args[0].value, str)
-        and (raw_header_name := get_http_header_name(meta_name)) is not None
+        and (header_name := get_header_name(meta_name)) is not None
     ):
         yield ast_start_offset(node), partial(
-            rewrite_header_access, raw_header_name=raw_header_name
+            rewrite_header_access, header_name=header_name
         )
 
 
@@ -71,10 +71,10 @@ def visit_Compare(
         and len(node.comparators) == 1
         and is_request_or_self_request_meta(node.comparators[0])
         and isinstance(node.left, ast.Constant)
-        and (raw_header_name := get_http_header_name(node.left.value)) is not None
+        and (header_name := get_header_name(node.left.value)) is not None
     ):
         yield ast_start_offset(node), partial(
-            rewrite_in_statement, raw_header_name=raw_header_name
+            rewrite_in_statement, header_name=header_name
         )
 
 
@@ -113,31 +113,27 @@ else:
         return None
 
 
-def get_http_header_name(meta_name: str) -> str | None:
+def get_header_name(meta_name: str) -> str | None:
     """Extract HTTP header name, unless it isn't an HTTP header."""
     http_prefix = "HTTP_"
     if meta_name.startswith(http_prefix):
-        return meta_name[len(http_prefix) :]
-    if meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
-        return meta_name
-    return None
+        name = meta_name[len(http_prefix) :]
+    elif meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
+        name = meta_name
+    else:
+        return None
+    return "-".join(x.title() for x in name.split("_"))
 
 
-def make_header_name(raw_header_name: str) -> str:
-    return "-".join(x.title() for x in raw_header_name.split("_"))
-
-
-def rewrite_header_access(tokens: list[Token], i: int, *, raw_header_name: str) -> None:
+def rewrite_header_access(tokens: list[Token], i: int, *, header_name: str) -> None:
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
     str_idx = find(tokens, meta_idx, name=STRING)
-    header_name = make_header_name(raw_header_name)
     replace(tokens, str_idx, src=repr(header_name))
 
 
-def rewrite_in_statement(tokens: list[Token], i: int, *, raw_header_name: str) -> None:
+def rewrite_in_statement(tokens: list[Token], i: int, *, header_name: str) -> None:
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
     str_idx = reverse_find(tokens, meta_idx, name=STRING)
-    header_name = make_header_name(raw_header_name)
     replace(tokens, str_idx, src=repr(header_name))

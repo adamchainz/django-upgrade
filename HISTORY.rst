@@ -28,6 +28,10 @@ History
 
 * Expand the range of files considered settings files.
 
+* Require at least one filename.
+
+  Thanks to Daan Vielen in `Issue #238 <https://github.com/adamchainz/django-upgrade/issues/238>`__.
+
 1.10.0 (2022-09-07)
 -------------------
 

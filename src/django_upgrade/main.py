@@ -21,7 +21,7 @@ from django_upgrade.tokens import DEDENT
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("filenames", nargs="*")
+    parser.add_argument("filenames", nargs="+")
     parser.add_argument("--exit-zero-even-if-changed", action="store_true")
     parser.add_argument(
         "--target-version",

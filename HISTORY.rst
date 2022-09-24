@@ -18,6 +18,10 @@ History
 
   Thanks to Christian Bundy in `PR #226 <https://github.com/adamchainz/django-upgrade/pull/226>`__.
 
+* Extend ``request.headers`` fixer to rewrite ``in`` and ``not in`` comparisons on ``request.META``.
+
+  Thanks to Daan Vielen in `Issue #234 <https://github.com/adamchainz/django-upgrade/issues/234>`__.
+
 * Make ``on_delete`` fixer also support ``ForeignKey`` and ``OneToOneField`` imported from ``django.db.models``.
 
   Thanks to Thibaut Decombe in `PR #236 <https://github.com/adamchainz/django-upgrade/pull/236>`__.
@@ -35,10 +39,6 @@ History
 * Update README with info on how to run an upgrade on entire project.
 
   Thanks to Daan Vielen in `Issue #240 <https://github.com/adamchainz/django-upgrade/issues/240>`__.
-
-* Extend ``request.headers`` fixer to rewrite ``in`` and ``not in`` comparisons on ``request.META``.
-
-  Thanks to Daan Vielen in `Issue #234 <https://github.com/adamchainz/django-upgrade/issues/234>`__.
 
 1.10.0 (2022-09-07)
 -------------------

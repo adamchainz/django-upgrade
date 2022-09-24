@@ -201,7 +201,6 @@ If a ``register()`` call is preceded by an ``unregister()`` call that includes t
     class MyCustomAdmin(admin.ModelAdmin):
         ...
 
-
     admin.site.unregister(MyModel1)
     admin.site.register(MyModel1, MyCustomAdmin)
 

@@ -22,6 +22,10 @@ History
 
   Thanks to Thibaut Decombe in `PR #236 <https://github.com/adamchainz/django-upgrade/pull/236>`__.
 
+* Make ``NullBooleanField`` fixer preserve existing ``null`` arguments.
+
+  Thanks to Joseph Zammit in `Issue #245 <https://github.com/adamchainz/django-upgrade/issues/245>`__.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

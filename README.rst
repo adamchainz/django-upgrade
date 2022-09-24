@@ -41,6 +41,13 @@ Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of you
         -   id: django-upgrade
             args: [--target-version, "4.1"]   # Replace with Django version
 
+
+To upgrade your entire project run:
+
+.. code-block:: sh
+
+    pre-commit run django-upgrade --all-files
+
 ----
 
 **Want to improve your code quality?**
@@ -54,7 +61,7 @@ Usage
 
 ``django-upgrade`` is a commandline tool that rewrites files in place.
 Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag.
-django-ugrade will run all its fixers for versions up to and including the target version.
+django-upgrade will run all its fixers for versions up to and including the target version.
 These fixers rewrite your code to avoid ``DeprecationWarning``\s and use some new features.
 
 For example:
@@ -70,10 +77,14 @@ For more on usage run ``django-upgrade --help``.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
 
 ``django-upgrade`` does not have any ability to recurse through directories.
-Use the pre-commit integration, globbing, or another technique for applying to many files such as |with git ls-files pipe xargs|__.
+Use the pre-commit integration, globbing, or another technique for applying to many files such as |with git ls-files pipe xargs|__. For example:
 
 .. |with git ls-files pipe xargs| replace:: with ``git ls-files | xargs``
 __ https://adamj.eu/tech/2022/03/09/how-to-run-a-command-on-many-files-in-your-git-repository/
+
+.. code-block:: sh
+
+    git ls-files -- '*.py' | xargs django-upgrade --target-version 4.1
 
 The full list of fixers is documented below.
 

@@ -84,7 +84,7 @@ __ https://adamj.eu/tech/2022/03/09/how-to-run-a-command-on-many-files-in-your-g
 
 .. code-block:: sh
 
-    git ls-files -- '*.py' | xargs django-upgrade --target-version 4.2
+    git ls-files -- '*.py' | xargs django-upgrade --target-version 4.1
 
 The full list of fixers is documented below.
 

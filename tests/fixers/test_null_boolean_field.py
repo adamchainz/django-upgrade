@@ -202,6 +202,7 @@ def test_transform_with_star_kwargs():
         settings,
     )
 
+
 def test_transform_with_null_is_true_kwarg_relative_import():
     check_transformed(
         """\
@@ -214,6 +215,7 @@ def test_transform_with_null_is_true_kwarg_relative_import():
         """,
         settings,
     )
+
 
 def test_transform_with_null_is_true_kwarg_absolute_import_renamed():
     check_transformed(
@@ -228,6 +230,7 @@ def test_transform_with_null_is_true_kwarg_absolute_import_renamed():
         settings,
     )
 
+
 def test_transform_with_null_is_true_kwarg_absolute_import_removed():
     check_transformed(
         """\
@@ -240,6 +243,7 @@ def test_transform_with_null_is_true_kwarg_absolute_import_removed():
         """,
         settings,
     )
+
 
 def test_transform_with_null_is_function():
     check_transformed(

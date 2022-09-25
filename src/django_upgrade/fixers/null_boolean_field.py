@@ -53,24 +53,23 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (
-         (
             isinstance(node.func, ast.Name)
             and "NullBooleanField" in state.from_imports["django.db.models"]
             and node.func.id == "NullBooleanField"
-         )
-         or (
+        )
+        or (
             isinstance(node.func, ast.Attribute)
             and node.func.attr == "NullBooleanField"
             and "models" in state.from_imports["django.db"]
             and isinstance(node.func.value, ast.Name)
             and node.func.value.id == "models"
-         )
         )
     ) and not state.looks_like_migrations_file():
         yield ast_start_offset(node), partial(fix_null_boolean_field, node=node)
 
+
 def fix_null_boolean_field(tokens: list[Token], i: int, *, node: ast.Call) -> None:
-    if  "null" not in [keyword.arg for keyword in node.keywords]:
+    if "null" not in [keyword.arg for keyword in node.keywords]:
         j = find(tokens, i, name=OP, src="(")
         func_args, j = parse_call_args(tokens, j)
 

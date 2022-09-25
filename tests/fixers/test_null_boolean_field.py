@@ -201,3 +201,59 @@ def test_transform_with_star_kwargs():
         """,
         settings,
     )
+
+
+def test_transform_with_null_is_true_kwarg_relative_import():
+    check_transformed(
+        """\
+        from django.db import models
+        models.NullBooleanField(null=True)
+        """,
+        """\
+        from django.db import models
+        models.BooleanField(null=True)
+        """,
+        settings,
+    )
+
+
+def test_transform_with_null_is_true_kwarg_absolute_import_renamed():
+    check_transformed(
+        """\
+        from django.db.models import NullBooleanField
+        NullBooleanField(null=True)
+        """,
+        """\
+        from django.db.models import BooleanField
+        BooleanField(null=True)
+        """,
+        settings,
+    )
+
+
+def test_transform_with_null_is_true_kwarg_absolute_import_removed():
+    check_transformed(
+        """\
+        from django.db.models import BooleanField, NullBooleanField
+        NullBooleanField(null=True)
+        """,
+        """\
+        from django.db.models import BooleanField
+        BooleanField(null=True)
+        """,
+        settings,
+    )
+
+
+def test_transform_with_null_is_function():
+    check_transformed(
+        """\
+        from django.db.models import NullBooleanField
+        NullBooleanField(null=f())
+        """,
+        """\
+        from django.db.models import BooleanField
+        BooleanField(null=f())
+        """,
+        settings,
+    )

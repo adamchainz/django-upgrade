@@ -69,20 +69,21 @@ def visit_Call(
 
 
 def fix_null_boolean_field(tokens: list[Token], i: int, *, node: ast.Call) -> None:
-    j = find(tokens, i, name=OP, src="(")
-    func_args, j = parse_call_args(tokens, j)
+    if not any(k.arg == "null" for k in node.keywords):
+        j = find(tokens, i, name=OP, src="(")
+        func_args, j = parse_call_args(tokens, j)
 
-    new_src = "null=True"
-    if len(func_args) > 0:
-        new_src = " " + new_src
-        final_start_idx, final_end_idx = func_args[-1]
-        final_has_comma = any(
-            t.name == OP and t.src == ","
-            for t in tokens[final_start_idx : final_end_idx + 1]
-        )
-        if not final_has_comma:
-            new_src = "," + new_src
+        new_src = "null=True"
+        if len(func_args) > 0:
+            new_src = " " + new_src
+            final_start_idx, final_end_idx = func_args[-1]
+            final_has_comma = any(
+                t.name == OP and t.src == ","
+                for t in tokens[final_start_idx : final_end_idx + 1]
+            )
+            if not final_has_comma:
+                new_src = "," + new_src
 
-    tokens.insert(j - 1, Token(name=CODE, src=new_src))
+        tokens.insert(j - 1, Token(name=CODE, src=new_src))
 
     find_and_replace_name(tokens, i, name="NullBooleanField", new="BooleanField")

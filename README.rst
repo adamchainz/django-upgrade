@@ -31,7 +31,7 @@ Installation
 
 Python 3.8 to 3.11 supported. See **Usage** for an introduction to the ``django-upgrade`` command.
 
-**Option 2**: You can also install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook. Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
+**Option 2**: You can install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook. Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
 
 .. code-block:: yaml
 
@@ -48,7 +48,9 @@ To upgrade your entire project immediately, you can tell pre-commit to run the `
 
     pre-commit run django-upgrade --all-files
 
-Tip: You may comment out this hook once your upgrade process has finished, but leaving it in place is considered entirely safe, as django-upgrade may receive future improvements and thus keep improving your code.
+.. tip:: Leaving this hook in place after the upgrade process is considered entirely safe and actually recommended! Django-upgrade may receive future improvements and thus keep improving your code.
+
+.. tip:: Normally, pre-commit will run exactly on the files that you have changed in your commit. Pre-commit can also help you update to the latest ``django-upgrade`` version with its ``autoupdate`` command. This is a sufficient flow for most cases, but remember to also run ``pre-commit run django-upgrade --all-files`` as django-upgrade may add new improvements in each release.
 
 
 ----

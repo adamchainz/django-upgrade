@@ -23,15 +23,15 @@ Automatically upgrade your Django project code.
 Installation
 ============
 
-Use **pip**:
+**Option 1**: Install django-upgrade with **pip**:
 
 .. code-block:: sh
 
     python -m pip install django-upgrade
 
-Python 3.8 to 3.11 supported.
+Python 3.8 to 3.11 supported. See **Usage** for an introduction to the ``django-upgrade`` command.
 
-Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
+**Option 2**: You can also install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook. Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
 
 .. code-block:: yaml
 
@@ -41,12 +41,14 @@ Or with `pre-commit <https://pre-commit.com/>`__ in the ``repos`` section of you
         -   id: django-upgrade
             args: [--target-version, "4.1"]   # Replace with Django version
 
-
-To upgrade your entire project run:
+To upgrade your entire project immediately, you can tell pre-commit to run the ``django-upgrade`` hook on all files. Once you commit these changes, your other pre-commit linters will execute and you may see further changes. Use the following command:
 
 .. code-block:: sh
 
     pre-commit run django-upgrade --all-files
+
+Tip: You may comment out this hook once your upgrade process has finished, but leaving it in place is considered entirely safe, as django-upgrade may receive future improvements and thus keep improving your code.
+
 
 ----
 

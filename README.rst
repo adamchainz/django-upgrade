@@ -31,7 +31,7 @@ Installation
 
 Python 3.8 to 3.11 supported. See **Usage** for an introduction to the ``django-upgrade`` command.
 
-**Option 2**: You can install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook. Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
+**Option 2**: Install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook. Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
 
 .. code-block:: yaml
 

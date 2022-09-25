@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add Django 4.2+ fixer to rewrite test case methods ``assertFormsetError()`` and ``assertQuerysetEqual()`` into the new spellings with capitalized “Set”.
+
+  Thanks to Michael Howitz in `PR #253 <https://github.com/adamchainz/django-upgrade/pull/253>`__.
+
 * Add Django 4.0 fixer to rewrite ``django.contrib.admin.utils.lookup_needs_distinct`` -> ``lookup_spawns_duplicates``.
 
   Thanks to Bruno Alla in `PR #313 <https://github.com/adamchainz/django-upgrade/pull/313>`__.

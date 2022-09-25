@@ -69,7 +69,7 @@ def visit_Call(
 
 
 def fix_null_boolean_field(tokens: list[Token], i: int, *, node: ast.Call) -> None:
-    if "null" not in [keyword.arg for keyword in node.keywords]:
+    if not any(k.arg == "null" for k in node.keywords):
         j = find(tokens, i, name=OP, src="(")
         func_args, j = parse_call_args(tokens, j)
 

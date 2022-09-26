@@ -3,7 +3,7 @@ from __future__ import annotations
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 
-settings = Settings(target_version=(2, 2))
+settings = Settings(target_version=(2, 0))
 
 
 def test_unrecognized_import_format():
@@ -53,6 +53,19 @@ def test_urls_unrecognized_name():
     check_noop(
         """\
         from django.urls import something
+        """,
+        settings,
+    )
+
+
+def test_two_imported_used():
+    check_noop(
+        """\
+        from django.urls import path
+        from django.urls import re_path
+
+        path('whatever')
+        re_path('whatever')
         """,
         settings,
     )

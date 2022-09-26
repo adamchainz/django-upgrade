@@ -52,11 +52,12 @@ def visit_ImportFrom(
         and is_rewritable_import_from(node)
         and any(alias.name == "re_path" for alias in node.names)
     ):
-        yield ast_start_offset(node), partial(
-            update_django_urls_import,
-            node=node,
-            state=state,
-        )
+        pass
+        # yield ast_start_offset(node), partial(
+        #     maybe_remove_re_path,
+        #     node=node,
+        #     state=state,
+        # )
 
 
 # Track which of path and re_path have been used for this current file
@@ -97,23 +98,12 @@ def update_django_conf_import(
             state_used_names[state] = used_names
 
 
-def update_django_urls_import(
-    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
-) -> None:
-    used_names = state_used_names.pop(state, set())
-
-    if used_names:
-        initial_names = state.from_imports["django.urls"] - {"re_path"}
-        used_names.update(initial_names)
-
-        j, indent = extract_indent(tokens, i)
-        erase_node(tokens, i, node=node)
-        joined_names = ", ".join(sorted(used_names))
-        insert(
-            tokens,
-            j,
-            new_src=f"{indent}from django.urls import {joined_names}\n",
-        )
+# def maybe_remove_re_path(
+#     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
+# ) -> None:
+#     used_names = state_used_names.pop(state, set())
+#     if "re_path" not in used_names:
+#         update_import_names(tokens, i, node=node, name_map={"re_path": ""})
 
 
 @fixer.register(ast.Call)

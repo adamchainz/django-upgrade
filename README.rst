@@ -50,7 +50,6 @@ You can install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hoo
         hooks:
         -   id: django-upgrade
             args: [--target-version, "4.1"]   # Replace with Django version
-            types: [file, python]
 
 To upgrade your entire project immediately, you can tell pre-commit to run the ``django-upgrade`` hook on all files. Once you commit these changes, your other pre-commit linters will execute and you may see further changes. Use the following command:
 

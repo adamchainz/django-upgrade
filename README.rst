@@ -23,13 +23,7 @@ Automatically upgrade your Django project code.
 Installation
 ============
 
-There are several ways to install and use django-upgrade, here are two common scenarios.
-
-
-Option 1: pip
--------------
-
-Install the ``django-upgrade`` command with pip. See **Usage** for an introduction to the ``django-upgrade`` command.
+Use **pip**:
 
 .. code-block:: sh
 
@@ -37,32 +31,31 @@ Install the ``django-upgrade`` command with pip. See **Usage** for an introducti
 
 Python 3.8 to 3.11 supported.
 
+pre-commit hook
+---------------
 
-Option 2: pre-commit
---------------------
-
-You can install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook. Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__):
+You can also install django-upgrade as a `pre-commit <https://pre-commit.com/>`__ hook.
+Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` file (`docs <https://pre-commit.com/#plugins>`__), above any code formatters (such as Black):
 
 .. code-block:: yaml
 
     -   repo: https://github.com/adamchainz/django-upgrade
-        rev: ''  # replace with latest tag on GitHub
+        rev: ""  # replace with latest tag on GitHub
         hooks:
         -   id: django-upgrade
             args: [--target-version, "4.1"]   # Replace with Django version
 
-To upgrade your entire project immediately, you can tell pre-commit to run the ``django-upgrade`` hook on all files. Once you commit these changes, your other pre-commit linters will execute and you may see further changes. Use the following command:
+Then, upgrade your entire project:
 
 .. code-block:: sh
 
     pre-commit run django-upgrade --all-files
 
-----
+Commit any changes.
+In the process, your other hooks will run, potentially reformatting django-upgrade’s changes to match your project’s code style.
 
-**Tip:** Leaving this hook in place after the upgrade process is considered entirely safe and actually recommended! Django-upgrade may receive future improvements and thus keep improving your code.
-
-**Tip:** Pre-commit can help you update to the latest ``django-upgrade`` version with its ``autoupdate`` command. Normally, pre-commit will run exactly on the files that you have changed in your commit. This is a sufficient flow for most cases, but remember to also run ``pre-commit run django-upgrade --all-files`` as django-upgrade may add new improvements in each release.
-
+Keep the hook installed in order to upgrade all code added to your project.
+pre-commit’s ``autoupdate`` command will also let you take advantage of future django-upgrade features.
 
 ----
 

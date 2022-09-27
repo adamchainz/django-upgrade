@@ -969,7 +969,78 @@ def test_unregister_at_least_one_model_leaves_register():
     )
 
 
+def test_unregister_kwarg():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(model_or_iterable=MyModel1)
+        admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_undetectable_names():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(*some_models())
+        admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
 def test_unregister_multiple_admins():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+
+        class MyOtherCustomAdmin:
+            pass
+
+        admin.site.register(MyModel1, MyOtherCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+
+        @admin.register(MyModel1)
+        class MyOtherCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_multiple_admins_different_models():
     check_transformed(
         """\
         from django.contrib import admin

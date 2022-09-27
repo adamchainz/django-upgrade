@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable, MutableMapping, cast
+from typing import Iterable, Literal, MutableMapping, cast
 from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
@@ -32,8 +32,10 @@ class AdminDetails:
 
 
 decorable_admins: MutableMapping[State, dict[str, AdminDetails]] = WeakKeyDictionary()
+# Name of site to set of unregistered model names, or True if potentially all
+# models have been unregistered
 unregistered_site_models: MutableMapping[
-    State, dict[str, set[str]]
+    State, dict[str, set[str] | Literal[True]]
 ] = WeakKeyDictionary()
 
 
@@ -142,7 +144,7 @@ def visit_Call(
                     and node.func.value.attr == "site"
                     and isinstance(node.func.value.value, ast.Name)
                     and node.func.value.value.id == "admin"
-                    and (site_name := "") == ""  # force walrus
+                    and (site_name := "") == ""  # force assign
                 )
                 or (  # custom_site.register(...)
                     isinstance(node.func.value, ast.Name)
@@ -181,11 +183,9 @@ def visit_Call(
             unregistered_models = unregistered_site_models.get(state, {}).get(
                 site_name, set()
             )
-            num_intersections = len(model_names & unregistered_models)
             if (
-                # We do not rewrite register calls that contain at least one
-                # unregistered model.
-                num_intersections == 0
+                unregistered_models is not True
+                and not unregistered_models.intersection(model_names)
                 and admin_details is not None
                 and admin_details.parent == parents[-2]
                 and not (site_name and not admin_name.endswith("Admin"))
@@ -194,42 +194,45 @@ def visit_Call(
                     model_names
                 )
                 yield ast_start_offset(node), partial(erase_node, node=parents[-1])
-        elif (
-            node.func.attr == "unregister"
-            and (
-                (  # admin.site.unregister(...)
-                    isinstance(node.func.value, ast.Attribute)
-                    and node.func.value.attr == "site"
-                    and isinstance(node.func.value.value, ast.Name)
-                    and node.func.value.value.id == "admin"
-                    and (site_name := "") == ""
-                )
-                or (  # custom_site.unregister(...)
-                    isinstance(node.func.value, ast.Name)
-                    and (site_name := node.func.value.id).endswith("site")
-                    and state.looks_like_admin_file()
-                )
+        elif node.func.attr == "unregister" and (
+            (  # admin.site.unregister(...)
+                isinstance(node.func.value, ast.Attribute)
+                and node.func.value.attr == "site"
+                and isinstance(node.func.value.value, ast.Name)
+                and node.func.value.value.id == "admin"
+                and (site_name := "") == ""  # force assign
             )
-            and (  # unregister(…) has only one parameter
-                isinstance((first_arg := node.args[0]), ast.Name)
-                or (
-                    isinstance(first_arg, (ast.Tuple, ast.List))
-                    and all(isinstance(elt, ast.Name) for elt in first_arg.elts)
-                )
+            or (  # custom_site.unregister(...)
+                isinstance(node.func.value, ast.Name)
+                and (site_name := node.func.value.id).endswith("site")
+                and state.looks_like_admin_file()
             )
         ):
-            if isinstance(first_arg, ast.Name):
-                model_names = {first_arg.id}
-            else:  # argument is a sequence of models
-                model_names = {cast(ast.Name, elt).id for elt in first_arg.elts}
+            # potentially all models unregistered, but in some cases we can
+            # detect unregistered names
+            unregistered_names: set[str] | Literal[True] = True
+            if len(node.args) == 1:
+                first_arg = node.args[0]
+                if isinstance(first_arg, ast.Name):
+                    unregistered_names = {first_arg.id}
+                elif isinstance(first_arg, (ast.Tuple, ast.List)) and all(
+                    isinstance(elt, ast.Name) for elt in first_arg.elts
+                ):
+                    # argument is a sequence of models
+                    unregistered_names = {
+                        cast(ast.Name, elt).id for elt in first_arg.elts
+                    }
 
-            site_details = unregistered_site_models.get(state, None)
-            if site_details is None:
-                site_details = {}
-                unregistered_site_models[state] = site_details
+            state_details = unregistered_site_models.get(state, None)
+            if state_details is None:
+                state_details = {}
+                unregistered_site_models[state] = state_details
 
-            model_details = site_details.get(site_name, None)
-            if model_details is None:
-                site_details[site_name] = model_names
+            if unregistered_names is True:
+                state_details[site_name] = True
             else:
-                model_details.update(model_names)
+                existing_names = state_details.get(site_name, None)
+                if existing_names is None:
+                    state_details[site_name] = unregistered_names
+                elif existing_names is not True:
+                    existing_names.update(unregistered_names)

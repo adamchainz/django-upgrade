@@ -1003,6 +1003,24 @@ def test_unregister_undetectable_names():
     )
 
 
+def test_unregister_undetectable_names_and_more():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(*some_models())
+        admin.site.unregister(MyModel2)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
 def test_unregister_multiple_admins():
     check_noop(
         """\

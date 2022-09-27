@@ -31,6 +31,16 @@ def test_unmatched_import_name():
     )
 
 
+def test_import_used_otherwise():
+    check_noop(
+        """\
+        from django.utils import timezone
+        timezone.now()
+        """,
+        settings,
+    )
+
+
 def test_untouched_utc_attribute():
     check_noop(
         """\
@@ -134,6 +144,25 @@ def test_extend_datetime_import():
     )
 
 
+def test_extend_datetime_import_multiline():
+    check_transformed(
+        """\
+        from datetime import (
+            datetime, timedelta
+        )
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        from datetime import (
+            datetime, timedelta, timezone
+        )
+        do_a_thing(timezone.utc)
+        """,
+        settings,
+    )
+
+
 def test_fix_skips_other_utc_names():
     check_transformed(
         """\
@@ -161,6 +190,25 @@ def test_attr():
         from datetime import timezone
 
         do_a_thing(timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_attr_other_use():
+    check_transformed(
+        """\
+        from django.utils import timezone
+
+        do_a_thing(timezone.utc)
+        timezone.now()
+        """,
+        """\
+        import datetime as dt
+        from django.utils import timezone
+
+        do_a_thing(dt.timezone.utc)
+        timezone.now()
         """,
         settings,
     )

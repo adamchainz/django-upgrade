@@ -191,6 +191,20 @@ Such calls are detected heuristically based on three criteria:
     -custom_site.register(MyModel, MyModelAdmin)
     -admin.site.register(MyModel, MyModelAdmin)
 
+If a ``register()`` call is preceded by an ``unregister()`` call that includes the same model, it is ignored.
+
+.. code-block:: python
+
+    from django.contrib import admin
+
+
+    class MyCustomAdmin(admin.ModelAdmin):
+        ...
+
+
+    admin.site.unregister(MyModel1)
+    admin.site.register(MyModel1, MyCustomAdmin)
+
 Django 1.9
 -----------
 

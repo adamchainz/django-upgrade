@@ -674,7 +674,7 @@ def test_multiple_model_mixed_registration():
     check_transformed(
         """\
         from django.contrib import admin
-        from myapp.models import MyModel1, MyModel2
+        from myapp.models import MyModel1, MyModel2, MyModel3, MyModel4
 
         class MyCustomAdmin:
             pass
@@ -685,7 +685,7 @@ def test_multiple_model_mixed_registration():
         """,
         """\
         from django.contrib import admin
-        from myapp.models import MyModel1, MyModel2
+        from myapp.models import MyModel1, MyModel2, MyModel3, MyModel4
 
         @admin.register(MyModel1, MyModel2, MyModel3, MyModel4)
         class MyCustomAdmin:
@@ -886,4 +886,287 @@ def test_multiple_admin_sites_sorted():
         """,
         settings=settings,
         filename="admin.py",
+    )
+
+
+def test_unregister():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_reoccurring():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_no_effect_if_register_precedes():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.register(MyModel1, MyCustomAdmin)
+        admin.site.unregister(MyModel1)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1
+
+        @admin.register(MyModel1)
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_at_least_one_model_leaves_register():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister([MyModel1])
+        admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_kwarg():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(model_or_iterable=MyModel1)
+        admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_undetectable_names():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(*some_models())
+        admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_undetectable_names_and_more():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(*some_models())
+        admin.site.unregister(MyModel2)
+        admin.site.register(MyModel1, MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_multiple_admins():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+
+        class MyOtherCustomAdmin:
+            pass
+
+        admin.site.register(MyModel1, MyOtherCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_multiple_admins_different_models():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+
+        class MyOtherCustomAdmin:
+            pass
+
+        admin.site.register(MyModel2, MyOtherCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister(MyModel1)
+        admin.site.register(MyModel1, MyCustomAdmin)
+
+        @admin.register(MyModel2)
+        class MyOtherCustomAdmin:
+            pass
+
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_multiple_models_for_model_admin():
+    check_transformed(
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2, MyModel3, MyModel4
+
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister([MyModel1, MyModel2])
+        admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
+        admin.site.register(MyModel3, MyCustomAdmin)
+        admin.site.register([MyModel4], MyCustomAdmin)
+        """,
+        """\
+        from django.contrib import admin
+        from myapp.models import MyModel1, MyModel2, MyModel3, MyModel4
+
+        @admin.register(MyModel3, MyModel4)
+        class MyCustomAdmin:
+            pass
+
+        admin.site.unregister([MyModel1, MyModel2])
+        admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_custom_admin_unregister():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site, secret_site
+        from django.contrib import admin
+
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(MyModel, MyModelAdmin)
+        custom_site.unregister([MyModel])
+        custom_site.register(MyModel, MyModelAdmin)
+        secret_site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site, secret_site
+        from django.contrib import admin
+
+        @admin.register(MyModel)
+        @admin.register(MyModel, site=secret_site)
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        custom_site.unregister([MyModel])
+        custom_site.register(MyModel, MyModelAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
+def test_unregister_not_admin_file():
+    check_transformed(
+        """\
+        from myapp.admin import custom_site, secret_site
+        from django.contrib import admin
+
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(MyModel, MyModelAdmin)
+        custom_site.unregister(MyModel)
+        custom_site.register(MyModel, MyModelAdmin)
+        secret_site.register(MyModel, MyModelAdmin)
+        """,
+        """\
+        from myapp.admin import custom_site, secret_site
+        from django.contrib import admin
+
+        @admin.register(MyModel)
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
+
+        custom_site.unregister(MyModel)
+        custom_site.register(MyModel, MyModelAdmin)
+        secret_site.register(MyModel, MyModelAdmin)
+        """,
+        settings=settings,
+        filename="a_d_m_i_n.py",
     )

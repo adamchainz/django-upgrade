@@ -16,7 +16,7 @@ History
 
 * Add Django 3.1+ fixer to replace ``list`` error message key with ``list_invalid`` on ``ModelMultipleChoiceField``.
 
-  Thanks to Thibaut Decombe in `PR #256 <https://github.com/adamchainz/django-upgrade/pull/256>`__.
+  Thanks to Thibaut Decombe in `PR #258 <https://github.com/adamchainz/django-upgrade/pull/258>`__.
 
 * Make ``request.headers`` fixer also rewrite accesses of the ``Content-Length`` and ``Content-Type`` headers.
 

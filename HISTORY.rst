@@ -14,6 +14,10 @@ History
 
 * Add Django 2.0+ fixer to drop assignments of ``allow_tags`` attributes to ``True``.
 
+* Add Django 3.1+ fixer to replace ``list`` error message key with ``list_invalid`` on ``ModelMultipleChoiceField``.
+
+  Thanks to Thibaut Decombe in `PR #256 <https://github.com/adamchainz/django-upgrade/pull/256>`__.
+
 * Make ``request.headers`` fixer also rewrite accesses of the ``Content-Length`` and ``Content-Type`` headers.
 
   Thanks to Christian Bundy in `PR #226 <https://github.com/adamchainz/django-upgrade/pull/226>`__.

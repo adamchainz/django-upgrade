@@ -685,7 +685,7 @@ This only applies in command files, which are heuristically detected as files wi
 ``EmailValidator``
 ~~~~~~~~~~~~~~~~~~
 
-Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``, and ``domain_whitelist`` to ``domain_allowlist``.
+Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``.
 
 .. code-block:: diff
 
@@ -693,8 +693,6 @@ Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``, a
 
     -EmailValidator(whitelist=["example.com"])
     +EmailValidator(allowlist=["example.com"])
-    -EmailValidator(domain_whitelist=["example.org"])
-    +EmailValidator(domain_allowlist=["example.org"])
 
 ``default_app_config``
 ~~~~~~~~~~~~~~~~~~~~~~

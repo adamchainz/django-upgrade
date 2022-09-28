@@ -40,54 +40,20 @@ def test_whitelist():
     )
 
 
-def test_domain_whitelist():
-    check_transformed(
-        """\
-        from django.core.validators import EmailValidator
-        EmailValidator(domain_whitelist=["example.com"])
-        """,
-        """\
-        from django.core.validators import EmailValidator
-        EmailValidator(domain_allowlist=["example.com"])
-        """,
-        settings,
-    )
-
-
-def test_both_module_imported():
-    check_transformed(
-        """\
-        from django.core import validators
-        validators.EmailValidator(
-            "hi", code="abc",
-            whitelist=["example.com"], domain_whitelist=["example.org"]
-        )
-        """,
-        """\
-        from django.core import validators
-        validators.EmailValidator(
-            "hi", code="abc",
-            allowlist=["example.com"], domain_allowlist=["example.org"]
-        )
-        """,
-        settings,
-    )
-
-
-def test_both_and_other_args():
+def test_other_args():
     check_transformed(
         """\
         from django.core.validators import EmailValidator
         EmailValidator(
             "hi", code="abc",
-            whitelist=["example.com"], domain_whitelist=["example.org"]
+            whitelist=["example.com"],
         )
         """,
         """\
         from django.core.validators import EmailValidator
         EmailValidator(
             "hi", code="abc",
-            allowlist=["example.com"], domain_allowlist=["example.org"]
+            allowlist=["example.com"],
         )
         """,
         settings,

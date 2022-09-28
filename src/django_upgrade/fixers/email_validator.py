@@ -21,10 +21,7 @@ fixer = Fixer(
 
 MODULE = "django.core.validators"
 NAME = "EmailValidator"
-KWARGS = {
-    "whitelist": "allowlist",
-    "domain_whitelist": "domain_allowlist",
-}
+KWARGS = {"whitelist": "allowlist"}
 
 
 @fixer.register(ast.Call)

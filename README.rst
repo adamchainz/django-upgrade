@@ -583,6 +583,16 @@ You will need to make migrations after this fix makes changes to models.
     -    valuable = NullBooleanField("Valuable")
     +    valuable = BooleanField("Valuable", null=True)
 
+``ModelMultipleChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Replace ``list`` error message key with ``list_invalid`` on forms ``ModelMultipleChoiceField``.
+
+.. code-block:: diff
+
+    -forms.ModelMultipleChoiceField(error_messages={"list": "Enter multiple values."})
+    +forms.ModelMultipleChoiceField(error_messages={"invalid_list": "Enter multiple values."})
+
 Django 3.2
 ----------
 

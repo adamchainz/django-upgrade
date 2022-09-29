@@ -695,7 +695,7 @@ This only applies in command files, which are heuristically detected as files wi
 ``EmailValidator``
 ~~~~~~~~~~~~~~~~~~
 
-Rewrites keyword arguments to their new names: ``whitelist`` to ``allowlist``.
+Rewrites the ``whitelist`` keyword argument to its new name ``allowlist``.
 
 .. code-block:: diff
 

@@ -368,7 +368,6 @@ def replace_argument_names(
 
     for n, keyword in reversed(list(enumerate(node.keywords))):
         if keyword.arg in arg_map:
-            x, y = kwarg_func_args[n]
             for k in range(*kwarg_func_args[n]):
                 if tokens[k].src == keyword.arg:
                     tokens[k] = tokens[k]._replace(src=arg_map[keyword.arg])

@@ -87,6 +87,23 @@ def test_basic():
     )
 
 
+def test_other_imports():
+    check_transformed(
+        """\
+        import datetime
+        from django.utils.timezone import utc
+        from myapp import timezone
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime
+        from myapp import timezone
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
 def test_docstring():
     check_transformed(
         """\
@@ -114,6 +131,53 @@ def test_import_aliased():
         """\
         import datetime as dt
         do_a_thing(dt.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_import_paired():
+    check_transformed(
+        """\
+        import datetime, os
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime, os
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_import_paired_alias():
+    check_transformed(
+        """\
+        import numpy as np, datetime as dt
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        import numpy as np, datetime as dt
+        do_a_thing(dt.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_multiple():
+    check_transformed(
+        """\
+        import datetime
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime
+        do_a_thing(datetime.timezone.utc)
+        do_a_thing(datetime.timezone.utc)
         """,
         settings,
     )

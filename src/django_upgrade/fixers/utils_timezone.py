@@ -83,7 +83,7 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
 
     details = ImportDetails()
 
-    for node in module.body:
+    for node in module.body:  # pragma: no branch
         if (
             isinstance(node, ast.Expr)
             and isinstance(node.value, ast.Constant)
@@ -120,11 +120,11 @@ def maybe_rewrite_import(
     if details.rewrite_scheduled:
         return
 
-    if details.old_utc_import is not None:
-        yield ast_start_offset(details.old_utc_import), partial(
-            update_import_names,
-            node=details.old_utc_import,
-            name_map={"utc": ""},
-        )
+    assert details.old_utc_import is not None
+    yield ast_start_offset(details.old_utc_import), partial(
+        update_import_names,
+        node=details.old_utc_import,
+        name_map={"utc": ""},
+    )
 
     details.rewrite_scheduled = True

@@ -217,12 +217,28 @@ def test_path_empty():
         """\
         from django.conf.urls import url
 
-        url(r"^$", views.index)
+        url(r'^$', views.index)
         """,
         """\
         from django.urls import path
 
         path('', views.index)
+        """,
+        settings,
+    )
+
+
+def test_path_empty_double_quoted():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+
+        url(r"^$", views.index)
+        """,
+        """\
+        from django.urls import path
+
+        path("", views.index)
         """,
         settings,
     )
@@ -303,6 +319,22 @@ def test_path_int_converter_1():
         from django.urls import path
 
         path('page/<int:number>/', views.page)
+        """,
+        settings,
+    )
+
+
+def test_path_int_converter_1_double_quotes():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+
+        url(r"^page/(?P<number>[0-9]+)/$", views.page)
+        """,
+        """\
+        from django.urls import path
+
+        path("page/<int:number>/", views.page)
         """,
         settings,
     )
@@ -422,7 +454,7 @@ def test_re_path_empty():
         """\
         from django.urls import re_path
 
-        re_path(r"^$", views.index)
+        re_path(r'^$', views.index)
         """,
         """\
         from django.urls import path
@@ -715,7 +747,7 @@ def test_combined_5():
         from django.urls import re_path
 
         include('example.urls')
-        re_path(r"^$", views.index)
+        re_path(r'^$', views.index)
         """,
         """\
         from django.urls import include, path

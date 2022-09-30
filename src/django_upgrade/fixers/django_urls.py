@@ -22,6 +22,7 @@ from django_upgrade.tokens import (
     insert,
     replace,
     update_import_names,
+    uses_double_quotes,
 )
 
 fixer = Fixer(
@@ -171,7 +172,11 @@ def fix_url_call(
         path = convert_path_syntax(regex_path)
         if path is not None:
             string_idx = find(tokens, i, name=STRING)
-            replace(tokens, string_idx, src=repr(path))
+            if uses_double_quotes(tokens[string_idx].src):
+                path = f'"{path}"'
+            else:
+                path = f"'{path}'"
+            replace(tokens, string_idx, src=path)
             new_name = "path"
     if new_name != node_name:
         state_added_names.setdefault(state, set()).add(new_name)

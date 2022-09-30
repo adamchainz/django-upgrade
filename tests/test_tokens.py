@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import ast
 
+import pytest
 from tokenize_rt import Token, src_to_tokens, tokens_to_src
 
-from django_upgrade.tokens import update_import_names
+from django_upgrade.tokens import update_import_names, uses_double_quotes
 
 
 def tokenize_and_parse(source: str) -> tuple[list[Token], ast.Module]:
@@ -104,3 +105,35 @@ class TestUpdateImportNames:
             name_map={"b": "", "c": ""},
             after="from a import d",
         )
+
+
+@pytest.mark.parametrize(
+    "string",
+    (
+        '""',
+        'r""',
+        '"foo"',
+        'r"foo"',
+        'R"foo"',
+        'rf"foo{bar}"',
+    ),
+)
+def test_are_double_quoted(string):
+    assert uses_double_quotes(string)
+
+
+@pytest.mark.parametrize(
+    "string",
+    (
+        "",
+        "foo",
+        "''",
+        "r''",
+        "'foo'",
+        "r'foo'",
+        "R'foo'",
+        "rf'foo{bar}'",
+    ),
+)
+def test_are_not_double_quoted(string):
+    assert not uses_double_quotes(string)

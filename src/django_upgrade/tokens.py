@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from collections import defaultdict
 
 from tokenize_rt import NON_CODING_TOKENS, UNIMPORTANT_WS, Token, tokens_to_src
@@ -478,3 +479,13 @@ def update_import_modules(
     for module, names in reversed(imports_to_add.items()):
         joined_names = ", ".join(sorted(names))
         insert(tokens, j, new_src=f"{indent}from {module} import {joined_names}\n")
+
+
+double_quote_string_re = re.compile(r'^[bfru]*".*"$', flags=re.IGNORECASE)
+
+
+def uses_double_quotes(src: str) -> bool:
+    """
+    Return whether a string token's src uses double quotes.
+    """
+    return double_quote_string_re.match(src) is not None

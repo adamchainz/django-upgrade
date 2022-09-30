@@ -168,6 +168,7 @@ def decorate_function(
     if decorated:
         i = reverse_find(tokens, i, name=OP, src="@")
     j, indent = extract_indent(tokens, i)
+    default_indent = indent if indent else "    "
     dec_src = f"{indent}@admin.{funcdetails.decorator}(\n"
 
     # Pull args in predefined order
@@ -179,8 +180,8 @@ def decorate_function(
     ]
     comma = "," if len(args) > 1 else ""
     for name, source in args:
-        source = source.replace("\n", f"\n{indent}    ")
-        dec_src += f"{indent}    {name}={source}{comma}\n"
+        source = source.replace("\n", f"\n{indent}{default_indent}")
+        dec_src += f"{indent}{default_indent}{name}={source}{comma}\n"
     dec_src += f"{indent})\n"
     insert(tokens, j, new_src=dec_src)
 

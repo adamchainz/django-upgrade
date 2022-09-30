@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 
@@ -147,6 +149,30 @@ class TestActionFunctions:
             )
             def make_published(modeladmin, request, queryset):
                 ...
+
+            """,
+            settings,
+        )
+
+    @pytest.mark.xfail(reason="Currently only look at current line's indentation")
+    def test_module_permissions_indented_with_tabs(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            def make_published(modeladmin, request, queryset):
+            	...
+
+            make_published.allowed_permissions = ('change',)
+            """,
+            """\
+            from django.contrib import admin
+
+            @admin.action(
+            	permissions=('change',)
+            )
+            def make_published(modeladmin, request, queryset):
+            	...
 
             """,
             settings,
@@ -315,6 +341,31 @@ class TestActionFunctions:
                 )
                 def make_published(self, request, queryset):
                     ...
+
+            """,
+            settings,
+        )
+
+    def test_class_description_indented_with_tabs(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            class BookAdmin(admin.ModelAdmin):
+            	def make_published(self, request, queryset):
+            		...
+
+            	make_published.short_description = "yada"
+            """,
+            """\
+            from django.contrib import admin
+
+            class BookAdmin(admin.ModelAdmin):
+            	@admin.action(
+            		description="yada"
+            	)
+            	def make_published(self, request, queryset):
+            		...
 
             """,
             settings,

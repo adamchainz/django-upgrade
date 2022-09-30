@@ -738,20 +738,22 @@ Django 4.1
 ``django.utils.timezone.utc`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites imports of ``utc`` from ``django.utils.timezone`` to use ``datetime.timezone``.
+Rewrites imports of ``django.utils.timezone.utc`` to use ``datetime.timezone.utc``.
+Requires an existing import of the ``datetime`` module.
 
 .. code-block:: diff
 
+     import datetime
     -from django.utils.timezone import utc
-    +from datetime import timezone
 
     -calculate_some_datetime(utc)
-    +calculate_some_datetime(timezone.utc)
+    +calculate_some_datetime(datetime.timezone.utc)
 
 .. code-block:: diff
 
      import datetime as dt
-    -from django.utils import timezone
+     from django.utils import timezone
+
 
     -do_a_thing(timezone.utc)
     +do_a_thing(dt.timezone.utc)

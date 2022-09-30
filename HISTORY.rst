@@ -34,7 +34,7 @@ History
 
   Thanks to Joseph Zammit in `Issue #245 <https://github.com/adamchainz/django-upgrade/issues/245>`__.
 
-* Extend ``timezone.utc`` fixer to reuse existing ``datetime`` module imports.
+* Update ``timezone.utc`` fixer to only use absolute references from existing imports of the ``datetime`` module.
 
 * Make fixers that erase lines also erase any trailing comments.
 

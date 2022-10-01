@@ -26,6 +26,8 @@ fixer = Fixer(
 
 
 class AdminDetails:
+    __slots__ = ("parent", "model_names_per_site")
+
     def __init__(self, parent: ast.AST) -> None:
         self.parent = parent
         self.model_names_per_site: dict[str, set[str]] = {}

@@ -127,6 +127,8 @@ CLIENT_REQUEST_METHODS = frozenset(
 
 
 class ResponseAssignmentVisitor(ast.NodeVisitor):
+    __slots__ = ("funcdef", "name", "before", "stop_search", "looks_like_response")
+
     def __init__(
         self,
         funcdef: ast.FunctionDef | ast.AsyncFunctionDef,

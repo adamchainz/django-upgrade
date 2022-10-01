@@ -64,6 +64,8 @@ NAME_MAPS = {
 
 
 class FunctionDetails:
+    __slots__ = ("node", "decorator", "assignments", "values")
+
     def __init__(self, node: ast.FunctionDef, decorator: Literal["action", "display"]):
         self.node = node
         self.decorator = decorator

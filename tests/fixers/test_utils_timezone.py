@@ -6,6 +6,13 @@ from tests.fixers.tools import check_noop, check_transformed
 settings = Settings(target_version=(4, 1))
 
 
+def test_empty():
+    check_noop(
+        "",
+        settings,
+    )
+
+
 def test_unmatched_import():
     check_noop(
         """\
@@ -24,21 +31,31 @@ def test_unmatched_import_name():
     )
 
 
-def test_unrecognized_import_format():
+def test_import_used_otherwise():
     check_noop(
         """\
         from django.utils import timezone
-
-        def foo():
-            print(timezone.utc)
+        timezone.now()
         """,
         settings,
     )
 
 
-def test_untouched_utc_attribute():
+def test_no_datetime_import():
     check_noop(
         """\
+        from django.utils import timezone
+
+        do_a_thing(timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_attr_no_import():
+    check_noop(
+        """\
+        import datetime as dt
         timezone.utc
         """,
         settings,
@@ -55,15 +72,112 @@ def test_not_imported_utc_name():
     )
 
 
-def test_fixed():
+def test_basic():
     check_transformed(
         """\
+        import datetime
         from django.utils.timezone import utc
-        foo(utc)
+        do_a_thing(utc)
         """,
         """\
-        from datetime import timezone
-        foo(timezone.utc)
+        import datetime
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_other_imports():
+    check_transformed(
+        """\
+        import datetime
+        from django.utils.timezone import utc
+        from myapp import timezone
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime
+        from myapp import timezone
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_docstring():
+    check_transformed(
+        """\
+        '''my module'''
+        from django.utils.timezone import utc
+        import datetime
+        do_a_thing(utc)
+        """,
+        """\
+        '''my module'''
+        import datetime
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_import_aliased():
+    check_transformed(
+        """\
+        import datetime as dt
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime as dt
+        do_a_thing(dt.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_import_paired():
+    check_transformed(
+        """\
+        import datetime, os
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime, os
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_import_paired_alias():
+    check_transformed(
+        """\
+        import numpy as np, datetime as dt
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        """,
+        """\
+        import numpy as np, datetime as dt
+        do_a_thing(dt.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_multiple():
+    check_transformed(
+        """\
+        import datetime
+        from django.utils.timezone import utc
+        do_a_thing(utc)
+        do_a_thing(utc)
+        """,
+        """\
+        import datetime
+        do_a_thing(datetime.timezone.utc)
+        do_a_thing(datetime.timezone.utc)
         """,
         settings,
     )
@@ -72,30 +186,51 @@ def test_fixed():
 def test_fix_skips_other_utc_names():
     check_transformed(
         """\
+        import datetime as dt
         from django.utils.timezone import utc
         utc
         myobj.utc
         """,
         """\
-        from datetime import timezone
-        timezone.utc
+        import datetime as dt
+        dt.timezone.utc
         myobj.utc
         """,
         settings,
     )
 
 
-def test_fix_inner_import():
+def test_attr():
     check_transformed(
         """\
-        def do_something():
-            from django.utils.timezone import utc
-            something(utc)
+        import datetime
+        from django.utils import timezone
+
+        do_a_thing(timezone.utc)
         """,
         """\
-        def do_something():
-            from datetime import timezone
-            something(timezone.utc)
+        import datetime
+        from django.utils import timezone
+
+        do_a_thing(datetime.timezone.utc)
+        """,
+        settings,
+    )
+
+
+def test_attr_import_aliased():
+    check_transformed(
+        """\
+        import datetime as dt
+        from django.utils import timezone
+
+        do_a_thing(timezone.utc)
+        """,
+        """\
+        import datetime as dt
+        from django.utils import timezone
+
+        do_a_thing(dt.timezone.utc)
         """,
         settings,
     )

@@ -103,7 +103,9 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
                     else:
                         details.datetime_module = alias.asname
 
-        elif (
+        # coverage bug
+        # https://github.com/nedbat/coveragepy/issues/1333
+        elif (  # pragma: no cover
             is_rewritable_import_from(node)
             and node.module == "django.utils.timezone"
             and any(a.name == "utc" for a in node.names)

@@ -1,6 +1,6 @@
 """
-Replace spelling of assertFormsetError:
-https://docs.djangoproject.com/en/4.2/releases/4.2/#miscellaneous  # noqa: E501
+Replace spelling of assertFormsetError and assertQuerysetEqual:
+https://docs.djangoproject.com/en/4.2/releases/4.2/#miscellaneous
 """
 from __future__ import annotations
 
@@ -26,16 +26,17 @@ NAMES = {
 }
 
 
-@fixer.register(ast.Attribute)
-def visit_Attribute(
+@fixer.register(ast.Call)
+def visit_Call(
     state: State,
-    node: ast.Attribute,
+    node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        (name := node.attr) in NAMES
-        and isinstance(node.value, ast.Name)
-        and node.value.id == "self"
+        isinstance(func := node.func, ast.Attribute)
+        and (name := func.attr) in NAMES
+        and isinstance(func.value, ast.Name)
+        and func.value.id == "self"
     ):
         yield ast_start_offset(node), partial(
             find_and_replace_name, name=name, new=NAMES[name]

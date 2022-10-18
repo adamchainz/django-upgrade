@@ -61,7 +61,7 @@ def visit_ImportFrom(
 # Track which of path and re_path have been used for this current file
 # Then when backtracking into an import statement, we can use the set of names
 # to determine what names to import.
-state_used_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
+state_re_path_used: MutableMapping[State, bool] = WeakKeyDictionary()
 state_added_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
 
 
@@ -100,13 +100,13 @@ def update_django_conf_import(
 def update_django_urls_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
-    used_names = state_used_names.get(state, set())
+    re_path_used = state_re_path_used.get(state, False)
     added_names = state_added_names.pop(state, set())
     missing_names = added_names - state.from_imports["django.urls"]
 
     if (
-        used_names
-        and "re_path" not in used_names
+        added_names
+        and not re_path_used
         and "re_path" in state.from_imports["django.urls"]
     ):
         update_import_names(
@@ -162,7 +162,6 @@ def visit_Call(
         and node.func.id == "include"
         and "include" in state.from_imports["django.conf.urls"]
     ):
-        state_used_names.setdefault(state, set()).add("include")
         state_added_names.setdefault(state, set()).add("include")
 
 
@@ -176,10 +175,11 @@ def fix_url_call(
             string_idx = find(tokens, i, name=STRING)
             replace(tokens, string_idx, src=repr(path))
             new_name = "path"
-    state_used_names.setdefault(state, set()).add(new_name)
     if new_name != node_name:
         state_added_names.setdefault(state, set()).add(new_name)
         replace(tokens, i, src=new_name)
+    else:
+        state_re_path_used.setdefault(state, True)
 
 
 REGEX_TO_CONVERTER = {

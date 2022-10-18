@@ -17,7 +17,6 @@ from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     STRING,
-    erase_node,
     extract_indent,
     find,
     insert,
@@ -63,19 +62,20 @@ def visit_ImportFrom(
 # Then when backtracking into an import statement, we can use the set of names
 # to determine what names to import.
 state_used_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
+state_added_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
 
 
 def update_django_conf_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
     re_path_imported = "re_path" in state.from_imports["django.urls"]
-    used_names = state_used_names.pop(state, set())
+    added_names = state_added_names.pop(state, set())
     removals = set()
 
     for alias in node.names:
         if alias.asname is not None:
             continue
-        if alias.name in ("include", "url") and (used_names or re_path_imported):
+        if alias.name in ("include", "url") and (added_names or re_path_imported):
             removals.add(alias.name)
 
     if removals:
@@ -87,28 +87,38 @@ def update_django_conf_import(
             name_map={name: "" for name in removals},
         )
         if not re_path_imported:
-            joined_names = ", ".join(sorted(used_names))
+            joined_names = ", ".join(sorted(added_names))
             insert(
                 tokens,
                 j,
                 new_src=f"{indent}from django.urls import {joined_names}\n",
             )
         else:
-            state_used_names[state] = used_names
+            state_added_names[state] = added_names
 
 
 def update_django_urls_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
-    used_names = state_used_names.pop(state, set())
+    used_names = state_used_names.get(state, set())
+    added_names = state_added_names.pop(state, set())
+    missing_names = added_names - state.from_imports["django.urls"]
 
-    if used_names:
-        initial_names = state.from_imports["django.urls"] - {"re_path"}
-        used_names.update(initial_names)
+    if (
+        used_names
+        and "re_path" not in used_names
+        and "re_path" in state.from_imports["django.urls"]
+    ):
+        update_import_names(
+            tokens,
+            i,
+            node=node,
+            name_map={"re_path": ""},
+        )
 
+    if missing_names:
         j, indent = extract_indent(tokens, i)
-        erase_node(tokens, i, node=node)
-        joined_names = ", ".join(sorted(used_names))
+        joined_names = ", ".join(sorted(missing_names))
         insert(
             tokens,
             j,
@@ -125,9 +135,12 @@ def visit_Call(
     if (
         isinstance(node.func, ast.Name)
         and (
-            (node.func.id == "url" and "url" in state.from_imports["django.conf.urls"])
+            (
+                (node_name := node.func.id) == "url"
+                and "url" in state.from_imports["django.conf.urls"]
+            )
             or (
-                node.func.id == "re_path"
+                ((node_name := node.func.id) == "re_path")
                 and "re_path" in state.from_imports["django.urls"]
             )
         )
@@ -141,9 +154,7 @@ def visit_Call(
             regex_path = node.args[0].value
 
         yield ast_start_offset(node), partial(
-            fix_url_call,
-            regex_path=regex_path,
-            state=state,
+            fix_url_call, regex_path=regex_path, state=state, node_name=node_name
         )
 
     if (
@@ -152,10 +163,11 @@ def visit_Call(
         and "include" in state.from_imports["django.conf.urls"]
     ):
         state_used_names.setdefault(state, set()).add("include")
+        state_added_names.setdefault(state, set()).add("include")
 
 
 def fix_url_call(
-    tokens: list[Token], i: int, *, regex_path: str | None, state: State
+    tokens: list[Token], i: int, *, regex_path: str | None, state: State, node_name: str
 ) -> None:
     new_name = "re_path"
     if regex_path is not None:
@@ -165,7 +177,9 @@ def fix_url_call(
             replace(tokens, string_idx, src=repr(path))
             new_name = "path"
     state_used_names.setdefault(state, set()).add(new_name)
-    replace(tokens, i, src=new_name)
+    if new_name != node_name:
+        state_added_names.setdefault(state, set()).add(new_name)
+        replace(tokens, i, src=new_name)
 
 
 REGEX_TO_CONVERTER = {

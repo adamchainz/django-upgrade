@@ -373,6 +373,7 @@ Django 2.2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Rewrites use of ``request.META`` to read HTTP headers to instead use |request.headers|__.
+Header lookups are done in lowercase per `the HTTP/2 specification <https://httpwg.org/specs/rfc9113.html#HttpHeaders.`__.
 
 .. |request.headers| replace:: ``request.headers``
 __ https://docs.djangoproject.com/en/2.2/ref/request-response/#django.http.HttpRequest.headers
@@ -380,16 +381,16 @@ __ https://docs.djangoproject.com/en/2.2/ref/request-response/#django.http.HttpR
 .. code-block:: diff
 
     -request.META['HTTP_ACCEPT_ENCODING']
-    +request.headers['Accept-Encoding']
+    +request.headers['accept-encoding']
 
     -self.request.META.get('HTTP_SERVER', '')
-    +self.request.headers.get('Server', '')
+    +self.request.headers.get('server', '')
 
     -request.META.get('CONTENT_LENGTH')
-    +request.headers.get('Content-Length')
+    +request.headers.get('content-length')
 
     -"HTTP_SERVER" in request.META
-    +"Server" in request.headers
+    +"server" in request.headers
 
 ``QuerySetPaginator``
 ~~~~~~~~~~~~~~~~~~~~~

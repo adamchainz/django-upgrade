@@ -57,7 +57,7 @@ def test_subscript_simple():
         request.META['HTTP_SERVER']
         """,
         """\
-        request.headers['Server']
+        request.headers['server']
         """,
         settings,
     )
@@ -69,7 +69,7 @@ def test_subscript_two_words():
         request.META['HTTP_ACCEPT_ENCODING']
         """,
         """\
-        request.headers['Accept-Encoding']
+        request.headers['accept-encoding']
         """,
         settings,
     )
@@ -81,7 +81,7 @@ def test_subscript_three_words():
         request.META['HTTP_X_POWERED_BY']
         """,
         """\
-        request.headers['X-Powered-By']
+        request.headers['x-powered-by']
         """,
         settings,
     )
@@ -93,7 +93,7 @@ def test_subscript_self_request():
         self.request.META['HTTP_ACCEPT_ENCODING']
         """,
         """\
-        self.request.headers['Accept-Encoding']
+        self.request.headers['accept-encoding']
         """,
         settings,
     )
@@ -105,7 +105,7 @@ def test_get_simple():
         request.META.get('HTTP_SERVER')
         """,
         """\
-        request.headers.get('Server')
+        request.headers.get('server')
         """,
         settings,
     )
@@ -117,7 +117,7 @@ def test_get_content_length():
         request.META.get('CONTENT_LENGTH')
         """,
         """\
-        request.headers.get('Content-Length')
+        request.headers.get('content-length')
         """,
         settings,
     )
@@ -129,7 +129,7 @@ def test_get_content_type():
         request.META.get('CONTENT_TYPE')
         """,
         """\
-        request.headers.get('Content-Type')
+        request.headers.get('content-type')
         """,
         settings,
     )
@@ -141,7 +141,7 @@ def test_get_default():
         request.META.get('HTTP_SERVER', '')
         """,
         """\
-        request.headers.get('Server', '')
+        request.headers.get('server', '')
         """,
         settings,
     )
@@ -153,7 +153,7 @@ def test_get_self_request():
         request.META.get('HTTP_SERVER')
         """,
         """\
-        request.headers.get('Server')
+        request.headers.get('server')
         """,
         settings,
     )
@@ -165,7 +165,7 @@ def test_in():
         'HTTP_AUTHORIZATION' in request.META
         """,
         """\
-        'Authorization' in request.headers
+        'authorization' in request.headers
         """,
         settings,
     )
@@ -178,7 +178,7 @@ def test_in_within_if():
             print('hi')
         """,
         """\
-        if 'Authorization' in request.headers:
+        if 'authorization' in request.headers:
             print('hi')
         """,
         settings,
@@ -192,8 +192,8 @@ def test_in_get_combined():
             print(request.META.get('HTTP_AUTHORIZATION'))
         """,
         """\
-        if 'Authorization' in request.headers:
-            print(request.headers.get('Authorization'))
+        if 'authorization' in request.headers:
+            print(request.headers.get('authorization'))
         """,
         settings,
     )
@@ -206,7 +206,7 @@ def test_in_double_statement():
             print('hi')
         """,
         """\
-        if 'Authorization' in request.headers and 'Server' in request.headers:
+        if 'authorization' in request.headers and 'server' in request.headers:
             print('hi')
         """,
         settings,
@@ -219,7 +219,7 @@ def test_not_in():
         'HTTP_SERVER' not in request.META
         """,
         """\
-        'Server' not in request.headers
+        'server' not in request.headers
         """,
         settings,
     )
@@ -232,7 +232,7 @@ def test_not_in_within_if():
             print('hi')
         """,
         """\
-        if 'Authorization' not in request.headers:
+        if 'authorization' not in request.headers:
             print('hi')
         """,
         settings,
@@ -246,8 +246,8 @@ def test_not_in_get_combined():
             print(request.META.get('HTTP_AUTHORIZATION'))
         """,
         """\
-        if 'Authorization' not in request.headers:
-            print(request.headers.get('Authorization'))
+        if 'authorization' not in request.headers:
+            print(request.headers.get('authorization'))
         """,
         settings,
     )
@@ -261,8 +261,8 @@ def test_not_in_double_statement():
             print('hi')
         """,
         """\
-        if 'Authorization' not in request.headers and \
-              'Server' not in request.headers:
+        if 'authorization' not in request.headers and \
+              'server' not in request.headers:
             print('hi')
         """,
         settings,

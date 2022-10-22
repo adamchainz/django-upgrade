@@ -122,7 +122,7 @@ def get_header_name(meta_name: str) -> str | None:
         name = meta_name
     else:
         return None
-    return "-".join(x.title() for x in name.split("_"))
+    return "-".join(x for x in name.lower().split("_"))
 
 
 def rewrite_header_access(tokens: list[Token], i: int, *, header_name: str) -> None:

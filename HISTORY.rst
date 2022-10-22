@@ -26,6 +26,8 @@ History
 
   Thanks to Daan Vielen in `Issue #234 <https://github.com/adamchainz/django-upgrade/issues/234>`__.
 
+* The ``request.headers`` fixer now uses lowercase for header lookups, as per the HTTP/2 specification.
+
 * Make ``on_delete`` fixer also support ``ForeignKey`` and ``OneToOneField`` imported from ``django.db.models``.
 
   Thanks to Thibaut Decombe in `PR #236 <https://github.com/adamchainz/django-upgrade/pull/236>`__.

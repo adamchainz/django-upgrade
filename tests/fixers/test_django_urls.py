@@ -213,6 +213,39 @@ def test_re_path_unanchored_end():
     )
 
 
+def test_re_path_unanchored_end_with_include():
+    check_transformed(
+        """\
+        from django.urls import re_path, include
+
+        re_path(r'^accounts/$', include('allauth.urls')),
+        """,
+        """\
+        from django.urls import path
+        from django.urls import include
+
+        path('accounts/', include('allauth.urls')),
+        """,
+        settings,
+    )
+
+
+def test_url_unanchored_end_with_include():
+    check_transformed(
+        """\
+        from django.conf.urls import url, include
+
+        url(r'^accounts/', include('allauth.urls')),
+        """,
+        """\
+        from django.urls import include, path
+
+        path('accounts/', include('allauth.urls')),
+        """,
+        settings,
+    )
+
+
 def test_path_empty():
     check_transformed(
         """\

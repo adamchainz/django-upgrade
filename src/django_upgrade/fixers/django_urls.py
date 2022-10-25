@@ -140,7 +140,7 @@ def visit_Call(
                 and "url" in state.from_imports["django.conf.urls"]
             )
             or (
-                ((node_name := node.func.id) == "re_path")
+                (node_name := node.func.id) == "re_path"
                 and "re_path" in state.from_imports["django.urls"]
             )
         )

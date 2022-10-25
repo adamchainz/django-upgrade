@@ -58,9 +58,9 @@ def visit_ImportFrom(
         )
 
 
-# Track which of path and re_path have been used for this current file
-# Then when backtracking into an import statement, we can use the set of names
-# to determine what names to import.
+# Track if re_path has been used, and which names need adding.
+# When fixing import statements, these variables determine which names to
+# import/remove.
 state_re_path_used: MutableMapping[State, bool] = WeakKeyDictionary()
 state_added_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
 

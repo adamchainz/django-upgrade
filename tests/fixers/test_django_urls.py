@@ -473,7 +473,8 @@ def test_re_path_multiple_import():
         re_path(r'^more-info/$', views.more_info)
         """,
         """\
-        from django.urls import path, reverse
+        from django.urls import path
+        from django.urls import reverse
 
         path('more-info/', views.more_info)
         """,
@@ -592,7 +593,8 @@ def test_re_path_complete():
         ]
         """,
         """\
-        from django.urls import include, path, re_path
+        from django.urls import path
+        from django.urls import include, re_path
 
         urlpatterns = [
             path('', views.index, name='index'),
@@ -619,7 +621,8 @@ def test_combined_keep_re_path():
         ]
         """,
         """\
-        from django.urls import include, path, re_path, reverse
+        from django.urls import include, path
+        from django.urls import re_path, reverse
 
         urlpatterns = [
             path('', views.index, name='index'),
@@ -643,7 +646,8 @@ def test_combined_rewrite_all():
         ]
         """,
         """\
-        from django.urls import include, path, reverse
+        from django.urls import include, path
+        from django.urls import reverse
 
         urlpatterns = [
             path('', views.index, name='index'),
@@ -667,7 +671,8 @@ def test_combined_3():
         ]
         """,
         """\
-        from django.urls import include, path, re_path, reverse
+        from django.urls import include, path
+        from django.urls import re_path, reverse
 
         urlpatterns = [
             path('', views.index, name='index'),
@@ -690,7 +695,8 @@ def test_combined_4():
         ]
         """,
         """\
-        from django.urls import include, path, reverse
+        from django.urls import include, path
+        from django.urls import reverse
 
         urlpatterns = [
             path('', views.index, name='index'),
@@ -716,6 +722,19 @@ def test_combined_5():
 
         include('example.urls')
         path('', views.index)
+        """,
+        settings,
+    )
+
+
+def test_two_imported_used():
+    check_noop(
+        """\
+        from django.urls import path
+        from django.urls import re_path
+
+        path('whatever')
+        re_path('whatever')
         """,
         settings,
     )

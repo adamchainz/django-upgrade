@@ -36,6 +36,10 @@ History
 
 * Update ``timezone.utc`` fixer to only use absolute references from existing imports of the ``datetime`` module.
 
+* Make Django 2.0+ URL fixer avoid a loop of adding imports that already exist.
+
+  Thanks to Benjamin Bach for the report in `Issue #250 <https://github.com/adamchainz/django-upgrade/issues/250>`__, and to Thibaut Decombe for the fix in `PR #270 <https://github.com/adamchainz/django-upgrade/pull/270>`__.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

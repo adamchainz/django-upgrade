@@ -132,37 +132,35 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        isinstance(node.func, ast.Name)
-        and (
+    if isinstance(node.func, ast.Name):
+        if (
             (
-                (node_name := node.func.id) == "url"
-                and "url" in state.from_imports["django.conf.urls"]
+                (
+                    (node_name := node.func.id) == "url"
+                    and "url" in state.from_imports["django.conf.urls"]
+                )
+                or (
+                    (node_name := node.func.id) == "re_path"
+                    and "re_path" in state.from_imports["django.urls"]
+                )
             )
-            or (
-                (node_name := node.func.id) == "re_path"
-                and "re_path" in state.from_imports["django.urls"]
-            )
-        )
-        # cannot convert where called with all kwargs as names don't align
-        and len(node.args) >= 1
-    ):
-        regex_path: str | None = None
-        if isinstance(node.args[0], ast.Constant) and isinstance(
-            node.args[0].value, str
+            # cannot convert where called with all kwargs as names don't align
+            and len(node.args) >= 1
         ):
-            regex_path = node.args[0].value
+            regex_path: str | None = None
+            if isinstance(node.args[0], ast.Constant) and isinstance(
+                node.args[0].value, str
+            ):
+                regex_path = node.args[0].value
 
-        yield ast_start_offset(node), partial(
-            fix_url_call, regex_path=regex_path, state=state, node_name=node_name
-        )
-
-    if (
-        isinstance(node.func, ast.Name)
-        and node.func.id == "include"
-        and "include" in state.from_imports["django.conf.urls"]
-    ):
-        state_added_names.setdefault(state, set()).add("include")
+            yield ast_start_offset(node), partial(
+                fix_url_call, regex_path=regex_path, state=state, node_name=node_name
+            )
+        elif (
+            node.func.id == "include"
+            and "include" in state.from_imports["django.conf.urls"]
+        ):
+            state_added_names.setdefault(state, set()).add("include")
 
 
 def fix_url_call(

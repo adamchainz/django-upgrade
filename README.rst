@@ -86,10 +86,10 @@ For more on usage run ``django-upgrade --help``.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
 
 ``django-upgrade`` does not have any ability to recurse through directories.
-Use the pre-commit integration, globbing, or another technique for applying to many files such as |with git ls-files pipe xargs|__. For example:
+Use the pre-commit integration, globbing, or another technique for applying to many files such as |with git ls-files pipe xargs|_. For example:
 
 .. |with git ls-files pipe xargs| replace:: with ``git ls-files | xargs``
-__ https://adamj.eu/tech/2022/03/09/how-to-run-a-command-on-many-files-in-your-git-repository/
+.. _with git ls-files pipe xargs: https://adamj.eu/tech/2022/03/09/how-to-run-a-command-on-many-files-in-your-git-repository/
 
 .. code-block:: sh
 
@@ -154,11 +154,11 @@ Django 1.7
 Admin model registration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites ``admin.site.register()`` calls to the new |@admin.register|__ decorator syntax when eligible.
+Rewrites ``admin.site.register()`` calls to the new |@admin.register|_ decorator syntax when eligible.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |@admin.register| replace:: ``@admin.register()``
-__ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-decorator
+.. _@admin.register: https://docs.djangoproject.com/en/stable/ref/contrib/admin/#the-register-decorator
 
 .. code-block:: diff
 
@@ -282,10 +282,10 @@ URL’s
 ~~~~~
 
 Rewrites imports of ``include()`` and ``url()`` from ``django.conf.urls`` to ``django.urls``.
-``url()`` calls using compatible regexes are rewritten to the |new path() syntax|__, otherwise they are converted to call ``re_path()``.
+``url()`` calls using compatible regexes are rewritten to the |new path() syntax|_, otherwise they are converted to call ``re_path()``.
 
 .. |new path() syntax| replace:: new ``path()`` syntax
-__ https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
+.. _new path() syntax: https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 
 .. code-block:: diff
 
@@ -349,11 +349,11 @@ Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``func
 
 Removes assignments of ``allow_tags`` attributes to ``True``.
 This was an admin feature to allow display functions to return HTML without marking it as unsafe,  deprecated in Django 1.9.
-In practice, most display functions that return HTML already use |format_html()|__ or similar, so the attribute wasn’t necessary.
+In practice, most display functions that return HTML already use |format_html()|_ or similar, so the attribute wasn’t necessary.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |format_html()| replace:: ``format_html()``
-__ https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.html.format_html
+.. _format_html(): https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.html.format_html
 
 .. code-block:: diff
 
@@ -372,11 +372,11 @@ Django 2.2
 ``HttpRequest.headers``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites use of ``request.META`` to read HTTP headers to instead use |request.headers|__.
-Header lookups are done in lowercase per `the HTTP/2 specification <https://httpwg.org/specs/rfc9113.html#HttpHeaders.`__.
+Rewrites use of ``request.META`` to read HTTP headers to instead use |request.headers|_.
+Header lookups are done in lowercase per `the HTTP/2 specification <https://httpwg.org/specs/rfc9113.html#HttpHeaders>`__.
 
 .. |request.headers| replace:: ``request.headers``
-__ https://docs.djangoproject.com/en/2.2/ref/request-response/#django.http.HttpRequest.headers
+.. _request.headers: https://docs.djangoproject.com/en/stable/ref/request-response/#django.http.HttpRequest.headers
 
 .. code-block:: diff
 
@@ -602,11 +602,11 @@ Django 3.2
 ``@admin.action()``
 ~~~~~~~~~~~~~~~~~~~
 
-Rewrites functions that have admin action attributes assigned to them to use the new |@admin.action decorator|__.
+Rewrites functions that have admin action attributes assigned to them to use the new |@admin.action decorator|_.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |@admin.action decorator| replace:: ``@admin.action()`` decorator
-__ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.contrib.admin.action
+.. _@admin.action decorator: https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.contrib.admin.action
 
 .. code-block:: diff
 
@@ -639,11 +639,11 @@ __ https://docs.djangoproject.com/en/stable/ref/contrib/admin/actions/#django.co
 ``@admin.display()``
 ~~~~~~~~~~~~~~~~~~~
 
-Rewrites functions that have admin display attributes assigned to them to use the new |@admin.display decorator|__.
+Rewrites functions that have admin display attributes assigned to them to use the new |@admin.display decorator|_.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
 
 .. |@admin.display decorator| replace:: ``@admin.display()`` decorator
-__ https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.display
+.. _@admin.display decorator: https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.display
 
 .. code-block:: diff
 

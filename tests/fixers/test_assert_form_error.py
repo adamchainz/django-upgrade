@@ -158,6 +158,17 @@ class TestForm:
             settings,
         )
 
+    def test_basic_single_quotes(self):
+        check_transformed(
+            """\
+            self.assertFormError(response, 'form', 'user', 'woops')
+            """,
+            """\
+            self.assertFormError(response.context['form'], 'user', 'woops')
+            """,
+            settings,
+        )
+
     def test_basic_with_msg_prefix(self):
         check_transformed(
             """\

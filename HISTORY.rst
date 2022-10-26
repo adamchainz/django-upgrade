@@ -42,6 +42,10 @@ History
 
   Thanks to Benjamin Bach for the report in `Issue #250 <https://github.com/adamchainz/django-upgrade/issues/250>`__, and to Thibaut Decombe for the fix in `PR #270 <https://github.com/adamchainz/django-upgrade/pull/270>`__.
 
+* Fixers that modify string literals now match existing use of double quotes.
+
+  Thanks to Kevin Marsh in `PR #260 <https://github.com/adamchainz/django-upgrade/pull/260>`__.
+
 * Make fixers that erase lines also erase any trailing comments.
 
 * Fix leaving a trailing comma when editing imports in certain cases.

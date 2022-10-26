@@ -69,7 +69,7 @@ def test_subscript_simple_double_quotes():
         request.META["HTTP_SERVER"]
         """,
         """\
-        request.headers["Server"]
+        request.headers["server"]
         """,
         settings,
     )
@@ -189,7 +189,7 @@ def test_in_double_quotes():
         "HTTP_AUTHORIZATION" in request.META
         """,
         """\
-        "Authorization" in request.headers
+        "authorization" in request.headers
         """,
         settings,
     )

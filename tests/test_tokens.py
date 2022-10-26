@@ -5,7 +5,7 @@ import ast
 import pytest
 from tokenize_rt import Token, src_to_tokens, tokens_to_src
 
-from django_upgrade.tokens import update_import_names, uses_double_quotes
+from django_upgrade.tokens import str_repr_matching, update_import_names
 
 
 def tokenize_and_parse(source: str) -> tuple[list[Token], ast.Module]:
@@ -108,32 +108,15 @@ class TestUpdateImportNames:
 
 
 @pytest.mark.parametrize(
-    "string",
+    "text,match_quotes,expected",
     (
-        '""',
-        'r""',
-        '"foo"',
-        'r"foo"',
-        'R"foo"',
-        'rf"foo{bar}"',
+        ("ball", "'bat'", "'ball'"),
+        ("ball", '"bat"', '"ball"'),
+        ("ball", 'r"bat"', '"ball"'),
+        ("quote: 'hi'", "'bat'", "\"quote: 'hi'\""),
+        ('quote: "hi"', "'bat'", "'quote: \"hi\"'"),
+        ('quote: "hi"', '"bat"', '"quote: \\"hi\\""'),
     ),
 )
-def test_are_double_quoted(string):
-    assert uses_double_quotes(string)
-
-
-@pytest.mark.parametrize(
-    "string",
-    (
-        "",
-        "foo",
-        "''",
-        "r''",
-        "'foo'",
-        "r'foo'",
-        "R'foo'",
-        "rf'foo{bar}'",
-    ),
-)
-def test_are_not_double_quoted(string):
-    assert not uses_double_quotes(string)
+def test_str_repr_matching(text, match_quotes, expected):
+    assert str_repr_matching(text, match_quotes=match_quotes) == expected

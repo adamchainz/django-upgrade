@@ -377,6 +377,27 @@ def replace_argument_names(
                 raise AssertionError(f"{keyword.arg} argument not found")
 
 
+str_repr_single_to_double = str.maketrans(
+    {
+        "'": '"',
+        '"': '\\"',
+    }
+)
+
+
+def str_repr_matching(text: str, *, match_quotes: str) -> str:
+    """
+    Give the repr of a string, switching it to double quotes if the string
+    literal represent in match_quotes uses double quotes.
+    """
+    result = repr(text)
+    first_quote = re.search(r'[\'"]', match_quotes)
+    assert first_quote is not None
+    if first_quote[0] == '"' and result[0] != '"':
+        result = result.translate(str_repr_single_to_double)
+    return result
+
+
 def update_import_names(
     tokens: list[Token],
     i: int,
@@ -479,13 +500,3 @@ def update_import_modules(
     for module, names in reversed(imports_to_add.items()):
         joined_names = ", ".join(sorted(names))
         insert(tokens, j, new_src=f"{indent}from {module} import {joined_names}\n")
-
-
-double_quote_string_re = re.compile(r'^[bfru]*".*"$', flags=re.IGNORECASE)
-
-
-def uses_double_quotes(src: str) -> bool:
-    """
-    Return whether a string token's src uses double quotes.
-    """
-    return double_quote_string_re.match(src) is not None

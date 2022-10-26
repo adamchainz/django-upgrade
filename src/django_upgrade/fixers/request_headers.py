@@ -13,7 +13,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import NAME, STRING, find, replace, uses_double_quotes
+from django_upgrade.tokens import NAME, STRING, find, replace, str_repr_matching
 
 fixer = Fixer(
     __name__,
@@ -129,18 +129,12 @@ def rewrite_header_access(tokens: list[Token], i: int, *, header_name: str) -> N
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")
     str_idx = find(tokens, meta_idx, name=STRING)
-    if uses_double_quotes(tokens[str_idx].src):
-        header_name = f'"{header_name}"'
-    else:
-        header_name = f"'{header_name}'"
-    replace(tokens, str_idx, src=header_name)
+    header_src = str_repr_matching(header_name, match_quotes=tokens[str_idx].src)
+    replace(tokens, str_idx, src=header_src)
 
 
 def rewrite_in_statement(tokens: list[Token], i: int, *, header_name: str) -> None:
-    if uses_double_quotes(tokens[i].src):
-        header_name = f'"{header_name}"'
-    else:
-        header_name = f"'{header_name}'"
-    replace(tokens, i, src=header_name)
+    header_src = str_repr_matching(header_name, match_quotes=tokens[i].src)
+    replace(tokens, i, src=header_src)
     meta_idx = find(tokens, i, name=NAME, src="META")
     replace(tokens, meta_idx, src="headers")

@@ -5,6 +5,8 @@ History
 1.11.0 (2022-10-26)
 -------------------
 
+See also `the release blog post <https://adamj.eu/tech/2022/10/26/django-upgrade-mega-release/>`__.
+
 * Add Django 1.7+ fixer to rewrite ``admin.site.register()`` calls into ``@admin.register()`` when eligible.
 
   Thanks to Thibaut Decombe in `PR #189 <https://github.com/adamchainz/django-upgrade/pull/189>`__.

@@ -637,7 +637,7 @@ This only applies in files that use ``from django.contrib import admin`` or ``fr
     -    make_unpublished.short_description = "Unpublish articles"
 
 ``@admin.display()``
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Rewrites functions that have admin display attributes assigned to them to use the new |@admin.display decorator|_.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.

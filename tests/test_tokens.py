@@ -8,6 +8,21 @@ from tokenize_rt import Token, src_to_tokens, tokens_to_src
 from django_upgrade.tokens import str_repr_matching, update_import_names
 
 
+@pytest.mark.parametrize(
+    "text,match_quotes,expected",
+    (
+        ("ball", "'bat'", "'ball'"),
+        ("ball", '"bat"', '"ball"'),
+        ("ball", 'r"bat"', '"ball"'),
+        ("quote: 'hi'", "'bat'", "\"quote: 'hi'\""),
+        ('quote: "hi"', "'bat'", "'quote: \"hi\"'"),
+        ('quote: "hi"', '"bat"', '"quote: \\"hi\\""'),
+    ),
+)
+def test_str_repr_matching(text, match_quotes, expected):
+    assert str_repr_matching(text, match_quotes=match_quotes) == expected
+
+
 def tokenize_and_parse(source: str) -> tuple[list[Token], ast.Module]:
     return src_to_tokens(source), ast.parse(source)
 
@@ -105,18 +120,3 @@ class TestUpdateImportNames:
             name_map={"b": "", "c": ""},
             after="from a import d",
         )
-
-
-@pytest.mark.parametrize(
-    "text,match_quotes,expected",
-    (
-        ("ball", "'bat'", "'ball'"),
-        ("ball", '"bat"', '"ball"'),
-        ("ball", 'r"bat"', '"ball"'),
-        ("quote: 'hi'", "'bat'", "\"quote: 'hi'\""),
-        ('quote: "hi"', "'bat'", "'quote: \"hi\"'"),
-        ('quote: "hi"', '"bat"', '"quote: \\"hi\\""'),
-    ),
-)
-def test_str_repr_matching(text, match_quotes, expected):
-    assert str_repr_matching(text, match_quotes=match_quotes) == expected

@@ -2,6 +2,9 @@
 History
 =======
 
+1.11.0 (2022-10-26)
+-------------------
+
 * Add Django 1.7+ fixer to rewrite ``admin.site.register()`` calls into ``@admin.register()`` when eligible.
 
   Thanks to Thibaut Decombe in `PR #189 <https://github.com/adamchainz/django-upgrade/pull/189>`__.

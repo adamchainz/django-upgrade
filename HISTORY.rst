@@ -18,7 +18,7 @@ History
 
   Thanks to Thibaut Decombe in `PR #258 <https://github.com/adamchainz/django-upgrade/pull/258>`__.
 
-* Make ``request.headers`` fixer also rewrite accesses of the ``Content-Length`` and ``Content-Type`` headers.
+* Make ``request.headers`` fixer also rewrite accesses of the ``content-length`` and ``content-type`` headers.
 
   Thanks to Christian Bundy in `PR #226 <https://github.com/adamchainz/django-upgrade/pull/226>`__.
 

@@ -21,6 +21,7 @@ from django_upgrade.tokens import (
     find,
     insert,
     replace,
+    str_repr_matching,
     update_import_names,
 )
 
@@ -171,7 +172,8 @@ def fix_url_call(
         path = convert_path_syntax(regex_path)
         if path is not None:
             string_idx = find(tokens, i, name=STRING)
-            replace(tokens, string_idx, src=repr(path))
+            path = str_repr_matching(path, match_quotes=tokens[string_idx].src)
+            replace(tokens, string_idx, src=path)
             new_name = "path"
     if new_name != node_name:
         state_added_names.setdefault(state, set()).add(new_name)

@@ -63,6 +63,18 @@ def test_subscript_simple():
     )
 
 
+def test_subscript_simple_double_quotes():
+    check_transformed(
+        """\
+        request.META["HTTP_SERVER"]
+        """,
+        """\
+        request.headers["server"]
+        """,
+        settings,
+    )
+
+
 def test_subscript_two_words():
     check_transformed(
         """\
@@ -166,6 +178,18 @@ def test_in():
         """,
         """\
         'authorization' in request.headers
+        """,
+        settings,
+    )
+
+
+def test_in_double_quotes():
+    check_transformed(
+        """\
+        "HTTP_AUTHORIZATION" in request.META
+        """,
+        """\
+        "authorization" in request.headers
         """,
         settings,
     )

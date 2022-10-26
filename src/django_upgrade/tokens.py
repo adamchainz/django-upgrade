@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from collections import defaultdict
 
 from tokenize_rt import NON_CODING_TOKENS, UNIMPORTANT_WS, Token, tokens_to_src
@@ -374,6 +375,27 @@ def replace_argument_names(
                     break
             else:  # pragma: no cover
                 raise AssertionError(f"{keyword.arg} argument not found")
+
+
+str_repr_single_to_double = str.maketrans(
+    {
+        "'": '"',
+        '"': '\\"',
+    }
+)
+
+
+def str_repr_matching(text: str, *, match_quotes: str) -> str:
+    """
+    Give the repr of a string, switching it to double quotes if the string
+    literal represent in match_quotes uses double quotes.
+    """
+    result = repr(text)
+    first_quote = re.search(r'[\'"]', match_quotes)
+    assert first_quote is not None
+    if first_quote[0] == '"' and result[0] != '"':
+        result = result.translate(str_repr_single_to_double)
+    return result
 
 
 def update_import_names(

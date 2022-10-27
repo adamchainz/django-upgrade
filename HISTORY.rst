@@ -2,8 +2,12 @@
 History
 =======
 
+* Make ``re_path`` -> ``path`` fixer also convert ``include()``'s with unterminated regexes.
+
+  Thanks to Thibaut Decombe in `PR #279 <https://github.com/adamchainz/django-upgrade/pull/279>`__.
+
 * Avoid rewriting ``request.META`` to ``request.headers`` in ``del`` statements.
-  This pattern works for ``request.META`` but not for ``request.headers`` which is an immutable Mapping.
+  This pattern works for ``request.META`` but not for ``request.headers`` which is an immutable mapping.
 
   Thanks to Thibaut Decombe in `PR #290 <https://github.com/adamchainz/django-upgrade/pull/290>`__.
 

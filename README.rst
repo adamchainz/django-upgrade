@@ -235,6 +235,28 @@ This fixer also support from-imports:
     -ForeignKey("auth.User")
     +ForeignKey("auth.User", on_delete=CASCADE)
 
+``DATABASES``
+~~~~~~~~~~~~~
+
+Update the ``DATABASES`` setting backend path ``django.db.backends.postgresql_psycopg2`` to use the renamed version ``django.db.backends.postgresql``.
+
+Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+.. code-block:: diff
+
+    DATABASES = {
+        "default": {
+   -        "ENGINE": "django.db.backends.postgresql_psycopg2",
+   +        "ENGINE": "django.db.backends.postgresql",
+            "NAME": "mydatabase",
+            "USER": "mydatabaseuser",
+            "PASSWORD": "mypassword",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
+        }
+    }
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

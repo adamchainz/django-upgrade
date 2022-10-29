@@ -96,6 +96,29 @@ def test_success():
     )
 
 
+def test_success_two_databases():
+    check_transformed(
+        """\
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql_psycopg2",
+            },
+            "analytics": {"ENGINE": 'django.db.backends.postgresql_psycopg2'},
+        }
+        """,
+        """\
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+            },
+            "analytics": {"ENGINE": 'django.db.backends.postgresql'},
+        }
+        """,
+        settings,
+        filename="myapp/settings.py",
+    )
+
+
 def test_success_with_merged_settings():
     check_transformed(
         """\

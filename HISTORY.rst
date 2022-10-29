@@ -6,7 +6,6 @@ History
 
   Thanks to Thibaut Decombe in `PR #280 <https://github.com/adamchainz/django-upgrade/pull/280>`__.
 
-
 1.11.0 (2022-10-26)
 -------------------
 

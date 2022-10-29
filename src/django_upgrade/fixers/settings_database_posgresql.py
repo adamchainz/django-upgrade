@@ -6,14 +6,13 @@ https://docs.djangoproject.com/en/2.0/releases/2.0/#id1
 from __future__ import annotations
 
 import ast
-from functools import partial
 from typing import Iterable
 
-from tokenize_rt import Offset
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import replace
+from django_upgrade.tokens import replace, str_repr_matching
 
 fixer = Fixer(
     __name__,
@@ -28,7 +27,8 @@ def visit_Dict(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(parents[-1], ast.Dict)
+        state.looks_like_settings_file()
+        and isinstance(parents[-1], ast.Dict)
         and isinstance((db_setting := parents[-2]), ast.Assign)
         and isinstance(db_setting.targets[0], ast.Name)
         and db_setting.targets[0].id == "DATABASES"
@@ -43,8 +43,10 @@ def visit_Dict(
             )
             for key, val in zip(node.keys, node.values)
         )
-        and state.looks_like_settings_file()
     ):
-        yield ast_start_offset(target_node), partial(
-            replace, src='"django.db.backends.postgresql"'
-        )
+        yield ast_start_offset(target_node), replace_engine
+
+
+def replace_engine(tokens: list[Token], i: int) -> None:
+    src = str_repr_matching("django.db.backends.postgresql", match_quotes=tokens[i])
+    replace(tokens, i, src=src)

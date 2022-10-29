@@ -46,8 +46,8 @@ def visit_ImportFrom(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        node.module in REWRITES
-        and not state.looks_like_migrations_file
+        not state.looks_like_migrations_file
+        and node.module in REWRITES
         and is_rewritable_import_from(node)
         and any(alias.name in REWRITES[node.module] for alias in node.names)
     ):

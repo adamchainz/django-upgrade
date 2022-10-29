@@ -27,13 +27,13 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(parents[-1], ast.ClassDef)
+        state.looks_like_command_file
+        and isinstance(parents[-1], ast.ClassDef)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == "requires_system_checks"
         and isinstance(node.value, ast.Constant)
         and (node.value.value is True or node.value.value is False)
-        and state.looks_like_command_file
     ):
         if node.value.value:
             new_src = '"__all__"'

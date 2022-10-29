@@ -30,10 +30,10 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        len(node.targets) == 1
+        state.looks_like_settings_file
+        and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == OLD_NAME
-        and state.looks_like_settings_file
     ):
         yield ast_start_offset(node), partial(rewrite_setting, node=node)
 

@@ -27,13 +27,13 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(parents[-1], ast.ClassDef)
+        state.looks_like_test_file
+        and isinstance(parents[-1], ast.ClassDef)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id in ("allow_database_queries", "multi_db")
         and isinstance(node.value, ast.Constant)
         and (node.value.value is True or node.value.value is False)
-        and state.looks_like_test_file
     ):
         yield ast_start_offset(node), partial(
             replace_assignment, node=node, value=node.value.value

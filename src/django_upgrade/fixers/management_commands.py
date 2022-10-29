@@ -33,7 +33,7 @@ def visit_Assign(
         and node.targets[0].id == "requires_system_checks"
         and isinstance(node.value, ast.Constant)
         and (node.value.value is True or node.value.value is False)
-        and state.looks_like_command_file()
+        and state.looks_like_command_file
     ):
         if node.value.value:
             new_src = '"__all__"'

@@ -28,7 +28,7 @@ def test_looks_like_admin_file_true(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert state.looks_like_admin_file()
+    assert state.looks_like_admin_file
 
 
 @pytest.mark.parametrize(
@@ -44,7 +44,7 @@ def test_looks_like_admin_file_false(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert not state.looks_like_admin_file()
+    assert not state.looks_like_admin_file
 
 
 @pytest.mark.parametrize(
@@ -62,7 +62,7 @@ def test_looks_like_command_file_true(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert state.looks_like_command_file()
+    assert state.looks_like_command_file
 
 
 @pytest.mark.parametrize(
@@ -82,7 +82,7 @@ def test_looks_like_command_file_false(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert not state.looks_like_command_file()
+    assert not state.looks_like_command_file
 
 
 @pytest.mark.parametrize(
@@ -101,7 +101,7 @@ def test_looks_like_dunder_init_file_true(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert state.looks_like_dunder_init_file()
+    assert state.looks_like_dunder_init_file
 
 
 @pytest.mark.parametrize(
@@ -121,7 +121,7 @@ def test_looks_like_dunder_init_file_false(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert not state.looks_like_dunder_init_file()
+    assert not state.looks_like_dunder_init_file
 
 
 @pytest.mark.parametrize(
@@ -147,7 +147,7 @@ def test_looks_like_test_file_true(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert state.looks_like_test_file()
+    assert state.looks_like_test_file
 
 
 @pytest.mark.parametrize(
@@ -164,7 +164,7 @@ def test_looks_like_test_file_false(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert not state.looks_like_test_file()
+    assert not state.looks_like_test_file
 
 
 @pytest.mark.parametrize(
@@ -184,7 +184,7 @@ def test_looks_like_settings_file_true(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert state.looks_like_settings_file()
+    assert state.looks_like_settings_file
 
 
 @pytest.mark.parametrize(
@@ -200,4 +200,4 @@ def test_looks_like_settings_file_false(filename: str) -> None:
         filename=filename,
         from_imports=defaultdict(set),
     )
-    assert not state.looks_like_settings_file()
+    assert not state.looks_like_settings_file

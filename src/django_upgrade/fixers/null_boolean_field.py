@@ -36,7 +36,7 @@ def visit_ImportFrom(
     if (
         is_rewritable_import_from(node)
         and node.module == "django.db.models"
-        and not state.looks_like_migrations_file()
+        and not state.looks_like_migrations_file
     ):
         yield ast_start_offset(node), partial(
             update_import_names,
@@ -64,7 +64,7 @@ def visit_Call(
             and isinstance(node.func.value, ast.Name)
             and node.func.value.id == "models"
         )
-    ) and not state.looks_like_migrations_file():
+    ) and not state.looks_like_migrations_file:
         yield ast_start_offset(node), partial(fix_null_boolean_field, node=node)
 
 

@@ -27,7 +27,7 @@ def visit_Dict(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_settings_file()
+        state.looks_like_settings_file
         and len(parents) >= 2
         and isinstance(parents[-1], ast.Dict)
         and isinstance((db_setting := parents[-2]), ast.Assign)

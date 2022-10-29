@@ -5,6 +5,7 @@ import os
 import pkgutil
 import re
 from collections import defaultdict
+from functools import cached_property
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -35,7 +36,7 @@ test_re = re.compile(r"(\b|_)tests?(\b|_)")
 
 
 class State:
-    __slots__ = ("settings", "filename", "from_imports", "__weakref__")
+    __slots__ = ("settings", "filename", "from_imports", "__weakref__", "__dict__")
 
     def __init__(
         self,
@@ -47,9 +48,11 @@ class State:
         self.filename = filename
         self.from_imports = from_imports
 
+    @cached_property
     def looks_like_admin_file(self) -> bool:
         return admin_re.search(self.filename) is not None
 
+    @cached_property
     def looks_like_command_file(self) -> bool:
         parts = self.filename.split(os.path.sep)
         try:
@@ -58,15 +61,19 @@ class State:
             return False
         return i > 0 and i < (len(parts) - 1) and parts[i - 1] == "management"
 
+    @cached_property
     def looks_like_dunder_init_file(self) -> bool:
         return dunder_init_re.search(self.filename) is not None
 
+    @cached_property
     def looks_like_migrations_file(self) -> bool:
         return "migrations" in self.filename.split(os.path.sep)
 
+    @cached_property
     def looks_like_settings_file(self) -> bool:
         return settings_re.search(self.filename) is not None
 
+    @cached_property
     def looks_like_test_file(self) -> bool:
         return test_re.search(self.filename) is not None
 

@@ -33,6 +33,6 @@ def visit_Assign(
         and isinstance(node.value, ast.Constant)
         and node.value.value is True
         and isinstance(parents[-1], ast.Module)
-        and state.looks_like_settings_file()
+        and state.looks_like_settings_file
     ):
         yield ast_start_offset(node), partial(erase_node, node=node)

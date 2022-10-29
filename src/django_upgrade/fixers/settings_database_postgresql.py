@@ -48,5 +48,5 @@ def visit_Dict(
 
 
 def replace_engine(tokens: list[Token], i: int) -> None:
-    src = str_repr_matching("django.db.backends.postgresql", match_quotes=tokens[i])
+    src = str_repr_matching("django.db.backends.postgresql", match_quotes=tokens[i].src)
     replace(tokens, i, src=src)

@@ -34,9 +34,9 @@ def visit_ImportFrom(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        is_rewritable_import_from(node)
+        not state.looks_like_migrations_file
+        and is_rewritable_import_from(node)
         and node.module == "django.db.models"
-        and not state.looks_like_migrations_file()
     ):
         yield ast_start_offset(node), partial(
             update_import_names,
@@ -51,7 +51,7 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
+    if not state.looks_like_migrations_file and (
         (
             isinstance(node.func, ast.Name)
             and "NullBooleanField" in state.from_imports["django.db.models"]
@@ -64,7 +64,7 @@ def visit_Call(
             and isinstance(node.func.value, ast.Name)
             and node.func.value.id == "models"
         )
-    ) and not state.looks_like_migrations_file():
+    ):
         yield ast_start_offset(node), partial(fix_null_boolean_field, node=node)
 
 

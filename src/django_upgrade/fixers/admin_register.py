@@ -149,9 +149,9 @@ def visit_Call(
                     and (site_name := "") == ""  # force assign
                 )
                 or (  # custom_site.register(...)
-                    isinstance(node.func.value, ast.Name)
+                    state.looks_like_admin_file
+                    and isinstance(node.func.value, ast.Name)
                     and (site_name := node.func.value.id).endswith("site")
-                    and state.looks_like_admin_file()
                 )
             )
             and (
@@ -205,9 +205,9 @@ def visit_Call(
                 and (site_name := "") == ""  # force assign
             )
             or (  # custom_site.unregister(...)
-                isinstance(node.func.value, ast.Name)
+                state.looks_like_admin_file
+                and isinstance(node.func.value, ast.Name)
                 and (site_name := node.func.value.id).endswith("site")
-                and state.looks_like_admin_file()
             )
         ):
             # potentially all models unregistered, but in some cases we can

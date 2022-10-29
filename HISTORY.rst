@@ -2,7 +2,7 @@
 History
 =======
 
-* Add Django 1.9+ fixer to rename settings.DATABASES backend path ``django.db.backends.postgresql_psycopg2`` to ``django.db.backends.postgresql``.
+* Add Django 1.9+ fixer to rename the legacy engine name ``django.db.backends.postgresql_psycopg2`` in ``settings.DATABASES`` to ``django.db.backends.postgresql``.
 
   Thanks to Thibaut Decombe in `PR #280 <https://github.com/adamchainz/django-upgrade/pull/280>`__.
 

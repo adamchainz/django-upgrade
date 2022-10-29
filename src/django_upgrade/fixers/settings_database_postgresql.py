@@ -28,11 +28,12 @@ def visit_Dict(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         state.looks_like_settings_file()
+        and len(parents) >= 2
         and isinstance(parents[-1], ast.Dict)
         and isinstance((db_setting := parents[-2]), ast.Assign)
+        and len(db_setting.targets) == 1
         and isinstance(db_setting.targets[0], ast.Name)
         and db_setting.targets[0].id == "DATABASES"
-        and len(db_setting.targets) == 1
         and any(
             (
                 isinstance(key, ast.Constant)

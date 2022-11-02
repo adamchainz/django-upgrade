@@ -100,6 +100,7 @@ For example when using ``bash``/``sh``:
 Or when using PowerShell:
 
 .. code-block:: powershell
+
     # When using git ls-files on Windows,
     # replace '/' back to the default path separator:
     git ls-files -- '*.py' | %{django-upgrade --target-version 4.1 $_.replace('/','\\')}

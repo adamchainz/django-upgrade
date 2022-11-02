@@ -106,7 +106,7 @@ Or when using PowerShell:
     git ls-files -- '*.py' | %{django-upgrade --target-version 4.1 $_.replace('/','\\')}
 
 Keep in mind:  ``django-upgrade`` expects your OS default path separator as input.
-This is not always the case using ``git ls-files`` (git bash uses '/'). 
+This is not always the case using ``git ls-files`` (git bash uses '/').
 
 
 The full list of fixers is documented below.

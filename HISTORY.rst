@@ -15,6 +15,10 @@ History
 
   Thanks to Thibaut Decombe in `PR #280 <https://github.com/adamchainz/django-upgrade/pull/280>`__.
 
+* Make detection of management commands and migration files detect both forward and backward slashes as directory separators.
+
+  Thanks to William Claassen in `PR #286 <https://github.com/adamchainz/django-upgrade/pull/286>`__.
+
 1.11.0 (2022-10-26)
 -------------------
 

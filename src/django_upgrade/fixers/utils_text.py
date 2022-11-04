@@ -8,16 +8,17 @@ import ast
 from functools import partial
 from typing import Iterable
 
-from tokenize_rt import Offset, Token
+from tokenize_rt import Offset
+from tokenize_rt import Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import (
-    extract_indent,
-    find_and_replace_name,
-    insert,
-    update_import_names,
-)
+from django_upgrade.data import Fixer
+from django_upgrade.data import State
+from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import extract_indent
+from django_upgrade.tokens import find_and_replace_name
+from django_upgrade.tokens import insert
+from django_upgrade.tokens import update_import_names
 
 fixer = Fixer(
     __name__,

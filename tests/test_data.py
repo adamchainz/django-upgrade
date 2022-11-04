@@ -4,7 +4,8 @@ from collections import defaultdict
 
 import pytest
 
-from django_upgrade.data import Settings, State
+from django_upgrade.data import Settings
+from django_upgrade.data import State
 
 settings = Settings(target_version=(4, 0))
 

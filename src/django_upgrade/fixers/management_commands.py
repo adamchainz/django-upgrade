@@ -11,7 +11,9 @@ from typing import Iterable
 from tokenize_rt import Offset
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.data import Fixer
+from django_upgrade.data import State
+from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import replace
 
 fixer = Fixer(

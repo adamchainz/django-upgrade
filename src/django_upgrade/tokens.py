@@ -4,7 +4,10 @@ import ast
 import re
 from collections import defaultdict
 
-from tokenize_rt import NON_CODING_TOKENS, UNIMPORTANT_WS, Token, tokens_to_src
+from tokenize_rt import NON_CODING_TOKENS
+from tokenize_rt import Token
+from tokenize_rt import tokens_to_src
+from tokenize_rt import UNIMPORTANT_WS
 
 # Token name aliases
 CODE = "CODE"  # Token name meaning 'replaced by us'

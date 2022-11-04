@@ -6,14 +6,19 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import Iterable, MutableMapping
+from typing import Iterable
+from typing import MutableMapping
 from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
-from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import replace, update_import_names
+from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import is_rewritable_import_from
+from django_upgrade.data import Fixer
+from django_upgrade.data import State
+from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import replace
+from django_upgrade.tokens import update_import_names
 
 fixer = Fixer(
     __name__,

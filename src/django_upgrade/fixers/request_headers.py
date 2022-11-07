@@ -35,7 +35,7 @@ def visit_Subscript(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        not isinstance(parents[-1], ast.Assign)
+        not isinstance(parents[-1], (ast.Assign, ast.Delete))
         and is_request_or_self_request_meta(node.value)
         and (meta_name := extract_constant(node.slice)) is not None
         and (header_name := get_header_name(meta_name)) is not None

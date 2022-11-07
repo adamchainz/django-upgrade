@@ -34,6 +34,15 @@ def test_assignment():
     )
 
 
+def test_delete():
+    check_noop(
+        """\
+        del request.META['HTTP_SERVER']
+        """,
+        settings,
+    )
+
+
 def test_in_not_header():
     check_noop(
         """\

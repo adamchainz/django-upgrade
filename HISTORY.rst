@@ -2,6 +2,11 @@
 History
 =======
 
+* Avoid rewriting ``request.META`` to ``request.headers`` in ``del`` statements.
+  This pattern works for ``request.META`` but not for ``request.headers`` which is an immutable Mapping.
+
+  Thanks to Thibaut Decombe in `PR #290 <https://github.com/adamchainz/django-upgrade/pull/290>`__.
+
 * Add Django 1.9+ fixer to rename the legacy engine name ``django.db.backends.postgresql_psycopg2`` in ``settings.DATABASES`` to ``django.db.backends.postgresql``.
 
   Thanks to Thibaut Decombe in `PR #280 <https://github.com/adamchainz/django-upgrade/pull/280>`__.

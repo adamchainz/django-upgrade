@@ -1,6 +1,7 @@
 =======
 History
 =======
+
 * Avoid rewriting ``request.META`` to ``request.headers`` in ``del`` statements.
   This pattern works for ``request.META`` but not for ``request.headers`` which is an immutable Mapping.
 

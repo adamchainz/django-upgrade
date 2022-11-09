@@ -15,12 +15,19 @@ settings = Settings(target_version=(4, 0))
     (
         "admin.py",
         "myapp/admin.py",
+        "myapp\\admin.py",
         "myapp/admin/file.py",
+        "myapp\\admin\\file.py",
         "myapp/blog/admin/article.py",
+        "myapp\\blog\\admin\\article.py",
         "myapp/custom_admin.py",
+        "myapp\\custom_admin.py",
         "myapp/custom_admin/file.py",
+        "myapp\\custom_admin\\file.py",
         "myapp/admin_custom.py",
+        "myapp\\admin_custom.py",
         "myapp/admin_custom/file.py",
+        "myapp\\admin_custom\\file.py",
     ),
 )
 def test_looks_like_admin_file_true(filename: str) -> None:
@@ -37,6 +44,7 @@ def test_looks_like_admin_file_true(filename: str) -> None:
     (
         "administrator.py",
         "blog/adm/article.py",
+        "blog\\adm\\article.py",
     ),
 )
 def test_looks_like_admin_file_false(filename: str) -> None:
@@ -52,13 +60,13 @@ def test_looks_like_admin_file_false(filename: str) -> None:
     "filename",
     (
         "management/commands/test.py",
-        r"management\commands\test.py",
+        "management\\commands\\test.py",
         "myapp/management/commands/test.py",
-        r"myapp\management\commands\test.py",
+        "myapp\\management\\commands\\test.py",
         "myapp/subapp/management/commands/test.py",
-        r"myapp\subapp\management\commands\test.py",
+        "myapp\\subapp\\management\\commands\\test.py",
         "myapp/subapp/management/commands/test/subcommand.py",
-        r"myapp\subapp\management\commands\test\subcommand.py",
+        "myapp\\subapp\\management\\commands\\test\\subcommand.py",
     ),
 )
 def test_looks_like_command_file_true(filename: str) -> None:
@@ -75,15 +83,15 @@ def test_looks_like_command_file_true(filename: str) -> None:
     (
         "test.py",
         "management/commands.py",
-        r"management\commands.py",
+        "management\\commands.py",
         "myapp/management/commands.py",
-        r"myapp\management\commands.py",
+        "myapp\\management\\commands.py",
         "myapp/mgmt/commands.py",
-        r"myapp\mgmt\commands.py",
+        "myapp\\mgmt\\commands.py",
         "myapp/management/something/commands/example.py",
-        r"myapp\management\something\commands\example.py",
+        "myapp\\management\\something\\commands\\example.py",
         "myapp/commands/management/example.py",
-        r"myapp\commands\management\example.py",
+        "myapp\\commands\\management\\example.py",
     ),
 )
 def test_looks_like_command_file_false(filename: str) -> None:
@@ -100,9 +108,9 @@ def test_looks_like_command_file_false(filename: str) -> None:
     (
         "__init__.py",
         "package/__init__.py",
-        r"package\__init__.py",
+        "package\\__init__.py",
         "project/package/__init__.py",
-        r"project\package\__init__.py",
+        "project\\package\\__init__.py",
     ),
 )
 def test_looks_like_dunder_init_file_true(filename: str) -> None:
@@ -138,9 +146,9 @@ def test_looks_like_dunder_init_file_false(filename: str) -> None:
     "filename",
     (
         "project/migrations/0238_auto_20200424_1249.py",
-        r"project\migrations\0238_auto_20200424_1249.py",
+        "project\\migrations\\0238_auto_20200424_1249.py",
         "another_project/migrations/0001_initial.py",
-        r"another_project\migrations\0001_initial.py",
+        "another_project\\migrations\\0001_initial.py",
     ),
 )
 def test_looks_like_migrations_file_true(filename: str) -> None:
@@ -157,9 +165,9 @@ def test_looks_like_migrations_file_true(filename: str) -> None:
     (
         "0238_auto_20200424_1249.py",
         "package/0001_initial.py",
-        r"package\0001_initial.py",
+        "package\\0001_initial.py",
         "migration/0001_initial.py",
-        r"migration\0001_initial.py",
+        "migration\\0001_initial.py",
     ),
 )
 def test_looks_like_migrations_file_false(filename: str) -> None:
@@ -176,10 +184,15 @@ def test_looks_like_migrations_file_false(filename: str) -> None:
     (
         "settings.py",
         "myapp/settings.py",
+        "myapp\\settings.py",
         "myapp/settings/prod.py",
+        "myapp\\settings\\prod.py",
         "myapp/prod_settings.py",
+        "myapp\\prod_settings.py",
         "myapp/local_settings.py",
+        "myapp\\local_settings.py",
         "myapp/settings_tests.py",
+        "myapp\\settings_tests.py",
     ),
 )
 def test_looks_like_settings_file_true(filename: str) -> None:
@@ -215,13 +228,21 @@ def test_looks_like_settings_file_false(filename: str) -> None:
         "test.py",
         "tests.py",
         "myapp/test.py",
+        "myapp\\test.py",
         "myapp/tests.py",
+        "myapp\\tests.py",
         "myapp/tests/base.py",
+        "myapp\\tests\\base.py",
         "myapp/tests/__init__.py",
+        "myapp\\tests\\__init__.py",
         "myapp/test_example.py",
+        "myapp\\test_example.py",
         "myapp/tests_example.py",
+        "myapp\\tests_example.py",
         "myapp/example_test.py",
+        "myapp\\example_test.py",
         "myapp/example_tests.py",
+        "myapp\\example_tests.py",
     ),
 )
 def test_looks_like_test_file_true(filename: str) -> None:
@@ -239,6 +260,7 @@ def test_looks_like_test_file_true(filename: str) -> None:
         "conftest.py",
         "protester.py",
         "myapp/protests/models.py",
+        "myapp\\protests\\models.py",
     ),
 )
 def test_looks_like_test_file_false(filename: str) -> None:

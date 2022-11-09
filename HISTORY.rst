@@ -2,7 +2,7 @@
 History
 =======
 
-* Make ``re_path`` -> ``path`` fixer also convert ``include()``'s with unterminated regexes.
+* Make ``re_path`` -> ``path`` fixer also convert ``include()``\'s with unterminated regexes.
 
   Thanks to Thibaut Decombe in `PR #279 <https://github.com/adamchainz/django-upgrade/pull/279>`__.
 

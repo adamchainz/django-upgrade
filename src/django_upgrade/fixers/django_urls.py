@@ -214,7 +214,7 @@ REGEX_TO_CONVERTER = {
 
 
 def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
-    if not regex_path.endswith("$") and not include_called:
+    if not (regex_path.endswith("$") or include_called):
         return None
     remaining = str_removeprefix(regex_path, "^")
     remaining = str_removesuffix(remaining, "$")

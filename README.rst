@@ -86,7 +86,9 @@ For more on usage run ``django-upgrade --help``.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
 
 ``django-upgrade`` does not have any ability to recurse through directories.
-Use the pre-commit integration, globbing, or another technique for applying to many files such as |with git ls-files pipe xargs|_. For example:
+Use the pre-commit integration, globbing, or another technique for applying to many files.
+Some fixers depend on the names of containing directories to activate, so ensure you run djagno-upgrade with paths relative to the root of your project.
+For example, |with git ls-files pipe xargs|_:
 
 .. |with git ls-files pipe xargs| replace:: with ``git ls-files | xargs``
 .. _with git ls-files pipe xargs: https://adamj.eu/tech/2022/03/09/how-to-run-a-command-on-many-files-in-your-git-repository/
@@ -94,6 +96,15 @@ Use the pre-commit integration, globbing, or another technique for applying to m
 .. code-block:: sh
 
     git ls-files -- '*.py' | xargs django-upgrade --target-version 4.1
+
+…or PowerShell’s |ForEach-Object|__:
+
+.. |ForEach-Object| replace:: ``ForEach-Object``
+__ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/foreach-object?view=powershell-7.2
+
+.. code-block:: powershell
+
+    git ls-files -- '*.py' | %{django-upgrade --target-version 4.1 $_}
 
 The full list of fixers is documented below.
 

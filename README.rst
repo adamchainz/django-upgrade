@@ -100,7 +100,7 @@ For example, |with git ls-files pipe xargs|_:
 …or PowerShell’s |ForEach-Object|__:
 
 .. |ForEach-Object| replace:: ``ForEach-Object``
-__ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/foreach-object?view=powershell-7.2
+__ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/foreach-object
 
 .. code-block:: powershell
 

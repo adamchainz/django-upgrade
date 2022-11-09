@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import os
 import pkgutil
 import re
 from collections import defaultdict
@@ -29,7 +28,9 @@ class Settings:
 
 
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
+commands_re = re.compile(r"(^|[\\/])management[\\/]commands[\\/]")
 dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
+migrations_re = re.compile(r"(^|[\\/])migrations([\\/])")
 settings_re = re.compile(r"(\b|_)settings(\b|_)")
 test_re = re.compile(r"(\b|_)tests?(\b|_)")
 
@@ -53,12 +54,7 @@ class State:
 
     @cached_property
     def looks_like_command_file(self) -> bool:
-        parts = self.filename.split(os.path.sep)
-        try:
-            i = parts.index("commands")
-        except ValueError:
-            return False
-        return i > 0 and i < (len(parts) - 1) and parts[i - 1] == "management"
+        return commands_re.search(self.filename) is not None
 
     @cached_property
     def looks_like_dunder_init_file(self) -> bool:
@@ -66,7 +62,7 @@ class State:
 
     @cached_property
     def looks_like_migrations_file(self) -> bool:
-        return "migrations" in self.filename.split(os.path.sep)
+        return migrations_re.search(self.filename) is not None
 
     @cached_property
     def looks_like_settings_file(self) -> bool:

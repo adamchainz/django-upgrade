@@ -213,6 +213,39 @@ def test_re_path_unanchored_end():
     )
 
 
+def test_re_path_unanchored_end_with_include():
+    check_transformed(
+        """\
+        from django.urls import re_path, include
+
+        re_path(r'^accounts/$', include('allauth.urls'))
+        """,
+        """\
+        from django.urls import path
+        from django.urls import include
+
+        path('accounts/', include('allauth.urls'))
+        """,
+        settings,
+    )
+
+
+def test_url_unanchored_end_with_include():
+    check_transformed(
+        """\
+        from django.conf.urls import url, include
+
+        url(r'^accounts/', include('allauth.urls'))
+        """,
+        """\
+        from django.urls import include, path
+
+        path('accounts/', include('allauth.urls'))
+        """,
+        settings,
+    )
+
+
 def test_path_empty():
     check_transformed(
         """\
@@ -443,7 +476,7 @@ def test_complete():
             path('about/', views.about, name='about'),
             path('post/<slug:slug>/', views.post, name='post'),
             re_path(r'^post/(?P<slug>[\\w-]+)/$', views.post, name='post'),
-            re_path(r'^weblog/', include('blog.urls')),
+            path('weblog/', include('blog.urls')),
         ]
         """,
         settings,
@@ -621,8 +654,8 @@ def test_re_path_complete():
             re_path(r'^$', views.index, name='index'),
             re_path(r'^about/$', views.about, name='about'),
             re_path(r'^post/(?P<slug>[-a-zA-Z0-9_]+)/$', views.post, name='post'),
-            re_path(r'^post/(?P<year>[0-9]{4})/$', views.post, name='post'),
             re_path(r'^weblog/', include('blog.urls')),
+            re_path(r'^post/(?P<year>[0-9]{4})/$', views.post, name='post'),
         ]
         """,
         """\
@@ -633,8 +666,8 @@ def test_re_path_complete():
             path('', views.index, name='index'),
             path('about/', views.about, name='about'),
             path('post/<slug:slug>/', views.post, name='post'),
+            path('weblog/', include('blog.urls')),
             re_path(r'^post/(?P<year>[0-9]{4})/$', views.post, name='post'),
-            re_path(r'^weblog/', include('blog.urls')),
         ]
         """,
         settings,
@@ -650,7 +683,7 @@ def test_combined_keep_re_path():
 
         urlpatterns = [
             re_path(r'^$', views.index, name='index'),
-            re_path(r'^weblog/', include('blog.urls')),
+            re_path(r'^weblog/[0-9]{4}', include('blog.urls')),
         ]
         """,
         """\
@@ -659,7 +692,7 @@ def test_combined_keep_re_path():
 
         urlpatterns = [
             path('', views.index, name='index'),
-            re_path(r'^weblog/', include('blog.urls')),
+            re_path(r'^weblog/[0-9]{4}', include('blog.urls')),
         ]
         """,
         settings,
@@ -700,7 +733,7 @@ def test_combined_3():
 
         urlpatterns = [
             re_path(r'^$', views.index, name='index'),
-            re_path(r'^weblog/', include('blog.urls')),
+            re_path(r'^weblog/[0-9]{4}', include('blog.urls')),
         ]
         """,
         """\
@@ -709,7 +742,7 @@ def test_combined_3():
 
         urlpatterns = [
             path('', views.index, name='index'),
-            re_path(r'^weblog/', include('blog.urls')),
+            re_path(r'^weblog/[0-9]{4}', include('blog.urls')),
         ]
         """,
         settings,

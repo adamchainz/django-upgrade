@@ -17,6 +17,7 @@ from tokenize_rt import Token
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.ast import is_rewritable_import_from
 from django_upgrade.compat import str_removeprefix
+from django_upgrade.compat import str_removesuffix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
@@ -157,9 +158,20 @@ def visit_Call(
             ):
                 regex_path = node.args[0].value
 
-            yield ast_start_offset(node), partial(
-                fix_url_call, regex_path=regex_path, state=state, node_name=node_name
+            include_called = (
+                len(node.args) >= 2
+                and isinstance(node.args[1], ast.Call)
+                and isinstance(node.args[1].func, ast.Name)
+                and node.args[1].func.id == "include"
             )
+            yield ast_start_offset(node), partial(
+                fix_url_call,
+                regex_path=regex_path,
+                state=state,
+                node_name=node_name,
+                include_called=include_called,
+            )
+
         elif (
             node.func.id == "include"
             and "include" in state.from_imports["django.conf.urls"]
@@ -168,11 +180,17 @@ def visit_Call(
 
 
 def fix_url_call(
-    tokens: list[Token], i: int, *, regex_path: str | None, state: State, node_name: str
+    tokens: list[Token],
+    i: int,
+    *,
+    regex_path: str | None,
+    state: State,
+    node_name: str,
+    include_called: bool,
 ) -> None:
     new_name = "re_path"
     if regex_path is not None:
-        path = convert_path_syntax(regex_path)
+        path = convert_path_syntax(regex_path, include_called)
         if path is not None:
             string_idx = find(tokens, i, name=STRING)
             path = str_repr_matching(path, match_quotes=tokens[string_idx].src)
@@ -195,10 +213,11 @@ REGEX_TO_CONVERTER = {
 }
 
 
-def convert_path_syntax(regex_path: str) -> str | None:
-    if not regex_path.endswith("$"):
+def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
+    if not (regex_path.endswith("$") or include_called):
         return None
-    remaining = str_removeprefix(regex_path[:-1], "^")
+    remaining = str_removeprefix(regex_path, "^")
+    remaining = str_removesuffix(remaining, "$")
     path = ""
     while "(?P<" in remaining:
         prefix, rest = remaining.split("(?P<", 1)

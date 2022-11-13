@@ -488,7 +488,6 @@ def update_import_modules(
     elsewhere. rewrites should map import names to the new modules they should
     be imported from.
     """
-    assert node.module is not None
     imports_to_add = defaultdict(list)
     name_map = {}
     for alias in node.names:

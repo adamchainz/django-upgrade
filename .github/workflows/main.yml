@@ -38,7 +38,7 @@ jobs:
         python -m pip install --upgrade codecov tox tox-py
 
     - name: Run tox targets for ${{ matrix.python-version }}
-      run: tox --py current
+      run: tox run -f py$(echo ${{ matrix.python-version }} | tr -d .)
 
     - name: Upload coverage data
       uses: actions/upload-artifact@v3

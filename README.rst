@@ -808,7 +808,7 @@ Requires an existing import of the ``datetime`` module.
 ``assertFormError()`` and ``assertFormsetError()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites calls to these assertion functions from the old signature to the new one.
+Rewrites calls to these assertion functions from the old signatures to the new ones.
 
 .. code-block:: diff
 

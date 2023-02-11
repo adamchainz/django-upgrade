@@ -35,7 +35,8 @@ def visit_Call(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(func := node.func, ast.Attribute)
+        state.looks_like_test_file
+        and isinstance(func := node.func, ast.Attribute)
         and (name := func.attr) in NAMES
         and isinstance(func.value, ast.Name)
         and func.value.id == "self"

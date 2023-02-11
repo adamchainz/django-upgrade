@@ -18,6 +18,7 @@ def test_assertFormsetError_not_transformed():
         a.assertFormsetError('foo', 'bar')
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -40,6 +41,7 @@ def test_assertFormsetError_transformed():
                 self.assertFormSetError('foo', 'bar')
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -54,6 +56,7 @@ def test_assertQuerysetEqual_not_transformed():
         a.assertQuerysetEqual('foo', 'bar')
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -76,4 +79,5 @@ def test_assertQuerysetEqual_transformed():
                 self.assertQuerySetEqual('foo', 'bar')
         """,
         settings,
+        filename="tests.py",
     )

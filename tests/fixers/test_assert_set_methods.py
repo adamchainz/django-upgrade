@@ -7,15 +7,29 @@ from tests.fixers.tools import check_transformed
 settings = Settings(target_version=(4, 2))
 
 
-def test_assertFormsetError_not_transformed():
+def test_assertFormsetError_non_test_file():
     check_noop(
         """\
-        class A:
-            def assertFormsetError(foo, bar):
-                pass
+        from django.test import SimpleTestCase
 
-        a = A()
-        a.assertFormsetError('foo', 'bar')
+        class MyTest(SimpleTestCase):
+
+            def test_formset_error(self):
+                self.assertFormsetError('foo', 'bar')
+        """,
+        settings,
+    )
+
+
+def test_assertFormsetError_custom_method():
+    check_noop(
+        """\
+        from django.test import SimpleTestCase
+
+        class MyTest(SimpleTestCase):
+
+            def assertFormsetError(self, foo, bar):
+                pass
         """,
         settings,
         filename="tests.py",
@@ -45,18 +59,31 @@ def test_assertFormsetError_transformed():
     )
 
 
-def test_assertQuerysetEqual_not_transformed():
+def test_assertQuerysetEqual_non_test_file():
     check_noop(
         """\
-        class A:
-            def assertQuerysetEqual(foo, bar):
-                pass
+        from django.test import SimpleTestCase
 
-        a = A()
-        a.assertQuerysetEqual('foo', 'bar')
+        class MyTest(SimpleTestCase):
+
+            def test_formset_error(self):
+                self.assertQuerysetEqual('foo', 'bar')
         """,
         settings,
-        filename="tests.py",
+    )
+
+
+def test_assertQuerysetEqual_custom_method():
+    check_noop(
+        """\
+        from django.test import SimpleTestCase
+
+        class MyTest(SimpleTestCase):
+
+            def assertQuerysetEqual(self, foo, bar):
+                pass
+        """,
+        settings,
     )
 
 

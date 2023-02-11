@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Group some compatibility import replacements into a single “fixer”, optimizing runtime by about 3%.
+
+  Thanks to Thibaut Decombe in `PR #295 <https://github.com/adamchainz/django-upgrade/pull/295>`__.
+
 1.12.0 (2022-11-09)
 -------------------
 

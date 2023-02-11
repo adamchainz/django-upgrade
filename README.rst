@@ -764,6 +764,19 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
     -USE_L10N = True
 
+``lookup_needs_distinct``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Renames the undocumented ``django.contrib.admin.utils.lookup_needs_distinct`` to ``lookup_spawns_duplicates``:
+
+.. code-block:: diff
+    -from django.contrib.admin.utils import lookup_needs_distinct
+    +from django.contrib.admin.utils import lookup_spawns_duplicates
+
+    -if lookup_needs_distinct(self.opts, search_spec):
+    +if lookup_spawns_duplicates(self.opts, search_spec):
+        ...
+
 Django 4.1
 ----------
 

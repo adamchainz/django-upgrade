@@ -823,3 +823,21 @@ Rewrites calls to these assertion functions from the old signatures to the new o
 
     -self.assertFormsetError(response, "formset", 0, "username", None)
     +self.assertFormsetError(response.context["formset"], 0, "username", [])
+
+Django 4.2
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/4.2/releases/4.2/>`__
+
+``assertFormsetError`` and ``assertQuerysetEqual``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites calls to these assertion functions from the old names to the new ones with capitalized “Set”.
+
+.. code-block:: diff
+
+    -self.assertFormsetError(response.context["form"], "username", ["Too long"])
+    +self.assertFormSetError(response.context["form"], "username", ["Too long"])
+
+    -self.assertQuerysetEqual(authors, ["Brad Dayley"], lambda a: a.name)
+    +self.assertQuerySetEqual(authors, ["Brad Dayley"], lambda a: a.name)

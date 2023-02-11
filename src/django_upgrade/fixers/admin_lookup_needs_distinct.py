@@ -55,14 +55,8 @@ def visit_Name(
     node: ast.Name,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (name := node.id) in state.from_imports[MODULE]:
-        new_name: str | None
-        if name in RENAMES:
-            new_name = RENAMES[name]
-        else:
-            new_name = None
-
-        if new_name is not None:
-            yield ast_start_offset(node), partial(
-                find_and_replace_name, name=name, new=new_name
-            )
+    if (name := node.id) in RENAMES and name in state.from_imports[MODULE]:
+        new_name = RENAMES[name]
+        yield ast_start_offset(node), partial(
+            find_and_replace_name, name=name, new=new_name
+        )

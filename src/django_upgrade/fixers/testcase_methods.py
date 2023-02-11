@@ -42,6 +42,6 @@ def visit_Call(
         and isinstance(func.value, ast.Name)
         and func.value.id == "self"
     ):
-        yield ast_start_offset(node), partial(
+        yield ast_start_offset(func), partial(
             find_and_replace_name, name=name, new=NAMES[name]
         )

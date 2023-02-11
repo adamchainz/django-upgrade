@@ -19,6 +19,7 @@ from collections import defaultdict
 from functools import lru_cache
 from functools import partial
 from typing import Iterable
+from typing import Mapping
 
 from tokenize_rt import Offset
 
@@ -34,7 +35,7 @@ fixer = Fixer(
     min_version=(0, 0),
 )
 
-REPLACE_EXACT = {
+REPLACEMENTS_EXACT = {
     (1, 9): {
         "django.forms.forms": {
             "pretty_name": "django.forms.utils",
@@ -65,7 +66,7 @@ REPLACE_EXACT = {
         },
     },
 }
-REPLACE_EXACT_EXCEPT_MIGRATIONS = {
+REPLACEMENTS_EXCEPT_MIGRATIONS = {
     (3, 1): {
         "django.contrib.postgres.fields": {
             "JSONField": "django.db.models",
@@ -82,23 +83,26 @@ REPLACE_EXACT_EXCEPT_MIGRATIONS = {
 
 
 @lru_cache(maxsize=None)
-def _for_version(
+def _get_replacements(
     version: tuple[int, int], looks_like_migrations_file: bool
-) -> defaultdict[str, dict[str, str]]:
-
-    exact: defaultdict[str, dict[str, str]] = defaultdict(dict)
-    for ver, replace_exact in REPLACE_EXACT.items():
-        if ver <= version:
-            for old_module, rewrite in replace_exact.items():
-                exact[old_module].update(rewrite)
+) -> Mapping[str, dict[str, str]]:
+    replacements: defaultdict[str, dict[str, str]] = defaultdict(dict)
+    for target_version, target_replacements in REPLACEMENTS_EXACT.items():
+        if target_version <= version:
+            for old_module, rewrite in target_replacements.items():
+                replacements[old_module].update(rewrite)
 
     if not looks_like_migrations_file:
-        for ver, replace_exact in REPLACE_EXACT_EXCEPT_MIGRATIONS.items():
-            if ver <= version:
-                for old_module, rewrite in replace_exact.items():
-                    exact[old_module].update(rewrite)
+        for (
+            target_version,
+            target_replacements,
+        ) in REPLACEMENTS_EXCEPT_MIGRATIONS.items():
+            if target_version <= version:
+                for old_module, rewrite in target_replacements.items():
+                    replacements[old_module].update(rewrite)
 
-    return exact
+    replacements.default_factory = None
+    return replacements
 
 
 @fixer.register(ast.ImportFrom)
@@ -110,13 +114,15 @@ def visit_ImportFrom(
     if not is_rewritable_import_from(node) or node.module is None:
         return
 
-    exact = _for_version(
+    replacements = _get_replacements(
         state.settings.target_version, state.looks_like_migrations_file
     )
 
-    if node.module in exact and any(
-        alias.name in exact[node.module] for alias in node.names
+    if node.module in replacements and any(
+        alias.name in replacements[node.module] for alias in node.names
     ):
         yield ast_start_offset(node), partial(
-            update_import_modules, node=node, module_rewrites=exact[node.module]
+            update_import_modules,
+            node=node,
+            module_rewrites=replacements[node.module],
         )

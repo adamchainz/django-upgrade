@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add Django 4.0 fixer to rewrite ``django.contrib.admin.utils.lookup_needs_distinct`` -> ``lookup_spawns_duplicates``.
+
+  Thanks to Bruno Alla in `PR #313 <https://github.com/adamchainz/django-upgrade/pull/313>`__.
+
 * Group some compatibility import replacements into a single “fixer”, optimizing runtime by about 3%.
 
   Thanks to Thibaut Decombe in `PR #295 <https://github.com/adamchainz/django-upgrade/pull/295>`__.

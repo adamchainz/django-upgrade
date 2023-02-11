@@ -832,8 +832,7 @@ Django 4.2
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites the methods calls to the new names ``assertFormSetError``
-resp. ``assertQuerysetEqual``.
+Rewrites calls to these assertion functions from the old names to the new ones with capitalized “Set”.
 
 .. code-block:: diff
 

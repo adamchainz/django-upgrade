@@ -1,5 +1,6 @@
 """
-Replace spelling of assertFormsetError and assertQuerysetEqual:
+Rewrite spelling of assertFormsetError and assertQuerysetEqual to include
+capitalized “Set”:
 https://docs.djangoproject.com/en/4.2/releases/4.2/#miscellaneous
 """
 from __future__ import annotations

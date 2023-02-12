@@ -31,6 +31,28 @@ HEADERS_KWARG = "headers"
 HTTP_PREFIX = "HTTP_"
 
 
+@fixer.register(ast.Call)
+def visit_Call(
+    state: State,
+    node: ast.Call,
+    parents: list[ast.AST],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        isinstance(node.func, ast.Name)
+        and node.func.id in ("Client", "RequestFactory")
+        and node.func.id in state.from_imports["django.test"]
+    ):
+        yield ast_start_offset(node), partial(
+            merge_http_headers_kwargs,
+            node=node,
+        )
+    elif looks_like_client_call(node, "client") and node.args:
+        yield ast_start_offset(node), partial(
+            merge_http_headers_kwargs,
+            node=node,
+        )
+
+
 def merge_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) -> None:
     http_kwargs_names = []
     contains_headers_kwarg = False
@@ -173,25 +195,3 @@ def insert_headers_kwarg(
         ]
 
     tokens[insert_position:insert_position] = new_tokens
-
-
-@fixer.register(ast.Call)
-def visit_Call(
-    state: State,
-    node: ast.Call,
-    parents: list[ast.AST],
-) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        isinstance(node.func, ast.Name)
-        and node.func.id in ("Client", "RequestFactory")
-        and node.func.id in state.from_imports["django.test"]
-    ):
-        yield ast_start_offset(node), partial(
-            merge_http_headers_kwargs,
-            node=node,
-        )
-    elif looks_like_client_call(node, "client") and node.args:
-        yield ast_start_offset(node), partial(
-            merge_http_headers_kwargs,
-            node=node,
-        )

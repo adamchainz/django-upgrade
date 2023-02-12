@@ -808,7 +808,7 @@ Requires an existing import of the ``datetime`` module.
 ``assertFormError()`` and ``assertFormsetError()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites calls to these assertion functions from the old signatures to the new ones.
+Rewrites calls to these test case methods from the old signatures to the new ones.
 
 .. code-block:: diff
 
@@ -832,7 +832,7 @@ Django 4.2
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rewrites calls to these assertion functions from the old names to the new ones with capitalized “Set”.
+Rewrites calls to these test case methods from the old names to the new ones with capitalized “Set”.
 
 .. code-block:: diff
 

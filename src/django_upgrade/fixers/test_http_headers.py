@@ -42,12 +42,7 @@ def visit_Call(
         isinstance(node.func, ast.Name)
         and node.func.id in ("Client", "RequestFactory")
         and node.func.id in state.from_imports["django.test"]
-    ):
-        yield ast_start_offset(node), partial(
-            merge_http_headers_kwargs,
-            node=node,
-        )
-    elif looks_like_client_call(node, "client") and node.args:
+    ) or (looks_like_client_call(node, "client") and node.args):
         yield ast_start_offset(node), partial(
             merge_http_headers_kwargs,
             node=node,

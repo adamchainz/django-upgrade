@@ -171,6 +171,69 @@ def test_instantiation_multiple_after_existing():
     )
 
 
+def test_instantiation_existing_empty():
+    check_transformed(
+        """\
+        from django.test import Client
+        Client(HTTP_A="1", headers={})
+        """,
+        """\
+        from django.test import Client
+        Client(headers={"a": "1"})
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_existing_comment():
+    check_transformed(
+        """\
+        from django.test import Client
+        Client(
+            HTTP_A="1",
+            headers={
+                # todo: add headers
+            }
+        )
+        """,
+        """\
+        from django.test import Client
+        Client(
+            headers={
+                # todo: add headers
+            "a": "1"}
+        )
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_existing_variable():
+    check_noop(
+        """\
+        from django.test import Client
+        headers = {}
+        Client(HTTP_A="1", headers=headers)
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_existing_dict_comp():
+    check_noop(
+        """\
+        from django.test import Client
+        names = ["header1"]
+        Client(HTTP_A="1", headers={h: "yes" for h in names})
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
 def test_client_call():
     check_transformed(
         """\

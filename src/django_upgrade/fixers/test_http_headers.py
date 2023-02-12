@@ -13,6 +13,7 @@ from tokenize_rt import Offset
 from tokenize_rt import Token
 
 from django_upgrade.ast import ast_start_offset
+from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
@@ -69,7 +70,7 @@ def merge_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) ->
         erased_tokens, start_idx = erase_keyword_argument(
             tokens, i, kwarg_name=http_kwarg_name
         )
-        new_headers_kwarg_values[transform_header_name(http_kwarg_name)] = erased_tokens
+        new_headers_kwarg_values[transform_header_arg(http_kwarg_name)] = erased_tokens
         if first_start_idx == -1:
             first_start_idx = start_idx
 
@@ -87,10 +88,8 @@ def merge_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) ->
             )
 
 
-def transform_header_name(header: str) -> str:
-    if header.startswith(HTTP_PREFIX):
-        header = header[len(HTTP_PREFIX) :]
-    return header.replace("_", "-").lower()
+def transform_header_arg(header: str) -> str:
+    return str_removeprefix(header, HTTP_PREFIX).replace("_", "-").lower()
 
 
 def erase_keyword_argument(

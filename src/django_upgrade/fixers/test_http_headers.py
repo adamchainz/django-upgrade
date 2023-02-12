@@ -156,9 +156,7 @@ def insert_headers_kwarg(
     open_idx = find(tokens, i, name=OP, src="(")
     func_args, close_idx = parse_call_args(tokens, open_idx)
 
-    new_tokens = []
-
-    new_tokens += [
+    new_tokens = [
         Token(name=NAME, src=HEADERS_KWARG),
         Token(name="OP", src="="),
         Token(name="OP", src="{"),

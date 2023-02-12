@@ -182,17 +182,8 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Name)
-        and "RequestFactory" in state.from_imports["django.test"]
-        and node.func.id == "RequestFactory"
-    ):
-        yield ast_start_offset(node), partial(
-            merge_http_headers_kwargs,
-            node=node,
-        )
-    elif (
-        isinstance(node.func, ast.Name)
-        and "Client" in state.from_imports["django.test"]
-        and node.func.id == "Client"
+        and node.func.id in ("Client", "RequestFactory")
+        and node.func.id in state.from_imports["django.test"]
     ):
         yield ast_start_offset(node), partial(
             merge_http_headers_kwargs,

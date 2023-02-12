@@ -18,6 +18,7 @@ from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.fixers.assert_form_error import looks_like_client_call
+from django_upgrade.tokens import CODE
 from django_upgrade.tokens import find
 from django_upgrade.tokens import NAME
 from django_upgrade.tokens import OP
@@ -143,16 +144,8 @@ def insert_into_existing_headers_kwarg(
 
     new_tokens = []
     for key, value in kwarg_dict.items():
-        new_tokens += [
-            Token(name="OP", src=","),
-            Token(name="UNIMPORTANT_WS", src=" "),
-        ]
-        new_tokens += [
-            Token(name="STRING", src=f'"{key}"'),
-            Token(name="OP", src=":"),
-            Token(name="UNIMPORTANT_WS", src=" "),
-        ]
-        new_tokens += value
+        new_tokens.append(Token(CODE, f', "{key}": '))
+        new_tokens.extend(value)
     tokens[headers_closing_idx:headers_closing_idx] = new_tokens
 
 
@@ -166,34 +159,18 @@ def insert_headers_kwarg(
     open_idx = find(tokens, i, name=OP, src="(")
     func_args, close_idx = parse_call_args(tokens, open_idx)
 
-    new_tokens = [
-        Token(name=NAME, src=HEADERS_KWARG),
-        Token(name="OP", src="="),
-        Token(name="OP", src="{"),
-    ]
+    new_tokens = [Token(CODE, f"{HEADERS_KWARG}={{")]
 
     for i, (key, value) in enumerate(kwarg_dict.items(), 1):
-        new_tokens += [
-            Token(name="STRING", src=f'"{key}"'),
-            Token(name="OP", src=":"),
-            Token(name="UNIMPORTANT_WS", src=" "),
-        ]
-        new_tokens += value
+        new_tokens.append(Token(CODE, f'"{key}": '))
+        new_tokens.extend(value)
         if i < len(kwarg_dict):
-            new_tokens += [
-                Token(name="OP", src=","),
-                Token(name="UNIMPORTANT_WS", src=" "),
-            ]
+            new_tokens.append(Token(CODE, ", "))
 
-    new_tokens += [
-        Token(name="OP", src="}"),
-    ]
+    new_tokens.append(Token(CODE, "}"))
 
     # If it's not the last argument.
     if len(func_args) != 0 and func_args[-1][1] > insert_position:
-        new_tokens += [
-            Token(name="OP", src=","),
-            Token(name="UNIMPORTANT_WS", src=" "),
-        ]
+        new_tokens.append(Token(CODE, ", "))
 
     tokens[insert_position:insert_position] = new_tokens

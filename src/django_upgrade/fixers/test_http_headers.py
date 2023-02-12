@@ -1,6 +1,7 @@
 """
-Rewrite HTTP headers as headers keyword parameter:
-https://docs.djangoproject.com/en/dev/releases/4.2/#tests
+Transforms HTTP headers from WSGI kwarg format to new 'headers' dictionary, for
+test Client and RequestFactory:
+https://docs.djangoproject.com/en/4.2/releases/4.2/#tests
 """
 from __future__ import annotations
 

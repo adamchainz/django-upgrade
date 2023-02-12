@@ -39,10 +39,20 @@ def visit_Call(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node.func, ast.Name)
-        and node.func.id in ("Client", "RequestFactory")
-        and node.func.id in state.from_imports["django.test"]
-    ) or (looks_like_client_call(node, "client") and node.args):
+        state.looks_like_test_file
+        and (
+            (
+                isinstance(node.func, ast.Name)
+                and node.func.id in ("Client", "RequestFactory")
+                and node.func.id in state.from_imports["django.test"]
+            )
+            or (looks_like_client_call(node, "client") and node.args)
+        )
+        and any(
+            kw.arg is not None and kw.arg.startswith(HTTP_PREFIX)
+            for kw in node.keywords
+        )
+    ):
         yield ast_start_offset(node), partial(
             merge_http_headers_kwargs,
             node=node,

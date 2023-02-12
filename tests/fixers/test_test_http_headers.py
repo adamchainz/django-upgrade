@@ -18,6 +18,7 @@ def test_transform_constructor_call():
         RequestFactory(headers={"host": "test.com"})
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -32,6 +33,7 @@ def test_transform_constructor_call_multiple():
         c = Client(headers={"user-agent": "example", "host": "test.com", "accept-language": "fr-fr"}, )
         """,  # noqa: E501
         settings,
+        filename="tests.py",
     )
 
 
@@ -48,6 +50,7 @@ def test_transform():
         self.client.get("/", headers={"host": "test.com"}, SCRIPT_NAME="/app/")
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -64,6 +67,7 @@ def test_transform_only():
         self.client.get("/", headers={"host": "test.com"})
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -80,6 +84,7 @@ def test_transform_multiple():
         self.client.get("/", headers={"host": "test.com", "accept": "application/json"})
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -89,6 +94,7 @@ def test_unchanged_parameter():
         self.client.get("/", SCRIPT_NAME="/app/"),
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -98,6 +104,7 @@ def test_unchanged_other_call():
         request.META.get("/", HTTP_HOST="host.com"),
         """,
         settings,
+        filename="tests.py",
     )
 
 
@@ -118,4 +125,5 @@ def test_transform_multiline():
         )
         """,
         settings,
+        filename="tests.py",
     )

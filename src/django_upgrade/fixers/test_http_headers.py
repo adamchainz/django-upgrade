@@ -39,26 +39,28 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        state.looks_like_test_file
-        and (
-            (
-                isinstance(node.func, ast.Name)
-                and node.func.id in ("Client", "RequestFactory")
-                and node.func.id in state.from_imports["django.test"]
-            )
-            or (looks_like_client_call(node, "client") and node.args)
+    if state.looks_like_test_file and (
+        (
+            isinstance(node.func, ast.Name)
+            and node.func.id in ("Client", "RequestFactory")
+            and node.func.id in state.from_imports["django.test"]
         )
-        and all(kw.arg is not None for kw in node.keywords)  # no **kwargs
-        and any(
-            kw.arg is not None and kw.arg.startswith(HTTP_PREFIX)
-            for kw in node.keywords
-        )
+        or (looks_like_client_call(node, "client") and node.args)
     ):
-        yield ast_start_offset(node), partial(
-            merge_http_headers_kwargs,
-            node=node,
-        )
+        has_http_kwarg = False
+        for keyword in node.keywords:
+            if keyword.arg is None:  # ** unpacking
+                return
+            elif keyword.arg == "headers" and not isinstance(keyword.value, ast.Dict):
+                return
+            elif keyword.arg.startswith(HTTP_PREFIX):
+                has_http_kwarg = True
+
+        if has_http_kwarg:
+            yield ast_start_offset(node), partial(
+                merge_http_headers_kwargs,
+                node=node,
+            )
 
 
 def merge_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) -> None:

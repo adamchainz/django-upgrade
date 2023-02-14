@@ -49,6 +49,7 @@ def visit_Call(
             )
             or (looks_like_client_call(node, "client") and node.args)
         )
+        and all(kw.arg is not None for kw in node.keywords)  # no **kwargs
         and any(
             kw.arg is not None and kw.arg.startswith(HTTP_PREFIX)
             for kw in node.keywords

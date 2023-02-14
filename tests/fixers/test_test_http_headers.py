@@ -47,6 +47,16 @@ def test_client_call_non_http_kwarg():
     )
 
 
+def test_client_call_unpacked_kwargs():
+    check_noop(
+        """
+        self.client.get("/", HTTP_ACCEPT="text/html", **maybe_has_headers),
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
 def test_instantiation_request_factory():
     check_transformed(
         """\

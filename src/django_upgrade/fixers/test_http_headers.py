@@ -11,6 +11,7 @@ from typing import Iterable
 
 from tokenize_rt import Offset
 from tokenize_rt import Token
+from tokenize_rt import UNIMPORTANT_WS
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.compat import str_removeprefix
@@ -19,6 +20,7 @@ from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.fixers.assert_form_error import looks_like_client_call
 from django_upgrade.tokens import CODE
+from django_upgrade.tokens import consume
 from django_upgrade.tokens import find
 from django_upgrade.tokens import NAME
 from django_upgrade.tokens import OP
@@ -120,19 +122,10 @@ def erase_keyword_argument(
         value_start_idx = find(tokens, kwarg_name_start_idx, name=OP, src="=")
         erased_tokens = tokens[value_start_idx + 1 : arg_end_idx]
 
-        ends_with_comma = (
-            tokens[arg_end_idx].name == OP and tokens[arg_end_idx].src == ","
-        )
-        if ends_with_comma:
-            arg_end_idx += 1
-        ends_with_whitespace = (
-            tokens[arg_end_idx].name == "UNIMPORTANT_WS"
-            and tokens[arg_end_idx].src == " "
-        )
-        if ends_with_whitespace:
-            arg_end_idx += 1
+        arg_end_idx = consume(tokens, arg_end_idx - 1, name=OP, src=",")
+        arg_end_idx = consume(tokens, arg_end_idx, name=UNIMPORTANT_WS)
 
-        del tokens[kwarg_name_start_idx:arg_end_idx]
+        del tokens[kwarg_name_start_idx : arg_end_idx + 1]
         return erased_tokens, kwarg_name_start_idx
     return [], -1
 

@@ -28,6 +28,7 @@ from django_upgrade.tokens import insert
 from django_upgrade.tokens import NAME
 from django_upgrade.tokens import OP
 from django_upgrade.tokens import parse_call_args
+from django_upgrade.tokens import PHYSICAL_NEWLINE
 
 fixer = Fixer(
     __name__,
@@ -89,6 +90,13 @@ def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) 
             k = find_last_token(tokens, j, node=keyword)
             src_fragments.extend([t.src for t in tokens[j : k + 1]])
 
+            # Remove indentation for any non-first keyword
+            if (
+                deletions
+                and tokens[kw_start - 1].name == UNIMPORTANT_WS
+                and tokens[kw_start - 2].name == PHYSICAL_NEWLINE
+            ):
+                kw_start -= 1
             kw_end = consume(tokens, k, name=OP, src=",")
             kw_end = consume(tokens, kw_end, name=UNIMPORTANT_WS)
             deletions.append((kw_start, kw_end))

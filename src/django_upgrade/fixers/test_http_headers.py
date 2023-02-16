@@ -22,6 +22,9 @@ from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import CODE
 from django_upgrade.tokens import consume
 from django_upgrade.tokens import find
+from django_upgrade.tokens import find_first_token
+from django_upgrade.tokens import find_last_token
+from django_upgrade.tokens import insert
 from django_upgrade.tokens import NAME
 from django_upgrade.tokens import OP
 from django_upgrade.tokens import parse_call_args
@@ -53,16 +56,54 @@ def visit_Call(
         for keyword in node.keywords:
             if keyword.arg is None:  # ** unpacking
                 return
-            elif keyword.arg == "headers" and not isinstance(keyword.value, ast.Dict):
+            elif (
+                keyword.arg == "headers"
+            ):  # and not isinstance(keyword.value, ast.Dict):
                 return
             elif keyword.arg.startswith(HTTP_PREFIX):
                 has_http_kwarg = True
 
         if has_http_kwarg:
             yield ast_start_offset(node), partial(
-                merge_http_headers_kwargs,
+                combine_http_headers_kwargs,
                 node=node,
             )
+
+
+def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) -> None:
+    j = i
+    src_fragments = ["headers={"]
+    deletions: list[tuple[int, int]] = []
+    all_kwargs_http = True
+    for keyword in node.keywords:
+        assert keyword.arg is not None
+        if keyword.arg.startswith(HTTP_PREFIX):
+            if deletions:
+                src_fragments.append(", ")
+
+            header_name = transform_header_arg(keyword.arg)
+            src_fragments.append(f'"{header_name}": ')
+
+            kw_start = find_first_token(tokens, j, node=keyword)
+            j = find(tokens, kw_start, name=OP, src="=") + 1
+            k = find_last_token(tokens, j, node=keyword)
+            src_fragments.extend([t.src for t in tokens[j : k + 1]])
+
+            kw_end = consume(tokens, k, name=OP, src=",")
+            kw_end = consume(tokens, kw_end, name=UNIMPORTANT_WS)
+            deletions.append((kw_start, kw_end))
+        elif keyword.arg == "headers":
+            # TODO
+            return
+        else:
+            all_kwargs_http = False
+    src_fragments.append("}")
+    if not all_kwargs_http:
+        src_fragments.append(", ")
+
+    for start, end in reversed(deletions):
+        del tokens[start : end + 1]
+    insert(tokens, start, new_src="".join(src_fragments))
 
 
 def merge_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) -> None:

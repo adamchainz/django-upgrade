@@ -283,6 +283,19 @@ def test_client_call_extra_arg():
     )
 
 
+def test_client_call_extra_arg_in_between():
+    check_transformed(
+        """\
+        self.client.get("/", HTTP_A="1", SCRIPT_NAME="/app/", HTTP_B="2")
+        """,
+        """\
+        self.client.get("/", headers={"a": "1", "b": "2"}, SCRIPT_NAME="/app/", )
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
 def test_client_call_multiline():
     check_transformed(
         """

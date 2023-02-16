@@ -113,8 +113,8 @@ def test_instantiation_multiline():
         """\
         from django.test import Client
         Client(
-            headers={"host": "example.com"
-        })
+            headers={"host": "example.com"}
+        )
         """,
         settings,
         filename="tests.py",

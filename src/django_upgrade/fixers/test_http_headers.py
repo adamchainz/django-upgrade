@@ -14,11 +14,11 @@ from tokenize_rt import Token
 from tokenize_rt import UNIMPORTANT_WS
 
 from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import looks_like_test_client_call
 from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
-from django_upgrade.fixers.assert_form_error import looks_like_client_call
 from django_upgrade.tokens import CODE
 from django_upgrade.tokens import consume
 from django_upgrade.tokens import find
@@ -47,7 +47,7 @@ def visit_Call(
             and node.func.id in ("Client", "RequestFactory")
             and node.func.id in state.from_imports["django.test"]
         )
-        or (looks_like_client_call(node, "client") and node.args)
+        or looks_like_test_client_call(node, "client")
     ):
         has_http_kwarg = False
         for keyword in node.keywords:

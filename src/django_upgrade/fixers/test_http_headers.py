@@ -74,7 +74,7 @@ def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) 
     j = i
     src_fragments = ["headers={"]
     deletions: list[tuple[int, int]] = []
-    all_kwargs_http = True
+    kwargs_after_first_http_kwarg = False
     for keyword in node.keywords:
         assert keyword.arg is not None
         if keyword.arg.startswith(HTTP_PREFIX):
@@ -95,10 +95,10 @@ def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) 
         elif keyword.arg == "headers":
             # TODO
             return
-        else:
-            all_kwargs_http = False
+        elif deletions:
+            kwargs_after_first_http_kwarg = True
     src_fragments.append("}")
-    if not all_kwargs_http:
+    if kwargs_after_first_http_kwarg:
         src_fragments.append(", ")
 
     for start, end in reversed(deletions):

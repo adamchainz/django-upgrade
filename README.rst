@@ -829,6 +829,29 @@ Django 4.2
 
 `Release Notes <https://docs.djangoproject.com/en/4.2/releases/4.2/>`__
 
+``STORAGES`` setting
+~~~~~~~~~~~~~~~~~~~~
+
+Combines deprecated settings ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` into the new ``STORAGES`` setting, within settings files.
+Only applies if all old settings are defined as strings, at module level, and a ``STORAGES`` setting hasn’t been defined.
+
+Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+.. code-block:: diff
+
+    -DEFAULT_FILE_STORAGE = "example.storages.ExtendedFileSystemStorage"
+    -STATICFILES_STORAGE = "example.storages.ExtendedS3Storage"
+    +STORAGES = {
+    +    "default": {
+    +        "BACKEND": "example.storages.ExtendedFileSystemStorage",
+    +    },
+    +    "staticfiles": {
+    +        "BACKEND": "example.storages.ExtendedS3Storage",
+    +    },
+    +}
+
+
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

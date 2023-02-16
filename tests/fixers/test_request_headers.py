@@ -73,6 +73,36 @@ def test_subscript_simple():
     )
 
 
+def test_subscript_assigned():
+    check_transformed(
+        """\
+        server = request.META['HTTP_SERVER']
+        """,
+        """\
+        server = request.headers['server']
+        """,
+        settings,
+    )
+
+
+def test_subscript_assigned_multiple():
+    check_transformed(
+        """\
+        server, powered_by = (
+            request.META['HTTP_SERVER'],
+            request.META['HTTP_X_POWERED_BY'],
+        )
+        """,
+        """\
+        server, powered_by = (
+            request.headers['server'],
+            request.headers['x-powered-by'],
+        )
+        """,
+        settings,
+    )
+
+
 def test_subscript_simple_double_quotes():
     check_transformed(
         """\

@@ -10,6 +10,8 @@ Changelog
 
   Thanks to Bruno Alla in `PR #313 <https://github.com/adamchainz/django-upgrade/pull/313>`__.
 
+* Rewrite ``request.META`` -> ``request.headers`` on the *right hand side* of assignments.
+
 * Group some compatibility import replacements into a single “fixer”, optimizing runtime by about 3%.
 
   Thanks to Thibaut Decombe in `PR #295 <https://github.com/adamchainz/django-upgrade/pull/295>`__.

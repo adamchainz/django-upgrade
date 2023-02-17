@@ -860,6 +860,8 @@ Transforms HTTP headers from the old WSGI kwarg format to use the new ``headers`
 * ``Client`` instantiation
 * ``RequestFactory`` instantiation
 
+Requires Python 3.9+ due to changes in ``ast.keyword``.
+
 .. code-block:: diff
 
     -response = self.client.get("/", HTTP_ACCEPT="text/plain")

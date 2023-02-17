@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/4.2/releases/4.2/#tests
 from __future__ import annotations
 
 import ast
+import sys
 from bisect import bisect
 from functools import partial
 from typing import cast
@@ -37,39 +38,41 @@ fixer = Fixer(
 HEADERS_KWARG = "headers"
 HTTP_PREFIX = "HTTP_"
 
+# Requires lineno/utf8_byte_offset on ast.keyword, added in Python 3.9
+if sys.version_info >= (3, 9):
 
-@fixer.register(ast.Call)
-def visit_Call(
-    state: State,
-    node: ast.Call,
-    parents: list[ast.AST],
-) -> Iterable[tuple[Offset, TokenFunc]]:
-    if state.looks_like_test_file and (
-        (
-            isinstance(node.func, ast.Name)
-            and node.func.id in ("Client", "RequestFactory")
-            and node.func.id in state.from_imports["django.test"]
-        )
-        or looks_like_test_client_call(node, "client")
-    ):
-        has_http_kwarg = False
-        headers_keyword = None
-        for keyword in node.keywords:
-            if keyword.arg is None:  # ** unpacking
-                return
-            elif keyword.arg == "headers":
-                if not isinstance(keyword.value, ast.Dict):
-                    return
-                headers_keyword = keyword
-            elif keyword.arg.startswith(HTTP_PREFIX):
-                has_http_kwarg = True
-
-        if has_http_kwarg:
-            yield ast_start_offset(node), partial(
-                combine_http_headers_kwargs,
-                node=node,
-                headers_keyword=headers_keyword,
+    @fixer.register(ast.Call)
+    def visit_Call(
+        state: State,
+        node: ast.Call,
+        parents: list[ast.AST],
+    ) -> Iterable[tuple[Offset, TokenFunc]]:
+        if state.looks_like_test_file and (
+            (
+                isinstance(node.func, ast.Name)
+                and node.func.id in ("Client", "RequestFactory")
+                and node.func.id in state.from_imports["django.test"]
             )
+            or looks_like_test_client_call(node, "client")
+        ):
+            has_http_kwarg = False
+            headers_keyword = None
+            for keyword in node.keywords:
+                if keyword.arg is None:  # ** unpacking
+                    return
+                elif keyword.arg == "headers":
+                    if not isinstance(keyword.value, ast.Dict):
+                        return
+                    headers_keyword = keyword
+                elif keyword.arg.startswith(HTTP_PREFIX):
+                    has_http_kwarg = True
+
+            if has_http_kwarg:
+                yield ast_start_offset(node), partial(
+                    combine_http_headers_kwargs,
+                    node=node,
+                    headers_keyword=headers_keyword,
+                )
 
 
 class Insert:

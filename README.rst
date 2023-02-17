@@ -851,6 +851,29 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
     +    },
     +}
 
+Test client HTTP headers
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Transforms HTTP headers from the old WSGI kwarg format to use the new ``headers`` dictionary, for:
+
+* ``Client`` method like ``self.client.get()``
+* ``Client`` instantiation
+* ``RequestFactory`` instantiation
+
+Requires Python 3.9+ due to changes in ``ast.keyword``.
+
+.. code-block:: diff
+
+    -response = self.client.get("/", HTTP_ACCEPT="text/plain")
+    +response = self.client.get("/", headers={"accept": "text/plain"})
+
+     from django.test import Client
+    -Client(HTTP_ACCEPT_LANGUAGE="fr-fr")
+    +Client(headers={"accept-language": "fr-fr"})
+
+     from django.test import RequestFactory
+    -RequestFactory(HTTP_USER_AGENT="curl")
+    +RequestFactory(headers={"user-agent": "curl"})
 
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

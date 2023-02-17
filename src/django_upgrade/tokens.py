@@ -352,7 +352,7 @@ def erase_node(tokens: list[Token], i: int, *, node: ast.AST) -> None:
 
 def find_and_replace_name(tokens: list[Token], i: int, *, name: str, new: str) -> None:
     j = find(tokens, i, name=NAME, src=name)
-    tokens[j] = tokens[j]._replace(name="CODE", src=new)
+    tokens[j] = tokens[j]._replace(name=CODE, src=new)
 
 
 def replace_argument_names(

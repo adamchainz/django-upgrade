@@ -10,7 +10,6 @@ import ast
 from functools import partial
 from typing import Any
 from typing import Iterable
-from typing import Literal
 
 from tokenize_rt import Offset
 from tokenize_rt import Token
@@ -18,6 +17,7 @@ from tokenize_rt import tokens_to_src
 from tokenize_rt import UNIMPORTANT_WS
 
 from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import looks_like_test_client_call
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
@@ -117,21 +117,6 @@ def arguments_match(node: ast.Call, func_name: str) -> bool:
         )
 
 
-CLIENT_REQUEST_METHODS = frozenset(
-    (
-        "request",
-        "get",
-        "post",
-        "head",
-        "options",
-        "put",
-        "patch",
-        "delete",
-        "trace",
-    )
-)
-
-
 class ResponseAssignmentVisitor(ast.NodeVisitor):
     __slots__ = ("funcdef", "name", "before", "stop_search", "looks_like_response")
 
@@ -180,30 +165,16 @@ class ResponseAssignmentVisitor(ast.NodeVisitor):
             and isinstance(node.targets[0], ast.Name)
             and node.targets[0].id == self.name
             and (
-                looks_like_client_call(node.value, "client")
+                looks_like_test_client_call(node.value, "client")
                 or (
                     isinstance(node.value, ast.Await)
-                    and looks_like_client_call(node.value.value, "async_client")
+                    and looks_like_test_client_call(node.value.value, "async_client")
                 )
             )
         ):
             self.stop_search = True
             self.looks_like_response = True
         return None
-
-
-def looks_like_client_call(
-    node: ast.AST, client_name: Literal["async_client", "client"]
-) -> bool:
-    return (
-        isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr in CLIENT_REQUEST_METHODS
-        and isinstance(node.func.value, ast.Attribute)
-        and node.func.value.attr == client_name
-        and isinstance(node.func.value.value, ast.Name)
-        and node.func.value.value.id == "self"
-    )
 
 
 def is_response_from_client(

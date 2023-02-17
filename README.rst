@@ -87,7 +87,7 @@ Run django-upgrade before formatters like `Black <https://black.readthedocs.io/e
 
 ``django-upgrade`` does not have any ability to recurse through directories.
 Use the pre-commit integration, globbing, or another technique for applying to many files.
-Some fixers depend on the names of containing directories to activate, so ensure you run djagno-upgrade with paths relative to the root of your project.
+Some fixers depend on the names of containing directories to activate, so ensure you run django-upgrade with paths relative to the root of your project.
 For example, |with git ls-files pipe xargs|_:
 
 .. |with git ls-files pipe xargs| replace:: with ``git ls-files | xargs``

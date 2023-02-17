@@ -210,6 +210,7 @@ def test_instantiation_existing_comment():
         """\
         from django.test import Client
         Client(
+
             headers={
                 # todo: add headers
             "a": "1"}

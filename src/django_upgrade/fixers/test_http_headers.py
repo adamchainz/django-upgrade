@@ -56,11 +56,14 @@ def visit_Call(
         or looks_like_test_client_call(node, "client")
     ):
         has_http_kwarg = False
+        headers_keyword = None
         for keyword in node.keywords:
             if keyword.arg is None:  # ** unpacking
                 return
-            elif keyword.arg == "headers" and not isinstance(keyword.value, ast.Dict):
-                return
+            elif keyword.arg == "headers":
+                if not isinstance(keyword.value, ast.Dict):
+                    return
+                headers_keyword = keyword
             elif keyword.arg.startswith(HTTP_PREFIX):
                 has_http_kwarg = True
 
@@ -68,6 +71,7 @@ def visit_Call(
             yield ast_start_offset(node), partial(
                 combine_http_headers_kwargs,
                 node=node,
+                headers_keyword=headers_keyword,
             )
 
 
@@ -81,13 +85,22 @@ class Delete:
         self.end = end
 
 
-def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) -> None:
+def combine_http_headers_kwargs(
+    tokens: list[Token], i: int, *, node: ast.Call, headers_keyword: ast.keyword | None
+) -> None:
+    if headers_keyword is not None:
+        existing_headers_idx = find_last_token(tokens, i, node=headers_keyword)
+        existing_headers_needs_comma = (
+            len(cast(ast.Dict, headers_keyword.value).keys) > 0
+        )
+    else:
+        existing_headers_idx = 0
+        existing_headers_needs_comma = False
+
     j = i
     src_fragments = []
     operations: list[tuple[int, Insert | Delete]] = []
     kwargs_after_first_http_kwarg = False
-    existing_headers_idx = None
-    existing_headers_needs_comma = True
 
     for keyword in node.keywords:
         assert keyword.arg is not None
@@ -103,9 +116,9 @@ def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) 
             k = find_last_token(tokens, j, node=keyword)
             src_fragments.extend([t.src for t in tokens[j : k + 1]])
 
-            # Remove indentation for any non-first keyword
+            # Remove indentation
             if (
-                operations
+                (headers_keyword is not None or operations)
                 and tokens[kw_start - 1].name == UNIMPORTANT_WS
                 and tokens[kw_start - 2].name == PHYSICAL_NEWLINE
             ):
@@ -113,14 +126,18 @@ def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) 
             kw_end = consume(tokens, k, name=OP, src=",")
             kw_end = consume(tokens, kw_end, name=UNIMPORTANT_WS)
             operations.append((kw_start, Delete(kw_end)))
-        elif keyword.arg == "headers":
-            j = find_last_token(tokens, j, node=keyword)
-            existing_headers_idx = j
-            existing_headers_needs_comma = len(cast(ast.Dict, keyword.value).keys) > 0
         elif operations:
             kwargs_after_first_http_kwarg = True
 
-    if existing_headers_idx is None:
+    if headers_keyword is not None:
+        if existing_headers_needs_comma:
+            src_fragments.insert(0, ", ")
+        insert_op = (
+            existing_headers_idx,
+            Insert("".join(src_fragments)),
+        )
+        operations.insert(bisect(operations, insert_op), insert_op)
+    else:
         src_fragments.insert(0, "headers={")
         src_fragments.append("}")
         if kwargs_after_first_http_kwarg:
@@ -132,14 +149,6 @@ def combine_http_headers_kwargs(tokens: list[Token], i: int, *, node: ast.Call) 
                 Insert("".join(src_fragments)),
             ),
         )
-    else:
-        if existing_headers_needs_comma:
-            src_fragments.insert(0, ", ")
-        insert_op = (
-            existing_headers_idx,
-            Insert("".join(src_fragments)),
-        )
-        operations.insert(bisect(operations, insert_op), insert_op)
 
     for pos, operation in reversed(operations):
         if isinstance(operation, Insert):

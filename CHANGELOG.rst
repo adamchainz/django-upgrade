@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.13.0 (2023-02-17)
+-------------------
+
 * Add Django 4.2+ fixer to combine deprecated ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings into the new ``STORAGES`` setting.
 
 * Add Django 4.2+ fixer to rewrite HTTP headers passed to test ``Client`` and ``RequestFactory``.

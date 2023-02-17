@@ -851,6 +851,20 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
     +    },
     +}
 
+If the module has a ``from ... import *`` with a module path mentioning “settings”, django-upgrade makes an educated guess that a base ``STORAGES`` setting is imported from there.
+It then uses ``**`` to extend that with any values in the current module:
+
+.. code-block:: diff
+
+     from example.settings.base import *
+    -DEFAULT_FILE_STORAGE = "example.storages.S3Storage"
+    +STORAGES = {
+    +    **STORAGES,
+    +    "default": {
+    +        "BACKEND": "example.storages.S3Storage",
+    +    },
+    +}
+
 Test client HTTP headers
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

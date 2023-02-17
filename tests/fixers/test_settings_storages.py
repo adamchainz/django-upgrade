@@ -171,3 +171,62 @@ def test_retains_quoting():
         settings,
         filename="settings.py",
     )
+
+
+def test_star_import_not_settings():
+    check_transformed(
+        """\
+        from example import *
+        DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        from example import *
+        STORAGES = {
+            "default": {
+                "BACKEND": "example.backend",
+            },
+        }
+        """,
+        settings,
+        filename="settings.py",
+    )
+
+
+def test_star_import_base_settings():
+    check_transformed(
+        """\
+        from base_settings import *
+        DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        from base_settings import *
+        STORAGES = {
+            **STORAGES,
+            "default": {
+                "BACKEND": "example.backend",
+            },
+        }
+        """,
+        settings,
+        filename="settings.py",
+    )
+
+
+def test_star_import_extended_module_path():
+    check_transformed(
+        """\
+        from example.settings.base import *
+        DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        from example.settings.base import *
+        STORAGES = {
+            **STORAGES,
+            "default": {
+                "BACKEND": "example.backend",
+            },
+        }
+        """,
+        settings,
+        filename="settings.py",
+    )

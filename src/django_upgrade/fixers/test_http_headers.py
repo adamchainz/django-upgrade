@@ -150,7 +150,8 @@ def combine_http_headers_kwargs(
     for pos, operation in reversed(operations):
         if isinstance(operation, Insert):
             insert(tokens, pos, new_src=operation.src)
-        elif isinstance(operation, Delete):
+        else:
+            assert isinstance(operation, Delete)
             del tokens[pos : operation.end + 1]
 
 

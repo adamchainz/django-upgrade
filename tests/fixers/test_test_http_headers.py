@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import sys
+
+import pytest
+
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop
 from tests.fixers.tools import check_transformed
+
+if sys.version_info < (3, 9):
+    pytest.skip("Python 3.9+", allow_module_level=True)
 
 settings = Settings(target_version=(4, 2))
 

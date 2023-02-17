@@ -36,16 +36,40 @@ NAME_MAP = {
 
 
 class SettingsDetails:
-    __slots__ = ("all_rewritable", "nodes", "value_tokens", "rewritten")
+    __slots__ = (
+        "all_rewritable",
+        "nodes",
+        "value_tokens",
+        "rewritten",
+        "settings_star_import",
+    )
 
     def __init__(self) -> None:
         self.all_rewritable = True
         self.nodes: dict[str, ast.Assign] = {}
         self.value_tokens: dict[str, Token] = {}
         self.rewritten: dict[str, bool] = {}
+        self.settings_star_import = False
 
 
 settings_details: MutableMapping[State, SettingsDetails] = WeakKeyDictionary()
+
+
+@fixer.register(ast.ImportFrom)
+def visit_ImportFrom(
+    state: State,
+    node: ast.ImportFrom,
+    parents: list[ast.AST],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        node.names[0].name == "*"
+        and node.module is not None
+        and "settings" in node.module
+    ):
+        details = settings_details.setdefault(state, SettingsDetails())
+        details.settings_star_import = True
+
+    return ()
 
 
 @fixer.register(ast.Assign)
@@ -100,6 +124,9 @@ def replace_storages(
     if len(details.rewritten) == len(details.nodes):
         # We just deleted the first in the file, insert the new setting
         src_fragments = ["STORAGES = {"]
+        if details.settings_star_import:
+            src_fragments.append("    **STORAGES,")
+
         for name in NAME_MAP:
             if name in details.value_tokens:
                 new_name = NAME_MAP[name]

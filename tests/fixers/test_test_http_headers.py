@@ -363,6 +363,27 @@ def test_client_call_multiline():
     )
 
 
+def test_client_call_multiline_comment():
+    check_transformed(
+        """
+        response = self.client.get(
+            "/",
+            {"q": "abc"},
+            HTTP_HOST="example.com",  # set host
+        )
+        """,
+        """
+        response = self.client.get(
+            "/",
+            {"q": "abc"},
+            headers={"host": "example.com"}  # set host
+        )
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
 def test_client_call_multiline_multiple():
     check_transformed(
         """

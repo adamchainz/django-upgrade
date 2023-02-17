@@ -22,6 +22,7 @@ from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import COMMENT
 from django_upgrade.tokens import consume
 from django_upgrade.tokens import find
 from django_upgrade.tokens import find_first_token
@@ -124,7 +125,11 @@ def combine_http_headers_kwargs(
             ):
                 kw_start -= 1
             kw_end = consume(tokens, k, name=OP, src=",")
-            kw_end = consume(tokens, kw_end, name=UNIMPORTANT_WS)
+            if (
+                tokens[kw_end + 1].name == UNIMPORTANT_WS
+                and tokens[kw_end + 2].name != COMMENT
+            ):
+                kw_end += 1
             if headers_keyword is not None or operations:
                 kw_end = consume(tokens, kw_end, name=PHYSICAL_NEWLINE)
             operations.append((kw_start, Delete(kw_end)))

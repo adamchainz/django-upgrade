@@ -16,11 +16,22 @@ def test_non_test_file():
     )
 
 
-def test_custom_client_class_instantiation():
+def test_instantiation_custom_client_class():
     check_noop(
         """
         from example.test import Client
         Client(HTTP_HOST="example.com")
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_unpacked_kwargs():
+    check_noop(
+        """
+        from example.test import Client
+        Client(**maybe_has_headers, HTTP_HOST="example.com")
         """,
         settings,
         filename="tests.py",
@@ -181,6 +192,21 @@ def test_instantiation_multiple_after_existing():
     )
 
 
+def test_instantiation_unpacked_args():
+    check_transformed(
+        """\
+        from django.test import Client
+        Client(*args, HTTP_HOST="example.com")
+        """,
+        """\
+        from django.test import Client
+        Client(*args, headers={"host": "example.com"})
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
 def test_instantiation_existing_empty():
     check_transformed(
         """\
@@ -278,6 +304,19 @@ def test_client_call_extra_arg():
         """,
         """\
         self.client.get("/", headers={"host": "example.com"}, SCRIPT_NAME="/app/")
+        """,
+        settings,
+        filename="tests.py",
+    )
+
+
+def test_client_call_unpacked_args():
+    check_transformed(
+        """\
+        self.client.get(*args, HTTP_HOST="example.com")
+        """,
+        """\
+        self.client.get(*args, headers={"host": "example.com"})
         """,
         settings,
         filename="tests.py",

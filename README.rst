@@ -770,6 +770,7 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 Renames the undocumented ``django.contrib.admin.utils.lookup_needs_distinct`` to ``lookup_spawns_duplicates``:
 
 .. code-block:: diff
+
     -from django.contrib.admin.utils import lookup_needs_distinct
     +from django.contrib.admin.utils import lookup_spawns_duplicates
 

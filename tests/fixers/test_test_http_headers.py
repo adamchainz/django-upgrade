@@ -236,7 +236,6 @@ def test_instantiation_existing_comment():
         """\
         from django.test import Client
         Client(
-
             headers={
                 # todo: add headers
             "a": "1"}
@@ -372,7 +371,6 @@ def test_client_call_multiline_multiple():
             "/",
             {"q": "abc"},
             headers={"host": "example.com", "accept": "text/html"}
-
         )
         """,
         settings,

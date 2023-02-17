@@ -122,6 +122,8 @@ def combine_http_headers_kwargs(
                 kw_start -= 1
             kw_end = consume(tokens, k, name=OP, src=",")
             kw_end = consume(tokens, kw_end, name=UNIMPORTANT_WS)
+            if headers_keyword is not None or operations:
+                kw_end = consume(tokens, kw_end, name=PHYSICAL_NEWLINE)
             operations.append((kw_start, Delete(kw_end)))
         elif operations:
             kwargs_after_first_http_kwarg = True

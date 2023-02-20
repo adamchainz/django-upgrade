@@ -68,7 +68,7 @@ def test_client_call_non_http_kwarg():
 def test_client_call_unpacked_kwargs():
     check_noop(
         """
-        self.client.get("/", HTTP_ACCEPT="text/html", **maybe_has_headers),
+        self.client.get("/", HTTP_ACCEPT="text/plain", **maybe_has_headers)
         """,
         settings,
         filename="tests.py",
@@ -293,10 +293,10 @@ def test_client_call():
 def test_client_call_multiple():
     check_transformed(
         """\
-        self.client.get("/", HTTP_HOST="example.com", HTTP_ACCEPT="text/html")
+        self.client.get("/", HTTP_HOST="example.com", HTTP_ACCEPT="text/plain")
         """,
         """\
-        self.client.get("/", headers={"host": "example.com", "accept": "text/html"})
+        self.client.get("/", headers={"host": "example.com", "accept": "text/plain"})
         """,
         settings,
         filename="tests.py",
@@ -391,14 +391,14 @@ def test_client_call_multiline_multiple():
             "/",
             {"q": "abc"},
             HTTP_HOST="example.com",
-            HTTP_ACCEPT="text/html",
+            HTTP_ACCEPT="text/plain",
         )
         """,
         """
         response = self.client.get(
             "/",
             {"q": "abc"},
-            headers={"host": "example.com", "accept": "text/html"}
+            headers={"host": "example.com", "accept": "text/plain"}
         )
         """,
         settings,

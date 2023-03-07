@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
+from pathlib import Path
 
 import pytest
 
+from django_upgrade.data import FIXERS
 from django_upgrade.data import Settings
 from django_upgrade.data import State
 
@@ -249,3 +252,21 @@ def test_looks_like_test_file_true(filename: str) -> None:
 )
 def test_looks_like_test_file_false(filename: str) -> None:
     assert not make_state(filename).looks_like_test_file
+
+
+def test_all_fixers_are_documented() -> None:
+    readme = (Path(__name__).parent.parent / "README.rst").read_text()
+    docs = set()
+    for line in readme.splitlines():
+        match = re.match(r"Name: ``(.+)``", line)
+        if not match:
+            continue
+        docs.add(match[1])
+
+    fixers = {fixer.name for fixer in FIXERS}
+
+    invalid = docs - fixers
+    assert not invalid
+
+    undocumented = fixers - docs
+    assert not undocumented

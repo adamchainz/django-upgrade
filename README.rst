@@ -133,6 +133,8 @@ The below fixers run regardless of the target version.
 Versioned blocks
 ~~~~~~~~~~~~~~~~
 
+Name: ``versioned_branches``
+
 Removes outdated comparisons and blocks from ``if`` statements comparing to ``django.VERSION``.
 Supports comparisons of the form:
 
@@ -165,6 +167,8 @@ Django 1.7
 
 Admin model registration
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``admin_register``
 
 Rewrites ``admin.site.register()`` calls to the new |@admin.register|_ decorator syntax when eligible.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
@@ -241,6 +245,8 @@ Django 1.9
 ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``on_delete``
+
 Add ``on_delete=models.CASCADE`` to ``ForeignKey`` and ``OneToOneField``:
 
 .. code-block:: diff
@@ -266,6 +272,8 @@ This fixer also support from-imports:
 ``DATABASES``
 ~~~~~~~~~~~~~
 
+Name: ``settings_database_postgresql``
+
 Update the ``DATABASES`` setting backend path ``django.db.backends.postgresql_psycopg2`` to use the renamed version ``django.db.backends.postgresql``.
 
 Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
@@ -288,6 +296,8 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``compatibility_imports``
+
 Rewrites some compatibility imports:
 
 * ``django.forms.utils.pretty_name`` in ``django.forms.forms``
@@ -308,6 +318,8 @@ Django 1.10
 
 ``request.user`` boolean attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``request_user_attributes``
 
 Rewrites calls to ``request.user.is_authenticated()`` and ``request.user.is_anonymous()`` to remove the parentheses, per `the deprecation <https://docs.djangoproject.com/en/1.10/releases/1.10/#using-user-is-authenticated-and-user-is-anonymous-as-methods>`__.
 
@@ -349,6 +361,8 @@ Django 1.11
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``compatibility_imports``
+
 Rewrites some compatibility imports:
 
 * ``django.core.exceptions.EmptyResultSet`` in ``django.db.models.query``, ``django.db.models.sql``, and ``django.db.models.sql.datastructures``
@@ -371,6 +385,8 @@ Django 2.0
 
 URL’s
 ~~~~~
+
+Name: ``django_urls``
 
 Rewrites imports of ``include()`` and ``url()`` from ``django.conf.urls`` to ``django.urls``.
 ``url()`` calls using compatible regexes are rewritten to the |new path() syntax|_, otherwise they are converted to call ``re_path()``.
@@ -428,6 +444,8 @@ That pattern matches all Unicode word characters, such as “α”, unlike Djang
 ``lru_cache``
 ~~~~~~~~~~~~~
 
+Name: ``compatibility_imports``
+
 Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``functools``.
 
 .. code-block:: diff
@@ -447,6 +465,8 @@ Rewrites imports of ``ContextDecorator`` from ``django.utils.decorators`` to use
 
 ``<func>.allow_tags = True``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``admin_allow_tags``
 
 Removes assignments of ``allow_tags`` attributes to ``True``.
 This was an admin feature to allow display functions to return HTML without marking it as unsafe,  deprecated in Django 1.9.
@@ -473,6 +493,8 @@ Django 2.2
 ``HttpRequest.headers``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``request_headers``
+
 Rewrites use of ``request.META`` to read HTTP headers to instead use |request.headers|_.
 Header lookups are done in lowercase per `the HTTP/2 specification <https://httpwg.org/specs/rfc9113.html#HttpHeaders>`__.
 
@@ -496,6 +518,8 @@ Header lookups are done in lowercase per `the HTTP/2 specification <https://http
 ``QuerySetPaginator``
 ~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``queryset_paginator``
+
 Rewrites deprecated alias ``django.core.paginator.QuerySetPaginator`` to ``Paginator``.
 
 .. code-block:: diff
@@ -509,6 +533,8 @@ Rewrites deprecated alias ``django.core.paginator.QuerySetPaginator`` to ``Pagin
 
 ``FixedOffset``
 ~~~~~~~~~~~~~~~
+
+Name: ``timezone_fixedoffset``
 
 Rewrites deprecated class ``FixedOffset(x, y))`` to ``timezone(timedelta(minutes=x), y)``
 
@@ -524,6 +550,8 @@ Known limitation: this fixer will leave code broken with an ``ImportError`` if `
 ``FloatRangeField``
 ~~~~~~~~~~~~~~~~~~~
 
+Name: ``postgres_float_range_field``
+
 Rewrites model and form fields using ``FloatRangeField`` to ``DecimalRangeField``, from the relevant ``django.contrib.postgres`` modules.
 
 .. code-block:: diff
@@ -538,6 +566,8 @@ Rewrites model and form fields using ``FloatRangeField`` to ``DecimalRangeField`
 
 ``TestCase`` class database declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``testcase_databases``
 
 Rewrites the ``allow_database_queries`` and ``multi_db`` attributes of Django’s ``TestCase`` classes to the new ``databases`` attribute.
 This only applies in test files, which are heuristically detected as files with either “test” or “tests” somewhere in their path.
@@ -564,6 +594,8 @@ Django 3.0
 ``django.utils.encoding`` aliases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``utils_encoding``
+
 Rewrites ``smart_text()`` to ``smart_str()``, and ``force_text()`` to ``force_str()``.
 
 .. code-block:: diff
@@ -580,6 +612,8 @@ Rewrites ``smart_text()`` to ``smart_str()``, and ``force_text()`` to ``force_st
 ``django.utils.http`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``utils_http``:
+
 Rewrites the ``urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and ``urlunquote_plus()`` functions to the ``urllib.parse`` versions.
 Also rewrites the internal function ``is_safe_url()`` to ``url_has_allowed_host_and_scheme()``.
 
@@ -594,6 +628,8 @@ Also rewrites the internal function ``is_safe_url()`` to ``url_has_allowed_host_
 ``django.utils.text`` deprecation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``utils_text``
+
 Rewrites ``unescape_entities()`` with the standard library ``html.escape()``.
 
 .. code-block:: diff
@@ -606,6 +642,8 @@ Rewrites ``unescape_entities()`` with the standard library ``html.escape()``.
 
 ``django.utils.translation`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``utils_translation``
 
 Rewrites the ``ugettext()``, ``ugettext_lazy()``, ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` functions to their non-u-prefixed versions.
 
@@ -625,6 +663,8 @@ Django 3.1
 ``JSONField``
 ~~~~~~~~~~~~~
 
+Name: ``compatibility_imports``
+
 Rewrites imports of ``JSONField`` and related transform classes from those in ``django.contrib.postgres`` to the new all-database versions.
 Ignores usage in migration files, since Django kept the old class around to support old migrations.
 You will need to make migrations after this fix makes changes to models.
@@ -636,6 +676,8 @@ You will need to make migrations after this fix makes changes to models.
 
 ``PASSWORD_RESET_TIMEOUT_DAYS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``password_reset_timeout_days``
 
 Rewrites the setting ``PASSWORD_RESET_TIMEOUT_DAYS`` to ``PASSWORD_RESET_TIMEOUT``, adding the multiplication by the number of seconds in a day.
 
@@ -650,6 +692,8 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 ``Signal``
 ~~~~~~~~~~
 
+Name: ``signal_providing_args``
+
 Removes the deprecated documentation-only ``providing_args`` argument.
 
 .. code-block:: diff
@@ -661,6 +705,8 @@ Removes the deprecated documentation-only ``providing_args`` argument.
 ``get_random_string``
 ~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``crypto_get_random_string``
+
 Injects the now-required ``length`` argument, with its previous default ``12``.
 
 .. code-block:: diff
@@ -671,6 +717,8 @@ Injects the now-required ``length`` argument, with its previous default ``12``.
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~
+
+Name: ``null_boolean_field``
 
 Transforms the ``NullBooleanField()`` model field to ``BooleanField(null=True)``.
 Applied only in model files, not migration files, since Django kept the old class around to support old migrations.
@@ -688,6 +736,8 @@ You will need to make migrations after this fix makes changes to models.
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``forms_model_multiple_choice_field``
+
 Replace ``list`` error message key with ``list_invalid`` on forms ``ModelMultipleChoiceField``.
 
 .. code-block:: diff
@@ -702,6 +752,8 @@ Django 3.2
 
 ``@admin.action()``
 ~~~~~~~~~~~~~~~~~~~
+
+Name: ``admin_decorators``
 
 Rewrites functions that have admin action attributes assigned to them to use the new |@admin.action decorator|_.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
@@ -739,6 +791,8 @@ This only applies in files that use ``from django.contrib import admin`` or ``fr
 
 ``@admin.display()``
 ~~~~~~~~~~~~~~~~~~~~
+
+Name: ``admin_decorators``
 
 Rewrites functions that have admin display attributes assigned to them to use the new |@admin.display decorator|_.
 This only applies in files that use ``from django.contrib import admin`` or ``from django.contrib.gis import admin``.
@@ -779,6 +833,8 @@ This only applies in files that use ``from django.contrib import admin`` or ``fr
 ``BaseCommand.requires_system_checks``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``management_commands``
+
 Rewrites the ``requires_system_checks`` attributes of management command classes from bools to ``"__all__"`` or ``[]`` as appropriate.
 This only applies in command files, which are heuristically detected as files with ``management/commands`` somewhere in their path.
 
@@ -797,6 +853,8 @@ This only applies in command files, which are heuristically detected as files wi
 ``EmailValidator``
 ~~~~~~~~~~~~~~~~~~
 
+Name: ``email_validator``
+
 Rewrites the ``whitelist`` keyword argument to its new name ``allowlist``.
 
 .. code-block:: diff
@@ -808,6 +866,8 @@ Rewrites the ``whitelist`` keyword argument to its new name ``allowlist``.
 
 ``default_app_config``
 ~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``default_app_config``
 
 Removes module-level ``default_app_config`` assignments from ``__init__.py`` files:
 
@@ -823,6 +883,8 @@ Django 4.0
 ``USE_L10N``
 ~~~~~~~~~~~~
 
+Name: ``use_l10n``
+
 Removes the deprecated ``USE_L10N`` setting if set to its default value of ``True``.
 
 Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
@@ -834,6 +896,8 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
 ``lookup_needs_distinct``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``admin_lookup_needs_distinct``
 
 Renames the undocumented ``django.contrib.admin.utils.lookup_needs_distinct`` to ``lookup_spawns_duplicates``:
 
@@ -866,6 +930,8 @@ Django 4.1
 ``django.utils.timezone.utc`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``utils_timezone``
+
 Rewrites imports of ``django.utils.timezone.utc`` to use ``datetime.timezone.utc``.
 Requires an existing import of the ``datetime`` module.
 
@@ -888,6 +954,8 @@ Requires an existing import of the ``datetime`` module.
 
 ``assertFormError()`` and ``assertFormsetError()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``assert_form_error``
 
 Rewrites calls to these test case methods from the old signatures to the new ones.
 
@@ -912,6 +980,8 @@ Django 4.2
 
 ``STORAGES`` setting
 ~~~~~~~~~~~~~~~~~~~~
+
+Name: ``settings_storages``
 
 Combines deprecated settings ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` into the new ``STORAGES`` setting, within settings files.
 Only applies if all old settings are defined as strings, at module level, and a ``STORAGES`` setting hasn’t been defined.
@@ -949,6 +1019,8 @@ It then uses ``**`` to extend that with any values in the current module:
 Test client HTTP headers
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+Name: ``test_http_headers``
+
 Transforms HTTP headers from the old WSGI kwarg format to use the new ``headers`` dictionary, for:
 
 * ``Client`` method like ``self.client.get()``
@@ -972,6 +1044,8 @@ Requires Python 3.9+ due to changes in ``ast.keyword``.
 
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: ``assert_set_methods``
 
 Rewrites calls to these test case methods from the old names to the new ones with capitalized “Set”.
 

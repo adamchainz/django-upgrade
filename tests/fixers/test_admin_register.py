@@ -782,6 +782,24 @@ def test_custom_admin_doesnt_end_with_site():
     )
 
 
+def test_custom_admin_site_defined_after_admin():
+    check_noop(
+        """\
+        from myapp.admin import CustomModelAdmin
+        from django.contrib import admin
+
+        class MyModelAdmin(CustomModelAdmin):
+            pass
+
+        custom_site = admin.AdminSite(...)
+
+        custom_site.register(MyModel, MyModelAdmin)
+        """,
+        settings=settings,
+        filename="admin.py",
+    )
+
+
 def test_custom_admin_site():
     check_transformed(
         """\

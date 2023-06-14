@@ -61,12 +61,12 @@ def _is_passing_comparison(
         and len(test.comparators) == 1
         and isinstance((comparator := test.comparators[0]), ast.Tuple)
         and len(comparator.elts) == 2
-        and all(isinstance(e, ast.Num) for e in comparator.elts)
-        and all(isinstance(cast(ast.Num, e).n, int) for e in comparator.elts)
+        and all(isinstance(e, ast.Constant) for e in comparator.elts)
+        and all(isinstance(cast(ast.Constant, e).value, int) for e in comparator.elts)
     ):
         return None
 
-    min_version = tuple(cast(ast.Num, e).n for e in comparator.elts)
+    min_version = tuple(cast(ast.Constant, e).value for e in comparator.elts)
     if isinstance(test.ops[0], ast.Gt):
         if state.settings.target_version > min_version:
             return "first"

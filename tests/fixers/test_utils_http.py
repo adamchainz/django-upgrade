@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import sys
+
+import pytest
+
 from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop
 from tests.fixers.tools import check_transformed
@@ -45,6 +49,23 @@ def test_one_urllib_name():
         from urllib.parse import quote
 
         x = quote(y)
+        """,
+        settings,
+    )
+
+
+@pytest.mark.xfail(sys.version_info < (3, 12), reason="3.12+ feature")
+def test_one_f_string():
+    check_transformed(
+        """\
+        from django.utils.http import urlquote
+
+        f"{urlquote(y)}"
+        """,
+        """\
+        from urllib.parse import quote
+
+        f"{quote(y)}"
         """,
         settings,
     )

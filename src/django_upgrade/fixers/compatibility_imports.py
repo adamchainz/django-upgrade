@@ -65,6 +65,11 @@ REPLACEMENTS_EXACT = {
             "JSONField": "django.forms",
         },
     },
+    (4, 0): {
+        "django.template.base": {
+            "TRANSLATOR_COMMENT_MARK": "django.utils.translation.template"
+        }
+    },
 }
 REPLACEMENTS_EXCEPT_MIGRATIONS = {
     (3, 1): {

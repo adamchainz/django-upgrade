@@ -4,6 +4,10 @@ Changelog
 
 * Support Django 5.0 as a target version. No fixers yet.
 
+* Add Django 5.0+ fixer to drop ``.choices`` on model field ``choices`` parameters when using an enumeration type.
+
+  Thanks to Thibaut Decombe in `PR #369 <https://github.com/adamchainz/django-upgrade/pull/369>`__.
+
 1.14.1 (2023-08-16)
 -------------------
 

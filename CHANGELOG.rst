@@ -8,6 +8,10 @@ Changelog
 
   Thanks to Thibaut Decombe in `PR #369 <https://github.com/adamchainz/django-upgrade/pull/369>`__.
 
+* Add some compatibility import replacements for Django 4.0 and below.
+
+  Thanks to Thibaut Decombe in `PR #368 <https://github.com/adamchainz/django-upgrade/pull/368>`__.
+
 1.14.1 (2023-08-16)
 -------------------
 

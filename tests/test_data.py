@@ -182,6 +182,47 @@ def test_looks_like_migrations_file_false(filename: str) -> None:
 @pytest.mark.parametrize(
     "filename",
     (
+        "my_app/models/blog.py",
+        "my_app\\models\\blog.py",
+        "my_app/models/blogging/blog.py",
+        "my_app\\models\\blogging\\blog.py",
+        "my_other_app/models.py",
+        "my_other_app\\models.py",
+        "my_app/models/__init__.py",
+    ),
+)
+def test_looks_like_models_file_true(filename: str) -> None:
+    state = State(
+        settings=settings,
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert state.looks_like_models_file
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "my_app/model.py",
+        "my_app/model/blog.py",
+        "my_app/model\\blog.py",
+        "my_app/test_models/test_foo.py",
+        "my_app/tests/test_models.py",
+        "my_app/migrations/0020_delete_old_models.py",
+    ),
+)
+def test_looks_like_models_file_false(filename: str) -> None:
+    state = State(
+        settings=settings,
+        filename=filename,
+        from_imports=defaultdict(set),
+    )
+    assert not state.looks_like_models_file
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
         "settings.py",
         "myapp/settings.py",
         "myapp\\settings.py",

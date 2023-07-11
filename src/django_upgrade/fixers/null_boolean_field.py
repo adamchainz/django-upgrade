@@ -36,7 +36,7 @@ def visit_ImportFrom(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        not state.looks_like_migrations_file
+        state.looks_like_models_file
         and is_rewritable_import_from(node)
         and node.module == "django.db.models"
     ):
@@ -53,7 +53,7 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if not state.looks_like_migrations_file and (
+    if state.looks_like_models_file and (
         (
             isinstance(node.func, ast.Name)
             and "NullBooleanField" in state.from_imports["django.db.models"]

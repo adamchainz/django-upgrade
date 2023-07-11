@@ -607,7 +607,7 @@ Injects the now-required ``length`` argument, with its previous default ``12``.
 ~~~~~~~~~~~~~~~~~~~~
 
 Transforms the ``NullBooleanField()`` model field to ``BooleanField(null=True)``.
-Ignores usage in migration files, since Django kept the old class around to support old migrations.
+Applied only in model files, not migration files, since Django kept the old class around to support old migrations.
 You will need to make migrations after this fix makes changes to models.
 
 .. code-block:: diff

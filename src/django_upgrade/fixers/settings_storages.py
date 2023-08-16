@@ -33,6 +33,11 @@ NAME_MAP = {
     "DEFAULT_FILE_STORAGE": "default",
     "STATICFILES_STORAGE": "staticfiles",
 }
+# Keep initial values from Django if one isn't defined
+INITIAL_VALUES = {
+    "default": "django.core.files.storage.FileSystemStorage",
+    "staticfiles": "django.contrib.staticfiles.storage.StaticFilesStorage",
+}
 
 
 class SettingsDetails:
@@ -138,5 +143,16 @@ def replace_storages(
                         "    },",
                     ]
                 )
+            elif not details.settings_star_import:
+                new_name = NAME_MAP[name]
+                initial_value = INITIAL_VALUES[new_name]
+                src_fragments.extend(
+                    [
+                        f'    "{new_name}": {{',
+                        f'        "BACKEND": "{initial_value}",',
+                        "    },",
+                    ]
+                )
+
         src_fragments.append("}\n")
         insert(tokens, i, new_src="\n".join(src_fragments))

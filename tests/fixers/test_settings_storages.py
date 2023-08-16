@@ -97,7 +97,7 @@ def test_setting_exists():
     )
 
 
-def test_one():
+def test_default_only():
     check_transformed(
         """\
         DEFAULT_FILE_STORAGE = "example.backend"
@@ -106,6 +106,29 @@ def test_one():
         STORAGES = {
             "default": {
                 "BACKEND": "example.backend",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
+        """,
+        settings,
+        filename="settings.py",
+    )
+
+
+def test_static_only():
+    check_transformed(
+        """\
+        STATICFILES_STORAGE = "example.other.backend"
+        """,
+        """\
+        STORAGES = {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "example.other.backend",
             },
         }
         """,
@@ -166,6 +189,9 @@ def test_retains_quoting():
             "default": {
                 "BACKEND": 'example.backend',
             },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
         }
         """,
         settings,
@@ -184,6 +210,9 @@ def test_star_import_not_settings():
         STORAGES = {
             "default": {
                 "BACKEND": "example.backend",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
             },
         }
         """,

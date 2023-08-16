@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.14.1 (2023-08-16)
+-------------------
+
 * Fix bug in ``STORAGES`` fixer when only one of ``DEFAULT_FILE_STORAGE`` or ``STATICFILES_STORAGE`` was defined.
 
   Thanks to Bruno Alla in `PR #376 <https://github.com/adamchainz/django-upgrade/pull/376>`__.

@@ -76,9 +76,9 @@ pytest==7.4.0 \
     # via
     #   -r requirements.in
     #   pytest-randomly
-pytest-randomly==3.13.0 \
-    --hash=sha256:079c78b94693189879fbd7304de4e147304f0811fa96249ea5619f2f1cd33df0 \
-    --hash=sha256:e78d898ef4066f89744e5075083aa7fb6f0de07ffd70ca9c4435cda590cf1eac
+pytest-randomly==3.15.0 \
+    --hash=sha256:0516f4344b29f4e9cdae8bce31c4aeebf59d0b9ef05927c33354ff3859eeeca6 \
+    --hash=sha256:b908529648667ba5e54723088edd6f82252f540cc340d748d1fa985539687047
     # via -r requirements.in
 tokenize-rt==5.2.0 \
     --hash=sha256:9fe80f8a5c1edad2d3ede0f37481cc0cc1538a2f442c9c2f9e4feacd2792d054 \

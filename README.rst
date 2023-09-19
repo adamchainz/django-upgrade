@@ -904,3 +904,10 @@ Rewrites calls to these test case methods from the old names to the new ones wit
 
     -self.assertQuerysetEqual(authors, ["Brad Dayley"], lambda a: a.name)
     +self.assertQuerySetEqual(authors, ["Brad Dayley"], lambda a: a.name)
+
+Django 5.0
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/5.0/releases/5.0/>`__
+
+No fixers yet.

@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Support Django 5.0 as a target version. No fixers yet.
+
 1.14.1 (2023-08-16)
 -------------------
 

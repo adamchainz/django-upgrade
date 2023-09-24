@@ -60,21 +60,6 @@ def test_transform_module_import():
     )
 
 
-def test_transform_gis_models_import():
-    check_transformed(
-        """\
-        from django.contrib.postgres.fields import ArrayField
-        field = ArrayField(choices=Card.choices)
-        """,
-        """\
-        from django.contrib.postgres.fields import ArrayField
-        field = ArrayField(choices=Card)
-        """,
-        settings,
-        filename="models/blog.py",
-    )
-
-
 def test_transform_with_kwarg_ending_comma():
     check_transformed(
         """\

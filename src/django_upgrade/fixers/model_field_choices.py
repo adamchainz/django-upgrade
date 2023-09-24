@@ -34,14 +34,10 @@ def visit_Call(
         and (
             (
                 isinstance(node.func, ast.Attribute)
-                and "models" in state.from_imports["django.db"]
                 and isinstance(node.func.value, ast.Name)
-                and node.func.value.id == "models"
+                and node.func.attr.endswith("Field")
             )
-            or (
-                isinstance(node.func, ast.Name)
-                and node.func.id in state.from_imports["django.db.models"]
-            )
+            or (isinstance(node.func, ast.Name) and node.func.id.endswith("Field"))
         )
         and any(
             kw.arg == "choices"

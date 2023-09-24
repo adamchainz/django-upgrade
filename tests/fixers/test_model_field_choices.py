@@ -14,6 +14,7 @@ def test_unmatched_import():
         CharField(choices=Card.choices)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -36,6 +37,7 @@ def test_untransformed_wrong_argument():
         CharField(default=Card.choices)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -50,6 +52,7 @@ def test_transform_full_import():
         CharField(choices=Card)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -64,6 +67,22 @@ def test_transform_module_import():
         field = models.BooleanField(choices=Card)
         """,
         settings,
+        filename="models/blog.py",
+    )
+
+
+def test_transform_gis_models_import():
+    check_transformed(
+        """\
+        from django.contrib.postgres.fields import ArrayField
+        field = ArrayField(choices=Card.choices)
+        """,
+        """\
+        from django.contrib.postgres.fields import ArrayField
+        field = ArrayField(choices=Card)
+        """,
+        settings,
+        filename="models/blog.py",
     )
 
 
@@ -78,6 +97,7 @@ def test_transform_with_kwarg_ending_comma():
         field = models.IntegerField(choices=Card,)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -96,6 +116,7 @@ def test_transform_with_kwargs_multiline():
         )
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -121,4 +142,35 @@ def test_transform_with_weird_syntax():
         )
         """,
         settings,
+        filename="models/blog.py",
+    )
+
+
+def test_transform_external_package():
+    check_transformed(
+        """\
+        from multiselectfield import MultiSelectField
+        field = MultiSelectField(choices=Card.choices)
+        """,
+        """\
+        from multiselectfield import MultiSelectField
+        field = MultiSelectField(choices=Card)
+        """,
+        settings,
+        filename="models/blog.py",
+    )
+
+
+def test_transform_other_app_package():
+    check_transformed(
+        """\
+        from my_app import custom_models
+        field = custom_models.MyField(choices=Card.choices)
+        """,
+        """\
+        from my_app import custom_models
+        field = custom_models.MyField(choices=Card)
+        """,
+        settings,
+        filename="models/blog.py",
     )

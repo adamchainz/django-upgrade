@@ -270,7 +270,8 @@ site_definitions: MutableMapping[
 ] = WeakKeyDictionary()
 
 
-def get_site_defined_line(module: ast.Module, site_name: str) -> int | None:
+def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
+    assert isinstance(module, ast.Module)
     lines = site_definitions.get(module, None)
     if lines is None:
         lines = {}
@@ -287,6 +288,7 @@ def get_site_defined_line(module: ast.Module, site_name: str) -> int | None:
             elif (
                 isinstance(node, ast.Assign)
                 and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)
                 and (name := node.targets[0].id) not in lines
             ):
                 lines[name] = node.lineno

@@ -36,11 +36,11 @@ fixer = Fixer(
 
 
 class AdminDetails:
-    __slots__ = ("parent", "node", "model_names_per_site")
+    __slots__ = ("parent", "lineno", "model_names_per_site")
 
-    def __init__(self, parent: ast.AST, node: ast.ClassDef) -> None:
+    def __init__(self, parent: ast.AST, lineno: int) -> None:
         self.parent = parent
-        self.node = node
+        self.lineno = lineno
         self.model_names_per_site: dict[str, set[str]] = {}
 
 
@@ -67,7 +67,7 @@ def visit_ClassDef(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if _is_django_admin_imported(state) and not uses_full_super_in_init_or_new(node):
         decorable_admins.setdefault(state, {})[node.name] = AdminDetails(
-            parents[-1], node
+            parents[-1], node.lineno
         )
         if not node.decorator_list:
             offset = ast_start_offset(node)
@@ -213,7 +213,7 @@ def visit_Call(
                             )
                         )
                         is not None
-                        and site_defined_line < admin_details.node.lineno
+                        and site_defined_line < admin_details.lineno
                     )
                 )
             ):

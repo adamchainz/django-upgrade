@@ -26,7 +26,7 @@ def test_untransformed_wrong_argument():
         CharField(default=Card.choices)
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -41,7 +41,7 @@ def test_transform_full_import():
         CharField(choices=Card)
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -56,7 +56,7 @@ def test_transform_module_import():
         field = models.BooleanField(choices=Card)
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -71,7 +71,7 @@ def test_transform_with_kwarg_ending_comma():
         field = models.IntegerField(choices=Card,)
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -90,7 +90,7 @@ def test_transform_with_kwargs_multiline():
         )
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -116,7 +116,7 @@ def test_transform_with_weird_syntax():
         )
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -131,7 +131,7 @@ def test_transform_external_package():
         field = MultiSelectField(choices=Card)
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )
 
 
@@ -150,5 +150,5 @@ def test_transform_other_app_package():
         field2 = CharField(choices=Card)
         """,
         settings,
-        filename="models/blog.py",
+        filename="models.py",
     )

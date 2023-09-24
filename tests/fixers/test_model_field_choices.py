@@ -7,17 +7,6 @@ from tests.fixers.tools import check_transformed
 settings = Settings(target_version=(5, 0))
 
 
-def test_unmatched_import():
-    check_noop(
-        """\
-        from example import CharField
-        CharField(choices=Card.choices)
-        """,
-        settings,
-        filename="models/blog.py",
-    )
-
-
 def test_untransformed_in_migration_file():
     # No `.choices` in migrations anyway, every option are listed automatically.
     check_noop(
@@ -165,11 +154,15 @@ def test_transform_other_app_package():
     check_transformed(
         """\
         from my_app import custom_models
+        from example import CustomCharField
         field = custom_models.MyField(choices=Card.choices)
+        field2 = CharField(choices=Card.choices)
         """,
         """\
         from my_app import custom_models
+        from example import CustomCharField
         field = custom_models.MyField(choices=Card)
+        field2 = CharField(choices=Card)
         """,
         settings,
         filename="models/blog.py",

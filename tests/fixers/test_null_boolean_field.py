@@ -14,6 +14,7 @@ def test_unmatched_import():
         NullBooleanField()
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -43,6 +44,7 @@ def test_transform_in_class():
             valuable = BooleanField("Valuable", null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -57,6 +59,7 @@ def test_transform():
         field = BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -71,6 +74,7 @@ def test_transform_import_exists():
         field = BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -85,6 +89,7 @@ def test_transform_import_exists_second():
         field = BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -99,6 +104,7 @@ def test_transform_module_import():
         field = models.BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -113,6 +119,7 @@ def test_transform_with_pos_arg():
         field = BooleanField("My Field", null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -127,6 +134,7 @@ def test_transform_with_kwarg():
         field = BooleanField(verbose_name="My Field", null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -141,6 +149,7 @@ def test_transform_with_kwarg_ending_comma():
         field = BooleanField(verbose_name="My Field", null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -155,6 +164,7 @@ def test_transform_with_kwargs():
         field = BooleanField(verbose_name="My Field", validators=[], null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -173,6 +183,7 @@ def test_transform_with_kwargs_multiline():
          null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -187,6 +198,7 @@ def test_transform_with_star_pos_arg():
         field = BooleanField(*names, null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -201,6 +213,7 @@ def test_transform_with_star_kwargs():
         field = BooleanField(**kwargs, null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -215,6 +228,7 @@ def test_transform_with_null_is_true_kwarg_relative_import():
         models.BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -229,6 +243,7 @@ def test_transform_with_null_is_true_kwarg_absolute_import_renamed():
         BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -243,6 +258,7 @@ def test_transform_with_null_is_true_kwarg_absolute_import_removed():
         BooleanField(null=True)
         """,
         settings,
+        filename="models/blog.py",
     )
 
 
@@ -257,4 +273,5 @@ def test_transform_with_null_is_function():
         BooleanField(null=f())
         """,
         settings,
+        filename="models/blog.py",
     )

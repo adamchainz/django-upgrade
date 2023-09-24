@@ -33,6 +33,7 @@ dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
 migrations_re = re.compile(r"(^|[\\/])migrations([\\/])")
 settings_re = re.compile(r"(\b|_)settings(\b|_)")
 test_re = re.compile(r"(\b|_)tests?(\b|_)")
+models_re = re.compile(r"(^|[\\/])models([\\/]|\.py)")
 
 
 class State:
@@ -71,6 +72,10 @@ class State:
     @cached_property
     def looks_like_test_file(self) -> bool:
         return test_re.search(self.filename) is not None
+
+    @cached_property
+    def looks_like_models_file(self) -> bool:
+        return models_re.search(self.filename) is not None
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)

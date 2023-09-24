@@ -60,6 +60,21 @@ def test_transform_module_import():
     )
 
 
+def test_transform_choices_module_reference():
+    check_transformed(
+        """\
+        from django.db import models
+        field = models.IntegerField(choices=enums.Card.choices)
+        """,
+        """\
+        from django.db import models
+        field = models.IntegerField(choices=enums.Card)
+        """,
+        settings,
+        filename="models.py",
+    )
+
+
 def test_transform_with_kwarg_ending_comma():
     check_transformed(
         """\

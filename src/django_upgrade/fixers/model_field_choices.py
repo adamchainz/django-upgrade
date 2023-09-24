@@ -16,6 +16,8 @@ from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import find_last_token
+from django_upgrade.tokens import OP
+from django_upgrade.tokens import reverse_find
 
 fixer = Fixer(
     __name__,
@@ -51,4 +53,5 @@ def visit_Call(
 
 def remove_choices(tokens: list[Token], i: int, node: ast.Attribute) -> None:
     j = find_last_token(tokens, i, node=node)
-    del tokens[i + 1 : j + 1]
+    i = reverse_find(tokens, j, name=OP, src=".")
+    del tokens[i : j + 1]

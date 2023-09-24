@@ -30,7 +30,7 @@ def visit_Call(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        not state.looks_like_migrations_file
+        state.looks_like_models_file
         and (
             (
                 isinstance(node.func, ast.Attribute)

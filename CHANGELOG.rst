@@ -12,6 +12,10 @@ Changelog
 
   Thanks to Thibaut Decombe in `PR #368 <https://github.com/adamchainz/django-upgrade/pull/368>`__.
 
+* Fix issue with ``@admin.register()`` checker
+
+  Thanks to Jan Pieter Waagmeester for the report in `Issue #337 <https://github.com/adamchainz/django-upgrade/issues/337>`__, and to Thibaut Decombe for the review in `PR #338 <https://github.com/adamchainz/django-upgrade/pull/338>`__.
+
 1.14.1 (2023-08-16)
 -------------------
 

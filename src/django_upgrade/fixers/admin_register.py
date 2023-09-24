@@ -36,10 +36,11 @@ fixer = Fixer(
 
 
 class AdminDetails:
-    __slots__ = ("parent", "model_names_per_site")
+    __slots__ = ("parent", "lineno", "model_names_per_site")
 
-    def __init__(self, parent: ast.AST) -> None:
+    def __init__(self, parent: ast.AST, lineno: int) -> None:
         self.parent = parent
+        self.lineno = lineno
         self.model_names_per_site: dict[str, set[str]] = {}
 
 
@@ -65,7 +66,9 @@ def visit_ClassDef(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if _is_django_admin_imported(state) and not uses_full_super_in_init_or_new(node):
-        decorable_admins.setdefault(state, {})[node.name] = AdminDetails(parents[-1])
+        decorable_admins.setdefault(state, {})[node.name] = AdminDetails(
+            parents[-1], node.lineno
+        )
         if not node.decorator_list:
             offset = ast_start_offset(node)
             decorated = False
@@ -201,6 +204,18 @@ def visit_Call(
                 and admin_details is not None
                 and admin_details.parent == parents[-2]
                 and not (site_name and not admin_name.endswith("Admin"))
+                and (
+                    site_name == ""
+                    or (
+                        (
+                            site_defined_line := get_site_defined_line(
+                                parents[0], site_name
+                            )
+                        )
+                        is not None
+                        and site_defined_line < admin_details.lineno
+                    )
+                )
             ):
                 admin_details.model_names_per_site.setdefault(site_name, set()).update(
                     model_names
@@ -248,3 +263,35 @@ def visit_Call(
                     state_details[site_name] = unregistered_names
                 elif existing_names is not True:
                     existing_names.update(unregistered_names)
+
+
+site_definitions: MutableMapping[
+    ast.Module, dict[str, int | None]
+] = WeakKeyDictionary()
+
+
+def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
+    assert isinstance(module, ast.Module)
+    lines = site_definitions.get(module, None)
+    if lines is None:
+        lines = {}
+        for node in module.body:
+            if isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    if alias.asname is not None:
+                        name = alias.asname
+                    else:
+                        name = alias.name
+
+                    if name.endswith("site") and name not in lines:
+                        lines[name] = node.lineno
+            elif (
+                isinstance(node, ast.Assign)
+                and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)
+                and (name := node.targets[0].id) not in lines
+            ):
+                lines[name] = node.lineno
+
+        site_definitions[module] = lines
+    return lines.get(site_name, None)

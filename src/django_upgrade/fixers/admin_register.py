@@ -294,5 +294,4 @@ def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
                 lines[name] = node.lineno
 
         site_definitions[module] = lines
-    print(lines)
     return lines.get(site_name, None)

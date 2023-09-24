@@ -914,7 +914,7 @@ Model field ``choices=<name>.choices``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Drop ``.choices`` for model field ``choices`` parameters.
-This parameter now accept enumeration types directly.
+This parameter now accepts enumeration types directly.
 
 .. code-block:: diff
 

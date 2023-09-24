@@ -218,6 +218,22 @@ If a ``register()`` call is preceded by an ``unregister()`` call that includes t
     admin.site.unregister(MyModel1)
     admin.site.register(MyModel1, MyCustomAdmin)
 
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites some compatibility imports:
+
+* ``django.contrib.admin.helpers.ACTION_CHECKBOX_NAME`` in ``django.contrib.admin``
+* ``django.template.context.BaseContext``, ``django.template.context.Context``, ``django.template.context.ContextPopException`` and ``django.template.context.RequestContext`` in ``django.template.base``
+
+.. code-block:: diff
+
+    -from django.contrib.admin import ACTION_CHECKBOX_NAME
+    +from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+
+    -from django.template.base import Context
+    +from django.template.context import Context
+
 Django 1.9
 -----------
 
@@ -277,6 +293,7 @@ Rewrites some compatibility imports:
 
 * ``django.forms.utils.pretty_name`` in ``django.forms.forms``
 * ``django.forms.boundfield.BoundField`` in ``django.forms.forms``
+* ``django.forms.widgets.SelectDateWidget`` in ``django.forms.extras``
 
 Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.com/en/3.1/releases/3.1/#id1>`_, these have been possible since Django 1.9.
 
@@ -284,6 +301,27 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
 
     -from django.forms.forms import pretty_name
     +from django.forms.utils import pretty_name
+
+Django 1.10
+-----------
+
+`Release Notes <https://docs.djangoproject.com/en/1.10/releases/1.10/>`__
+
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites some compatibility imports:
+
+* ``django.templatetags.static.static`` in ``django.contrib.staticfiles.templatetags.staticfiles``
+
+Whilst mentioned in the `Django 2.1 release notes <https://docs.djangoproject.com/en/2.1/releases/2.1/#features-deprecated-in-2-1>`_, these have been possible since Django 1.10.
+
+
+.. code-block:: diff
+
+    -from django.contrib.staticfiles.templatetags.staticfiles import static
+    +from django.templatetags.static import static
+
 
 Django 1.11
 -----------
@@ -378,6 +416,16 @@ Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``func
 
     -from django.utils.functional import lru_cache
     +from functools import lru_cache
+
+``ContextDecorator``
+~~~~~~~~~~~~~~~~~~~~
+
+Rewrites imports of ``ContextDecorator`` from ``django.utils.decorators`` to use ``contextlib``.
+
+.. code-block:: diff
+
+    -from django.utils.decorators import ContextDecorator
+    +from contextlib import ContextDecorator
 
 ``<func>.allow_tags = True``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -779,6 +827,18 @@ Renames the undocumented ``django.contrib.admin.utils.lookup_needs_distinct`` to
     -if lookup_needs_distinct(self.opts, search_spec):
     +if lookup_spawns_duplicates(self.opts, search_spec):
         ...
+
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites some compatibility imports:
+
+* ``django.utils.translation.template.TRANSLATOR_COMMENT_MARK`` in ``django.template.base``
+
+.. code-block:: diff
+
+    -from django.template.base import TRANSLATOR_COMMENT_MARK
+    +from django.utils.translation.template import TRANSLATOR_COMMENT_MARK
 
 Django 4.1
 ----------

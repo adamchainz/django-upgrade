@@ -36,10 +36,27 @@ fixer = Fixer(
 )
 
 REPLACEMENTS_EXACT = {
+    (1, 7): {
+        "django.contrib.admin": {
+            "ACTION_CHECKBOX_NAME": "django.contrib.admin.helpers",
+        },
+        "django.template.base": {
+            "BaseContext": "django.template.context",
+            "Context": "django.template.context",
+            "ContextPopException": "django.template.context",
+            "RequestContext": "django.template.context",
+        },
+    },
     (1, 9): {
         "django.forms.forms": {
             "pretty_name": "django.forms.utils",
             "BoundField": "django.forms.boundfield",
+        },
+        "django.forms.extras": {"SelectDateWidget": "django.forms.widgets"},
+    },
+    (1, 10): {
+        "django.contrib.staticfiles.templatetags.staticfiles": {
+            "static": "django.templatetags.static",
         },
     },
     (1, 11): {
@@ -55,8 +72,12 @@ REPLACEMENTS_EXACT = {
         "django.db.models.sql.datastructures": {
             "EmptyResultSet": "django.core.exceptions",
         },
+        "django.test.runner": {"setup_databases": "django.test.utils"},
     },
-    (2, 0): {"django.utils.functional": {"lru_cache": "functools"}},
+    (2, 0): {
+        "django.utils.functional": {"lru_cache": "functools"},
+        "django.utils.decorators": {"ContextDecorator": "contextlib"},
+    },
     (3, 1): {
         "django.contrib.postgres.forms": {
             "JSONField": "django.forms",
@@ -64,6 +85,11 @@ REPLACEMENTS_EXACT = {
         "django.contrib.postgres.forms.jsonb": {
             "JSONField": "django.forms",
         },
+    },
+    (4, 0): {
+        "django.template.base": {
+            "TRANSLATOR_COMMENT_MARK": "django.utils.translation.template"
+        }
     },
 }
 REPLACEMENTS_EXCEPT_MIGRATIONS = {

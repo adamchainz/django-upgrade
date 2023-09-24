@@ -18,10 +18,11 @@ def test_unmatched_import():
 
 
 def test_untransformed_in_migration_file():
+    # No `.choices` in migrations anyway, every option are listed automatically.
     check_noop(
         """\
         from django.db.models import CharField
-        CharField(choices=[(1, 2), (3, 4)]) # No .choices in migrations anyway
+        CharField(choices=[(1, 2), (3, 4)])
         """,
         settings,
         filename="example/core/migrations/0001_initial.py",

@@ -910,10 +910,11 @@ Django 5.0
 
 `Release Notes <https://docs.djangoproject.com/en/5.0/releases/5.0/>`__
 
-``.choices``
-~~~~~~~~~~~~
+Model field ``choices=<name>.choices``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Drop ``.choices`` for model field ``choices`` parameters. This parameter now accept enumeration types directly.
+Drop ``.choices`` for model field ``choices`` parameters.
+This parameter now accept enumeration types directly.
 
 .. code-block:: diff
 

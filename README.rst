@@ -20,6 +20,13 @@ django-upgrade
 
 Automatically upgrade your Django project code.
 
+----
+
+**Improve your code quality** with my book `Boost Your Django DX <https://adamchainz.gumroad.com/l/byddx>`__ which covers using  pre-commit, django-upgrade, and many other tools.
+I wrote django-upgrade whilst working on the book!
+
+----
+
 Installation
 ============
 
@@ -58,14 +65,6 @@ In the process, your other hooks will run, potentially reformatting django-upgra
 
 Keep the hook installed in order to upgrade all code added to your project.
 pre-commit’s ``autoupdate`` command will also let you take advantage of future django-upgrade features.
-
-----
-
-**Want to improve your code quality?**
-Check out my book `Boost Your Django DX <https://adamchainz.gumroad.com/l/byddx>`__ which covers using  pre-commit, django-upgrade, and many other tools.
-I wrote django-upgrade whilst working on the book!
-
-----
 
 Usage
 =====

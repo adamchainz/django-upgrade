@@ -4,6 +4,44 @@ requires = [
   "setuptools",
 ]
 
+[project]
+name = "django-upgrade"
+version = "1.15.0"
+description = "Automatically upgrade your Django project code."
+readme = {file = "README.rst", content-type = "text/x-rst"}
+keywords = [
+  "Django",
+]
+license = {text = "MIT"}
+authors = [{name = "Adam Johnson", email = "me@adamj.eu"}]
+requires-python = ">=3.8"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: Django :: 2.2",
+  "Framework :: Django :: 3.0",
+  "Framework :: Django :: 3.1",
+  "Framework :: Django :: 3.2",
+  "Framework :: Django :: 4.0",
+  "Framework :: Django :: 4.1",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed",
+]
+dependencies = [
+  "tokenize-rt>=4.1",
+]
+urls = {Changelog = "https://github.com/adamchainz/django-upgrade/blob/main/CHANGELOG.rst",Funding = "https://adamj.eu/books/",Repository = "https://github.com/adamchainz/django-upgrade"}
+[project.scripts]
+django-upgrade = "django_upgrade.main:main"
+
 [tool.black]
 target-version = ['py38']
 
@@ -12,6 +50,23 @@ addopts = """\
     --strict-config
     --strict-markers
     """
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = [
+    "django_upgrade",
+    "tests",
+]
+
+[tool.coverage.paths]
+source = [
+    "src",
+    ".tox/**/site-packages",
+]
+
+[tool.coverage.report]
+show_missing = true
 
 [tool.mypy]
 mypy_path = "src/"

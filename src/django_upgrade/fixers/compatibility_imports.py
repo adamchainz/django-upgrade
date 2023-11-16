@@ -36,6 +36,32 @@ fixer = Fixer(
     min_version=(0, 0),
 )
 
+# Every symbol moved from `django.core.resolvers` to `django.urls` in django 1.10.
+# https://github.com/django/django/blob/stable/1.10.x/django/urls/__init__.py
+# We also strip 'RegexURLPattern', 'LocaleRegexURLResolver', 'RegexURLResolver'
+# and 'LocaleRegexProvider' because they were removed in django 2.0.
+# See https://github.com/django/django/pull/7482#discussion_r121311884
+_urls_all_110 = [
+    "NoReverseMatch",
+    "Resolver404",
+    "ResolverMatch",
+    "clear_script_prefix",
+    "clear_url_caches",
+    "get_callable",
+    "get_mod_func",
+    "get_ns_resolver",
+    "get_resolver",
+    "get_script_prefix",
+    "get_urlconf",
+    "is_valid_path",
+    "resolve",
+    "reverse",
+    "reverse_lazy",
+    "set_script_prefix",
+    "set_urlconf",
+    "translate_url",
+]
+
 REPLACEMENTS_EXACT = {
     (1, 7): {
         "django.contrib.admin": {
@@ -59,6 +85,7 @@ REPLACEMENTS_EXACT = {
         "django.contrib.staticfiles.templatetags.staticfiles": {
             "static": "django.templatetags.static",
         },
+        "django.core.urlresolvers": {symbol: "django.urls" for symbol in _urls_all_110},
     },
     (1, 11): {
         "django.db.models.fields": {

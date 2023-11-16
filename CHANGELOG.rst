@@ -6,6 +6,10 @@ Changelog
 
   Thanks to Alessandro Ferrini in `PR #423 <https://github.com/adamchainz/django-upgrade/pull/423>`__.
 
+* Add Django 2.0+ fixer to rewrite imports from ``django.core.urlresolvers`` to use ``django.urls``.
+
+  Thanks to Thibaut Decombe in `PR #404 <https://github.com/adamchainz/django-upgrade/pull/404>`__.
+
 1.15.0 (2023-09-24)
 -------------------
 

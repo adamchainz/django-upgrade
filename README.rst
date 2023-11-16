@@ -326,13 +326,20 @@ Rewrites some compatibility imports:
 
 * ``django.templatetags.static.static`` in ``django.contrib.staticfiles.templatetags.staticfiles``
 
-Whilst mentioned in the `Django 2.1 release notes <https://docs.djangoproject.com/en/2.1/releases/2.1/#features-deprecated-in-2-1>`_, these have been possible since Django 1.10.
+   (Whilst mentioned in the `Django 2.1 release notes <https://docs.djangoproject.com/en/2.1/releases/2.1/#features-deprecated-in-2-1>`_, this has been possible since Django 1.10.)
 
+* ``django.urls.*`` in ``django.core.urlresolvers.*``
 
 .. code-block:: diff
 
     -from django.contrib.staticfiles.templatetags.staticfiles import static
     +from django.templatetags.static import static
+
+    -from django.core.urlresolvers import reverse
+    +from django.urls import reverse
+
+    -from django.core.urlresolvers import resolve
+    +from django.urls import resolve
 
 Django 1.11
 -----------

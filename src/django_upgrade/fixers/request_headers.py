@@ -2,6 +2,7 @@
 Update use of request.META to fetch headers to use request.headers
 https://docs.djangoproject.com/en/2.2/releases/2.2/#requests-and-responses
 """
+
 from __future__ import annotations
 
 import ast

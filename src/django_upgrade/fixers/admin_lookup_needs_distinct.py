@@ -2,6 +2,7 @@
 Rename django.contrib.admin.utils.lookup_needs_distinct to lookup_spawns_duplicates:
 https://docs.djangoproject.com/en/4.0/releases/4.0/#miscellaneous
 """
+
 from __future__ import annotations
 
 import ast

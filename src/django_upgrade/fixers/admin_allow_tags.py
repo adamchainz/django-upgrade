@@ -3,6 +3,7 @@ Drop lines that set `allow_tags` to `True` on functions.
 
 https://docs.djangoproject.com/en/2.0/releases/2.0/#features-removed-in-2-0
 """
+
 from __future__ import annotations
 
 import ast

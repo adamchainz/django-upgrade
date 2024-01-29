@@ -4,6 +4,7 @@ Update functions with admin attributes attached to use the new decorator forms:
 https://docs.djangoproject.com/en/3.2/ref/contrib/admin/actions/#django.contrib.admin.action
 https://docs.djangoproject.com/en/3.2/ref/contrib/admin/#django.contrib.admin.display
 """
+
 from __future__ import annotations
 
 import ast

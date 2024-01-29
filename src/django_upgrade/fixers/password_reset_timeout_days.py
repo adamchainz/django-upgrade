@@ -2,6 +2,7 @@
 PASSWORD_RESET_TIMEOUT_DAYS setting replaced with PASSWORD_RESET_TIMEOUT:
 https://docs.djangoproject.com/en/3.1/releases/3.1/#django-contrib-auth
 """
+
 from __future__ import annotations
 
 import ast

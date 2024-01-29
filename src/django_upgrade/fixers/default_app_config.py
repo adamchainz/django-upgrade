@@ -2,6 +2,7 @@
 Remove default_app_config:
 https://docs.djangoproject.com/en/stable/releases/3.2/#features-deprecated-in-3-2
 """
+
 from __future__ import annotations
 
 import ast

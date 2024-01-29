@@ -2,6 +2,7 @@
 Remove the 'providing_args' argument from Signal():
 https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1
 """
+
 from __future__ import annotations
 
 import ast

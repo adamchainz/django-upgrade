@@ -12,6 +12,7 @@
 - Replace `django.utils.functional.lru_cache` with `functools.lru_cache`
   Undocumented change
 """
+
 from __future__ import annotations
 
 import ast

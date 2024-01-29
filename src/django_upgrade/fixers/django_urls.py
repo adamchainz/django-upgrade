@@ -2,6 +2,7 @@
 Update URL definitions:
 https://docs.djangoproject.com/en/2.0/releases/2.0/#simplified-url-routing-syntax
 """
+
 from __future__ import annotations
 
 import ast

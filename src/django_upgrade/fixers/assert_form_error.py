@@ -4,6 +4,7 @@ form/formset instead of the response.
 
 https://docs.djangoproject.com/en/4.1/releases/4.1/#tests
 """
+
 from __future__ import annotations
 
 import ast

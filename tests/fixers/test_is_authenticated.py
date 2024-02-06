@@ -95,11 +95,11 @@ def test_if_request_user():
     check_transformed(
         """\
         if request.user.is_authenticated():
-            ... 
+            ...
         """,
         """\
         if request.user.is_authenticated:
-            ... 
+            ...
         """,
         settings,
     )
@@ -109,11 +109,11 @@ def test_if_self_request_user():
     check_transformed(
         """\
         if self.request.user.is_authenticated():
-            ... 
+            ...
         """,
         """\
         if self.request.user.is_authenticated:
-            ... 
+            ...
         """,
         settings,
     )
@@ -123,11 +123,11 @@ def test_if_request_user_warlus():
     check_transformed(
         """\
         if auth:= request.user.is_authenticated():
-            ... 
+            ...
         """,
         """\
         if auth:= request.user.is_authenticated:
-            ... 
+            ...
         """,
         settings,
     )
@@ -137,11 +137,11 @@ def test_if_self_request_user_warlus():
     check_transformed(
         """\
         if auth:= self.request.user.is_authenticated():
-            ... 
+            ...
         """,
         """\
         if auth:= self.request.user.is_authenticated:
-            ... 
+            ...
         """,
         settings,
     )
@@ -151,11 +151,11 @@ def test_if_request_user_equal():
     check_transformed(
         """\
         if request.user.is_authenticated() == True:
-            ... 
+            ...
         """,
         """\
         if request.user.is_authenticated == True:
-            ... 
+            ...
         """,
         settings,
     )
@@ -165,11 +165,11 @@ def test_if_self_request_user_equal():
     check_transformed(
         """\
         if request.user.is_authenticated() == True:
-            ... 
+            ...
         """,
         """\
         if request.user.is_authenticated == True:
-            ... 
+            ...
         """,
         settings,
     )

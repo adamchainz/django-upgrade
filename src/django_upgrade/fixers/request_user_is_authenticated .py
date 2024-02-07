@@ -61,25 +61,6 @@ def is_request_user_or_self_request_user(node: ast.AST) -> bool:
     )
 
 
-if sys.version_info >= (3, 9):
-
-    def extract_constant(node: ast.AST) -> str | None:
-        if isinstance(node, ast.Constant) and isinstance(node.value, str):
-            return node.value
-        return None
-
-else:
-
-    def extract_constant(node: ast.AST) -> str | None:
-        if (
-            isinstance(node, ast.Index)
-            and isinstance(node.value, ast.Constant)
-            and isinstance(node.value.value, str)
-        ):
-            return node.value.value
-        return None
-
-
 def rewrite_user_is_auth(tokens: list[Token], i: int) -> None:
     j = find(tokens, i, name=NAME, src="is_authenticated")
     y = find(tokens, i, name=OP, src=")")

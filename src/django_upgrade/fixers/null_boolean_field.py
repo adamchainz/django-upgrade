@@ -17,9 +17,9 @@ from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import CODE
+from django_upgrade.tokens import OP
 from django_upgrade.tokens import find
 from django_upgrade.tokens import find_and_replace_name
-from django_upgrade.tokens import OP
 from django_upgrade.tokens import parse_call_args
 from django_upgrade.tokens import update_import_names
 

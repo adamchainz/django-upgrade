@@ -5,13 +5,13 @@ import pkgutil
 import re
 from collections import defaultdict
 from functools import cached_property
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import DefaultDict
 from typing import Iterable
 from typing import List
 from typing import Tuple
-from typing import TYPE_CHECKING
 from typing import TypeVar
 
 from tokenize_rt import Offset

@@ -18,10 +18,10 @@ from django_upgrade.ast import is_rewritable_import_from
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import OP
 from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find
 from django_upgrade.tokens import insert
-from django_upgrade.tokens import OP
 from django_upgrade.tokens import parse_call_args
 
 fixer = Fixer(

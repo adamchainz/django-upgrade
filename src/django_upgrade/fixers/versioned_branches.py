@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import ast
 from functools import partial
-from typing import cast
 from typing import Iterable
 from typing import Literal
+from typing import cast
 
 from tokenize_rt import Offset
 from tokenize_rt import Token

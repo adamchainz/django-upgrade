@@ -8,9 +8,9 @@ import ast
 from functools import partial
 from typing import Iterable
 
+from tokenize_rt import UNIMPORTANT_WS
 from tokenize_rt import Offset
 from tokenize_rt import Token
-from tokenize_rt import UNIMPORTANT_WS
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer
@@ -18,10 +18,10 @@ from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import CODE
 from django_upgrade.tokens import COMMENT
-from django_upgrade.tokens import consume
-from django_upgrade.tokens import find
 from django_upgrade.tokens import INDENT
 from django_upgrade.tokens import OP
+from django_upgrade.tokens import consume
+from django_upgrade.tokens import find
 from django_upgrade.tokens import parse_call_args
 from django_upgrade.tokens import reverse_consume
 

@@ -11,21 +11,21 @@ from functools import partial
 from typing import Any
 from typing import Iterable
 
+from tokenize_rt import UNIMPORTANT_WS
 from tokenize_rt import Offset
 from tokenize_rt import Token
 from tokenize_rt import tokens_to_src
-from tokenize_rt import UNIMPORTANT_WS
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.ast import looks_like_test_client_call
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import OP
+from django_upgrade.tokens import PHYSICAL_NEWLINE
 from django_upgrade.tokens import consume
 from django_upgrade.tokens import find_first_token
 from django_upgrade.tokens import find_last_token
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import PHYSICAL_NEWLINE
 from django_upgrade.tokens import replace
 from django_upgrade.tokens import reverse_consume
 

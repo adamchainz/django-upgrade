@@ -7,8 +7,8 @@ from textwrap import dedent
 from unittest import mock
 
 import pytest
-from tokenize_rt import src_to_tokens
 from tokenize_rt import UNIMPORTANT_WS
+from tokenize_rt import src_to_tokens
 
 from django_upgrade import __main__  # noqa: F401
 from django_upgrade.main import fixup_dedent_tokens

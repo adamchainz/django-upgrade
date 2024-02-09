@@ -4,15 +4,15 @@ import argparse
 import sys
 import tokenize
 from importlib import metadata
-from typing import cast
 from typing import Sequence
 from typing import Tuple
+from typing import cast
 
+from tokenize_rt import UNIMPORTANT_WS
+from tokenize_rt import Token
 from tokenize_rt import reversed_enumerate
 from tokenize_rt import src_to_tokens
-from tokenize_rt import Token
 from tokenize_rt import tokens_to_src
-from tokenize_rt import UNIMPORTANT_WS
 
 from django_upgrade.ast import ast_parse
 from django_upgrade.data import Settings

@@ -16,8 +16,8 @@ from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import CODE
-from django_upgrade.tokens import find
 from django_upgrade.tokens import OP
+from django_upgrade.tokens import find
 
 fixer = Fixer(
     __name__,

@@ -3,8 +3,8 @@ from __future__ import annotations
 import ast
 
 import pytest
-from tokenize_rt import src_to_tokens
 from tokenize_rt import Token
+from tokenize_rt import src_to_tokens
 from tokenize_rt import tokens_to_src
 
 from django_upgrade.tokens import str_repr_matching

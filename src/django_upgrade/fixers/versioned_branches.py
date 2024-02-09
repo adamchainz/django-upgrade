@@ -5,6 +5,7 @@ if django.VERSION >= (1, 8):
 else:
     ...
 """
+
 from __future__ import annotations
 
 import ast

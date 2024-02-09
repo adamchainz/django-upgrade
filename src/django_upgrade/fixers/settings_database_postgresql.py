@@ -3,6 +3,7 @@ Update settings.DATABASES backend path 'django.db.backends.postgresql_psycopg2'
 to the new 'django.db.backends.postgresql'.
 https://docs.djangoproject.com/en/2.0/releases/2.0/#id1
 """
+
 from __future__ import annotations
 
 import ast

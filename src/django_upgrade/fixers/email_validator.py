@@ -2,6 +2,7 @@
 Rewrite django.core.validator.EmailValidator arguments:
 https://docs.djangoproject.com/en/3.2/releases/3.2/#features-deprecated-in-3-2
 """
+
 from __future__ import annotations
 
 import ast

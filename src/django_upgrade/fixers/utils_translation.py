@@ -2,6 +2,7 @@
 Replace imports from django.utils.translation:
 https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
 """
+
 from __future__ import annotations
 
 import ast

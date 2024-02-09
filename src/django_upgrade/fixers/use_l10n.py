@@ -2,6 +2,7 @@
 USE_L10N setting is deprecated:
 https://docs.djangoproject.com/en/4.0/releases/4.0/#localization
 """
+
 from __future__ import annotations
 
 import ast

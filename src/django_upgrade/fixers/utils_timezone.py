@@ -2,6 +2,7 @@
 Replace django.utils.timezone.utc with datetime.timezone.utc
 https://docs.djangoproject.com/en/4.1/releases/4.1/#id2
 """
+
 from __future__ import annotations
 
 import ast

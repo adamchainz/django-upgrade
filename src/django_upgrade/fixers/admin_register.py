@@ -2,6 +2,7 @@
 Replace `admin.site.register` with the new `@register` decorator syntax:
 https://docs.djangoproject.com/en/stable/releases/1.7/#minor-features
 """
+
 from __future__ import annotations
 
 import ast
@@ -47,9 +48,9 @@ class AdminDetails:
 decorable_admins: MutableMapping[State, dict[str, AdminDetails]] = WeakKeyDictionary()
 # Name of site to set of unregistered model names, or True if potentially all
 # models have been unregistered
-unregistered_site_models: MutableMapping[
-    State, dict[str, set[str] | Literal[True]]
-] = WeakKeyDictionary()
+unregistered_site_models: MutableMapping[State, dict[str, set[str] | Literal[True]]] = (
+    WeakKeyDictionary()
+)
 
 
 def _is_django_admin_imported(state: State) -> bool:
@@ -265,9 +266,9 @@ def visit_Call(
                     existing_names.update(unregistered_names)
 
 
-site_definitions: MutableMapping[
-    ast.Module, dict[str, int | None]
-] = WeakKeyDictionary()
+site_definitions: MutableMapping[ast.Module, dict[str, int | None]] = (
+    WeakKeyDictionary()
+)
 
 
 def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:

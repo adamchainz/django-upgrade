@@ -2,6 +2,7 @@
 Add on_delete=models.CASCADE to ForeignKey and OneToOneField:
 https://docs.djangoproject.com/en/stable/releases/1.9/#features-deprecated-in-1-9
 """
+
 from __future__ import annotations
 
 import ast

@@ -2,6 +2,7 @@
 Replace declarations of database support in test cases:
 https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 """
+
 from __future__ import annotations
 
 import ast

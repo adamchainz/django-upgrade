@@ -2,6 +2,7 @@
 Drop `.choices` for model field `choices` parameters:
 https://docs.djangoproject.com/en/5.0/releases/5.0/#forms
 """
+
 from __future__ import annotations
 
 import ast

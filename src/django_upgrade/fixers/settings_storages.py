@@ -2,6 +2,7 @@
 Merge DEFAULT_FILE_STORAGE and STATICFILES_STORAGE into new STORAGES setting:
 https://docs.djangoproject.com/en/4.2/releases/4.2/#custom-file-storages
 """
+
 from __future__ import annotations
 
 import ast

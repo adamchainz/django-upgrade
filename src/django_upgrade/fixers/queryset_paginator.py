@@ -2,6 +2,7 @@
 Rewrite django.core.paginator’s alias QuerySetPaginator of Paginator:
 https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 """
+
 from __future__ import annotations
 
 import ast

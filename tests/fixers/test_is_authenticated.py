@@ -173,3 +173,18 @@ def test_if_self_request_user_equal():
         """,
         settings,
     )
+
+
+def test_spaces_between_noop():
+    check_noop(
+        "request . user . is_authenticated  ",
+        settings,
+    )
+
+
+def test_spaces_between():
+    check_transformed(
+        "request . user . is_authenticated ( )",
+        "request . user . is_authenticated  ",
+        settings,
+    )

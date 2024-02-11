@@ -353,3 +353,63 @@ def test_all_transformed():
         """,
         Settings(target_version=(3, 1)),
     )
+
+
+def test_urlresolvers_noop():
+    check_noop(
+        """\
+        from django.core.urlresolvers import RegexURLPattern
+        from django.core.urlresolvers import LocaleRegexURLResolver
+        from django.core.urlresolvers import RegexURLResolver
+        from django.core.urlresolvers import LocaleRegexProvider
+        from django.core.urlresolvers import Foo
+        from django.core.urlresolvers import *
+        """,
+        Settings(target_version=(1, 10)),
+    )
+
+
+def test_urlresolvers_transformed():
+    check_transformed(
+        """\
+        from django.core.urlresolvers import NoReverseMatch
+        from django.core.urlresolvers import Resolver404
+        from django.core.urlresolvers import ResolverMatch
+        from django.core.urlresolvers import clear_script_prefix
+        from django.core.urlresolvers import clear_url_caches
+        from django.core.urlresolvers import get_callable
+        from django.core.urlresolvers import get_mod_func
+        from django.core.urlresolvers import get_ns_resolver
+        from django.core.urlresolvers import get_resolver
+        from django.core.urlresolvers import get_script_prefix
+        from django.core.urlresolvers import get_urlconf
+        from django.core.urlresolvers import is_valid_path
+        from django.core.urlresolvers import resolve
+        from django.core.urlresolvers import reverse
+        from django.core.urlresolvers import reverse_lazy
+        from django.core.urlresolvers import set_script_prefix
+        from django.core.urlresolvers import set_urlconf
+        from django.core.urlresolvers import translate_url
+        """,
+        """\
+        from django.urls import NoReverseMatch
+        from django.urls import Resolver404
+        from django.urls import ResolverMatch
+        from django.urls import clear_script_prefix
+        from django.urls import clear_url_caches
+        from django.urls import get_callable
+        from django.urls import get_mod_func
+        from django.urls import get_ns_resolver
+        from django.urls import get_resolver
+        from django.urls import get_script_prefix
+        from django.urls import get_urlconf
+        from django.urls import is_valid_path
+        from django.urls import resolve
+        from django.urls import reverse
+        from django.urls import reverse_lazy
+        from django.urls import set_script_prefix
+        from django.urls import set_urlconf
+        from django.urls import translate_url
+        """,
+        Settings(target_version=(1, 10)),
+    )

@@ -6,6 +6,10 @@ Changelog
 
   Thanks to Alessandro Ferrini in `PR #423 <https://github.com/adamchainz/django-upgrade/pull/423>`__.
 
+* Add Django 2.0+ imports fixes for names moved from ``django.core.urlresolvers`` to ``django.urls``.
+
+  Thanks to Thibaut Decombe in `PR #404 <https://github.com/adamchainz/django-upgrade/pull/404>`__.
+
 1.15.0 (2023-09-24)
 -------------------
 

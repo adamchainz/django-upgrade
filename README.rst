@@ -306,6 +306,19 @@ Django 1.10
 
 `Release Notes <https://docs.djangoproject.com/en/1.10/releases/1.10/>`__
 
+``request.user`` boolean attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites calls to ``request.user.is_authenticated()`` and ``request.user.is_anonymous()`` to remove the parentheses, per `the deprecation <https://docs.djangoproject.com/en/1.10/releases/1.10/#using-user-is-authenticated-and-user-is-anonymous-as-methods>`__.
+
+.. code-block:: diff
+
+    -request.user.is_authenticated()
+    +request.user.is_authenticated
+
+    -self.request.user.is_anonymous()
+    +self.request.user.is_anonymous
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -320,7 +333,6 @@ Whilst mentioned in the `Django 2.1 release notes <https://docs.djangoproject.co
 
     -from django.contrib.staticfiles.templatetags.staticfiles import static
     +from django.templatetags.static import static
-
 
 Django 1.11
 -----------

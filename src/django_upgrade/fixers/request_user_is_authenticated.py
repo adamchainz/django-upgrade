@@ -62,5 +62,7 @@ def is_request_user_or_self_request_user(node: ast.AST) -> bool:
 
 def rewrite_user_is_auth(tokens: list[Token], i: int) -> None:
     j = find(tokens, i, name=NAME, src="is_authenticated")
-    y = find(tokens, i, name=OP, src=")")
-    del tokens[j + 1 : y + 1]
+    y = find(tokens, j, name=OP, src="(")
+    z = find(tokens, y, name=OP, src=")")
+    del tokens[z]
+    del tokens[y]

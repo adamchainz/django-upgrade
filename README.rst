@@ -321,6 +321,15 @@ Whilst mentioned in the `Django 2.1 release notes <https://docs.djangoproject.co
     -from django.contrib.staticfiles.templatetags.staticfiles import static
     +from django.templatetags.static import static
 
+``user.is_authenticated()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites ``user.is_authenticated()`` in ``user.is_authenticated``.
+
+.. code-block:: diff
+
+    -user.is_authenticated()
+    +user.is_authenticated
 
 Django 1.11
 -----------

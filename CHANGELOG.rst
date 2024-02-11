@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add Django 1.10 fixer to rewrite ``user.is_authenticated()`` -> ``user.is_authenticated``.
+
+  Thanks to Alessandro Ferrini in `PR #423 <https://github.com/adamchainz/django-upgrade/pull/423>`__.
+
 1.15.0 (2023-09-24)
 -------------------
 

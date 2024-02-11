@@ -34,13 +34,13 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr == "is_authenticated"
+        and node.func.attr in ("is_anonymous", "is_authenticated")
         and is_request_user_or_self_request_user(node.func.value)
         and len(node.args) == 0
     ):
         yield (
             ast_start_offset(node),
-            partial(rewrite_user_is_auth),
+            partial(rewrite_user_attribute),
         )
 
 
@@ -60,9 +60,8 @@ def is_request_user_or_self_request_user(node: ast.AST) -> bool:
     )
 
 
-def rewrite_user_is_auth(tokens: list[Token], i: int) -> None:
+def rewrite_user_attribute(tokens: list[Token], i: int) -> None:
     j = find(tokens, i, name=NAME, src="is_authenticated")
     y = find(tokens, j, name=OP, src="(")
     z = find(tokens, y, name=OP, src=")")
-    del tokens[z]
-    del tokens[y]
+    del tokens[y:z+1]

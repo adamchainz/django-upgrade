@@ -1,5 +1,7 @@
 """
-Update use of request.user.is_authenticated() to use request.user.is_authenticated
+Update use of request.user methods is_anonymous() and is_authenticated() to
+attribute accesses.
+
 https://docs.djangoproject.com/en/1.10/releases/1.10/#using-user-is-authenticated-and-user-is-anonymous-as-methods
 """
 

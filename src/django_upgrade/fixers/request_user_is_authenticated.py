@@ -2,6 +2,7 @@
 Update use of request.user.is_authenticated() to use request.user.is_authenticated
 https://docs.djangoproject.com/en/1.10/releases/1.10/#using-user-is-authenticated-and-user-is-anonymous-as-methods
 """
+
 from __future__ import annotations
 
 import ast
@@ -15,10 +16,9 @@ from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import find
 from django_upgrade.tokens import NAME
 from django_upgrade.tokens import OP
-
+from django_upgrade.tokens import find
 
 fixer = Fixer(
     __name__,

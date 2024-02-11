@@ -188,3 +188,41 @@ def test_spaces_between():
         "request . user . is_authenticated  ",
         settings,
     )
+
+
+def test_spaces_and_comments():
+    check_transformed(
+        """\
+        if (
+            request
+            .user
+            .is_authenticated  # bla
+            () # bla
+        ):
+            ...
+        """,
+        """\
+        if (
+            request
+            .user
+            .is_authenticated  # bla
+             # bla
+        ):
+            ...
+        """,
+        settings,
+    )
+
+
+def test_spaces_and_comments_noop():
+    check_noop(
+        """\
+        if (
+            request
+            .user
+            .is_authenticated  # bla
+        ):
+            ...
+        """,
+        settings,
+    )

@@ -35,16 +35,16 @@ def visit_Call(
     if (
         isinstance(node.func, ast.Attribute)
         and node.func.attr in ("is_anonymous", "is_authenticated")
-        and is_request_user_or_self_request_user(node.func.value)
+        and is_request_or_self_request_user(node.func.value)
         and len(node.args) == 0
     ):
         yield (
             ast_start_offset(node),
-            partial(rewrite_user_attribute),
+            partial(rewrite_user_attribute, attr=node.func.attr),
         )
 
 
-def is_request_user_or_self_request_user(node: ast.AST) -> bool:
+def is_request_or_self_request_user(node: ast.AST) -> bool:
     return (
         isinstance(node, ast.Attribute)
         and node.attr == "user"
@@ -60,8 +60,9 @@ def is_request_user_or_self_request_user(node: ast.AST) -> bool:
     )
 
 
-def rewrite_user_attribute(tokens: list[Token], i: int) -> None:
-    j = find(tokens, i, name=NAME, src="is_authenticated")
+def rewrite_user_attribute(tokens: list[Token], i: int, *, attr: str) -> None:
+    j = find(tokens, i, name=NAME, src=attr)
     y = find(tokens, j, name=OP, src="(")
     z = find(tokens, y, name=OP, src=")")
-    del tokens[y:z+1]
+    del tokens[z]
+    del tokens[y]

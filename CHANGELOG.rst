@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.16.0 (2024-02-11)
+-------------------
+
 * Remove the Django 5.0+ fixer that dropped ``.choices`` from model field ``choices`` parameters.
   It was too unreliable because it could break use for “DIY” enumeration types.
 

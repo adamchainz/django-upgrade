@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* Remove the Django 5.0+ fixer that dropped ``.choices`` from model field ``choices`` parameters.
+  It was too unreliable because it could break use for “DIY” enumeration types.
+
+  Thanks to Niccolò Mineo and washeck for reporting in `Issue #417 <https://github.com/adamchainz/django-upgrade/issues/417>`__.
+
 * Add Django 1.10+ fixer to rewrite ``request.user`` functions that changed to boolean attributes: ``is_authenticated`` and ``is_anonymous``.
 
   Thanks to Alessandro Ferrini in `PR #423 <https://github.com/adamchainz/django-upgrade/pull/423>`__.

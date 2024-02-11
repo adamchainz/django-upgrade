@@ -43,7 +43,19 @@ def test_not_self_user():
     )
 
 
-def test_request_user_simple():
+def test_request_user_is_anonymous_simple():
+    check_transformed(
+        """\
+        request.user.is_anonymous()
+        """,
+        """\
+        request.user.is_anonymous
+        """,
+        settings,
+    )
+
+
+def test_request_user_is_authenticated_simple():
     check_transformed(
         """\
         request.user.is_authenticated()
@@ -55,7 +67,19 @@ def test_request_user_simple():
     )
 
 
-def test_self_request_user_simple():
+def test_self_request_user_is_anonymous_simple():
+    check_transformed(
+        """\
+        self.request.user.is_anonymous()
+        """,
+        """\
+        self.request.user.is_anonymous
+        """,
+        settings,
+    )
+
+
+def test_self_request_user_is_authenticated_simple():
     check_transformed(
         """\
         self.request.user.is_authenticated()
@@ -67,31 +91,21 @@ def test_self_request_user_simple():
     )
 
 
-def test_request_user_assigned():
+def test_if_request_user_is_anonymous():
     check_transformed(
         """\
-        auth = request.user.is_authenticated()
+        if request.user.is_anonymous():
+            ...
         """,
         """\
-        auth = request.user.is_authenticated
+        if request.user.is_anonymous:
+            ...
         """,
         settings,
     )
 
 
-def test_self_request_user_assigned():
-    check_transformed(
-        """\
-        auth = self.request.user.is_authenticated()
-        """,
-        """\
-        auth = self.request.user.is_authenticated
-        """,
-        settings,
-    )
-
-
-def test_if_request_user():
+def test_if_request_user_is_authenticated():
     check_transformed(
         """\
         if request.user.is_authenticated():
@@ -105,7 +119,21 @@ def test_if_request_user():
     )
 
 
-def test_if_self_request_user():
+def test_if_self_request_user_is_anonymous():
+    check_transformed(
+        """\
+        if self.request.user.is_anonymous():
+            ...
+        """,
+        """\
+        if self.request.user.is_anonymous:
+            ...
+        """,
+        settings,
+    )
+
+
+def test_if_self_request_user_is_authenticated():
     check_transformed(
         """\
         if self.request.user.is_authenticated():
@@ -113,62 +141,6 @@ def test_if_self_request_user():
         """,
         """\
         if self.request.user.is_authenticated:
-            ...
-        """,
-        settings,
-    )
-
-
-def test_if_request_user_warlus():
-    check_transformed(
-        """\
-        if auth:= request.user.is_authenticated():
-            ...
-        """,
-        """\
-        if auth:= request.user.is_authenticated:
-            ...
-        """,
-        settings,
-    )
-
-
-def test_if_self_request_user_warlus():
-    check_transformed(
-        """\
-        if auth:= self.request.user.is_authenticated():
-            ...
-        """,
-        """\
-        if auth:= self.request.user.is_authenticated:
-            ...
-        """,
-        settings,
-    )
-
-
-def test_if_request_user_equal():
-    check_transformed(
-        """\
-        if request.user.is_authenticated() == True:
-            ...
-        """,
-        """\
-        if request.user.is_authenticated == True:
-            ...
-        """,
-        settings,
-    )
-
-
-def test_if_self_request_user_equal():
-    check_transformed(
-        """\
-        if request.user.is_authenticated() == True:
-            ...
-        """,
-        """\
-        if request.user.is_authenticated == True:
             ...
         """,
         settings,
@@ -190,6 +162,20 @@ def test_spaces_between():
     )
 
 
+def test_spaces_and_comments_noop():
+    check_noop(
+        """\
+        if (
+            request
+            .user
+            .is_authenticated  # bla
+        ):
+            ...
+        """,
+        settings,
+    )
+
+
 def test_spaces_and_comments():
     check_transformed(
         """\
@@ -207,20 +193,6 @@ def test_spaces_and_comments():
             .user
             .is_authenticated  # bla
              # bla
-        ):
-            ...
-        """,
-        settings,
-    )
-
-
-def test_spaces_and_comments_noop():
-    check_noop(
-        """\
-        if (
-            request
-            .user
-            .is_authenticated  # bla
         ):
             ...
         """,

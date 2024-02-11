@@ -64,5 +64,4 @@ def rewrite_user_attribute(tokens: list[Token], i: int, *, attr: str) -> None:
     j = find(tokens, i, name=NAME, src=attr)
     y = find(tokens, j, name=OP, src="(")
     z = find(tokens, y, name=OP, src=")")
-    del tokens[z]
-    del tokens[y]
+    del tokens[y : z + 1]

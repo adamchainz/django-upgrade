@@ -149,7 +149,7 @@ def test_if_self_request_user_is_authenticated():
 
 def test_spaces_between_noop():
     check_noop(
-        "request . user . is_authenticated  ",
+        "request . user . is_authenticated ",
         settings,
     )
 
@@ -157,7 +157,20 @@ def test_spaces_between_noop():
 def test_spaces_between():
     check_transformed(
         "request . user . is_authenticated ( )",
-        "request . user . is_authenticated  ",
+        "request . user . is_authenticated ",
+        settings,
+    )
+
+
+def test_comment_between():
+    check_transformed(
+        """\
+        request.user.is_anonymous(  # something
+        )
+        """,
+        """\
+        request.user.is_anonymous
+        """,
         settings,
     )
 

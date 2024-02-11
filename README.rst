@@ -307,7 +307,7 @@ Django 1.10
 `Release Notes <https://docs.djangoproject.com/en/1.10/releases/1.10/>`__
 
 ``request.user`` boolean attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Rewrites calls to ``request.user.is_authenticated()`` and ``request.user.is_anonymous()`` to remove the parentheses, per `the deprecation <https://docs.djangoproject.com/en/1.10/releases/1.10/#using-user-is-authenticated-and-user-is-anonymous-as-methods>`__.
 

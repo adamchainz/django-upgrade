@@ -2,7 +2,7 @@
 Changelog
 =========
 
-* Add Django 1.10 fixer to rewrite ``user.is_authenticated()`` -> ``user.is_authenticated``.
+* Add Django 1.10+ fixer to rewrite ``request.user`` functions that changed to boolean attributes: ``is_authenticated`` and ``is_anonymous``.
 
   Thanks to Alessandro Ferrini in `PR #423 <https://github.com/adamchainz/django-upgrade/pull/423>`__.
 

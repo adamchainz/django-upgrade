@@ -37,8 +37,8 @@ def visit_Call(
     if (
         isinstance(node.func, ast.Attribute)
         and node.func.attr in ("is_anonymous", "is_authenticated")
-        and is_request_or_self_request_user(node.func.value)
         and len(node.args) == 0
+        and is_request_or_self_request_user(node.func.value)
     ):
         yield (
             ast_start_offset(node),

@@ -52,7 +52,7 @@ Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` f
         rev: ""  # replace with latest tag on GitHub
         hooks:
         -   id: django-upgrade
-            args: [--target-version, "4.1"]   # Replace with Django version
+            args: [--target-version, "4.2"]   # Replace with Django version
 
 Then, upgrade your entire project:
 
@@ -78,7 +78,7 @@ For example:
 
 .. code-block:: sh
 
-    django-upgrade --target-version 4.1 example/core/models.py example/settings.py
+    django-upgrade --target-version 4.2 example/core/models.py example/settings.py
 
 The ``--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
 For more on usage run ``django-upgrade --help``.
@@ -96,7 +96,7 @@ For example, |with git ls-files pipe xargs|_:
 
 .. code-block:: sh
 
-    git ls-files -z -- '*.py' | xargs -0 django-upgrade --target-version 4.1
+    git ls-files -z -- '*.py' | xargs -0 django-upgrade --target-version 4.2
 
 …or PowerShell’s |ForEach-Object|__:
 
@@ -105,7 +105,7 @@ __ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core
 
 .. code-block:: powershell
 
-    git ls-files -- '*.py' | %{django-upgrade --target-version 4.1 $_}
+    git ls-files -- '*.py' | %{django-upgrade --target-version 4.2 $_}
 
 The full list of fixers is documented below.
 

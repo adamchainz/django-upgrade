@@ -24,6 +24,7 @@ def test_not_within_module():
         if PRODUCTION:
             DEFAULT_FILE_STORAGE = "example.backend"
         """,
+        filename="settings.py",
     )
 
 

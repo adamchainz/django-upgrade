@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(4, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_assertFormsetError_non_test_file():
@@ -17,7 +20,6 @@ def test_assertFormsetError_non_test_file():
             def test_formset_error(self):
                 self.assertFormsetError('foo', 'bar')
         """,
-        settings,
     )
 
 
@@ -31,7 +33,6 @@ def test_assertFormsetError_custom_method():
             def assertFormsetError(self, foo, bar):
                 pass
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -54,7 +55,6 @@ def test_assertFormsetError_transformed():
             def test_formset_error(self):
                 self.assertFormSetError('foo', 'bar')
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -69,7 +69,6 @@ def test_assertQuerysetEqual_non_test_file():
             def test_formset_error(self):
                 self.assertQuerysetEqual('foo', 'bar')
         """,
-        settings,
     )
 
 
@@ -83,7 +82,6 @@ def test_assertQuerysetEqual_custom_method():
             def assertQuerysetEqual(self, foo, bar):
                 pass
         """,
-        settings,
     )
 
 
@@ -105,6 +103,5 @@ def test_assertQuerysetEqual_transformed():
             def test_formset_error(self):
                 self.assertQuerySetEqual('foo', 'bar')
         """,
-        settings,
         filename="tests.py",
     )

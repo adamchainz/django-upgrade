@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_unmatched_import():
@@ -13,7 +16,6 @@ def test_unmatched_import():
         from test import ModelMultipleChoiceField
         ModelMultipleChoiceField(error_messages={"list": "Enter values!"})
         """,
-        settings,
     )
 
 
@@ -25,7 +27,6 @@ def test_variable():
         msg = {"list": "Enter values!"}
         ModelMultipleChoiceField(error_messages=msg)
         """,
-        settings,
     )
 
 
@@ -41,7 +42,6 @@ def test_from_django_forms_import():
 
         ModelMultipleChoiceField(error_messages={"invalid_list": "Enter values!"})
         """,
-        settings,
     )
 
 
@@ -57,7 +57,6 @@ def test_from_django_import():
 
         forms.ModelMultipleChoiceField(error_messages={"invalid_list": "Enter values!"})
         """,
-        settings,
     )
 
 
@@ -77,7 +76,6 @@ def test_mixed_import():
         ModelMultipleChoiceField(error_messages={"invalid_list": "Enter values!"})
         forms.ModelMultipleChoiceField(error_messages={"invalid_list": "Enter values!"})
         """,
-        settings,
     )
 
 
@@ -101,7 +99,6 @@ def test_with_queryset_arg():
             error_messages={"invalid_list": "Enter values!"}
         )
         """,
-        settings,
     )
 
 
@@ -125,7 +122,6 @@ def test_with_queryset_kwarg():
             error_messages={"invalid_list": "Enter values!"}
         )
         """,
-        settings,
     )
 
 
@@ -147,5 +143,4 @@ def test_starargs():
             error_messages={**msg, "invalid_list": "Enter values!"}
         )
         """,
-        settings,
     )

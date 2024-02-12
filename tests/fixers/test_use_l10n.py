@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(4, 0))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_settings_file():
@@ -12,7 +15,6 @@ def test_not_settings_file():
         """\
         USE_L10N = True
         """,
-        settings,
     )
 
 
@@ -21,7 +23,6 @@ def test_false():
         """\
         USE_L10N = False
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -32,7 +33,6 @@ def test_dynamic():
         import os
         USE_L10N = os.environ["USE_L10N"]
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -43,7 +43,6 @@ def test_ignore_conditional():
         if something:
             USE_L10N = True
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -54,7 +53,6 @@ def test_success():
         USE_L10N = True
         """,
         "",
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -65,7 +63,6 @@ def test_success_comment():
         USE_L10N = True  # localization
         """,
         "",
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -76,7 +73,6 @@ def test_success_settings_subfolder():
         USE_L10N = True
         """,
         "",
-        settings,
         filename="myapp/settings/prod.py",
     )
 
@@ -88,7 +84,6 @@ def test_success_function_call_multiline():
             True
         """,
         "",
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -104,6 +99,5 @@ def test_success_with_other_lines():
         import os
         ANOTHER_SETTING = True
         """,
-        settings,
         filename="myapp/settings.py",
     )

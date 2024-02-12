@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 class TestActionFunctions:
@@ -18,7 +21,6 @@ class TestActionFunctions:
 
             make_published.long_description = "yada"
             """,
-            settings,
         )
 
     def test_module_incorrect_argument_count(self):
@@ -31,7 +33,6 @@ class TestActionFunctions:
 
             make_published.short_description = "yada"
             """,
-            settings,
         )
 
     def test_module_kwargs(self):
@@ -44,7 +45,6 @@ class TestActionFunctions:
 
             make_published.short_description = "yada"
             """,
-            settings,
         )
 
     def test_module_admin_not_imported(self):
@@ -55,7 +55,6 @@ class TestActionFunctions:
 
             make_published.short_description = 'yada'
             """,
-            settings,
         )
 
     def test_module_admin_imported_with_as(self):
@@ -68,7 +67,6 @@ class TestActionFunctions:
 
             make_published.long_description = "yada"
             """,
-            settings,
         )
 
     def test_module_admin_using_setattr(self):
@@ -81,7 +79,6 @@ class TestActionFunctions:
 
             setattr(make_published, "long_description", "yada")
             """,
-            settings,
         )
 
     def test_module_description(self):
@@ -104,7 +101,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_pos_only_args(self):
@@ -127,7 +123,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_permissions(self):
@@ -150,7 +145,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_both(self):
@@ -175,7 +169,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_both_existing_decorator(self):
@@ -202,7 +195,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_description_multiline(self):
@@ -231,7 +223,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_comment_not_copied(self):
@@ -256,7 +247,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_gis(self):
@@ -279,7 +269,6 @@ class TestActionFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_class_unknown_attribute(self):
@@ -293,7 +282,6 @@ class TestActionFunctions:
 
                 make_published.long_description = "yada"
             """,
-            settings,
         )
 
     def test_class_description(self):
@@ -318,7 +306,6 @@ class TestActionFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_permissions(self):
@@ -343,7 +330,6 @@ class TestActionFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_both(self):
@@ -370,7 +356,6 @@ class TestActionFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_both_existing_decorator(self):
@@ -399,7 +384,6 @@ class TestActionFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_gis(self):
@@ -424,7 +408,6 @@ class TestActionFunctions:
                     ...
 
             """,
-            settings,
         )
 
 
@@ -439,7 +422,6 @@ class TestDisplayFunctions:
 
             upper_case_name.long_description = "yada"
             """,
-            settings,
         )
 
     def test_module_incorrect_argument_count(self):
@@ -452,7 +434,6 @@ class TestDisplayFunctions:
 
             upper_case_name.short_description = "yada"
             """,
-            settings,
         )
 
     def test_module_kwargs(self):
@@ -465,7 +446,6 @@ class TestDisplayFunctions:
 
             upper_case_name.short_description = "yada"
             """,
-            settings,
         )
 
     def test_module_admin_not_imported(self):
@@ -476,7 +456,6 @@ class TestDisplayFunctions:
 
             upper_case_name.short_description = 'yada'
             """,
-            settings,
         )
 
     def test_module_admin_imported_with_as(self):
@@ -489,7 +468,6 @@ class TestDisplayFunctions:
 
             upper_case_name.short_description = "yada"
             """,
-            settings,
         )
 
     def test_module_admin_using_setattr(self):
@@ -502,7 +480,6 @@ class TestDisplayFunctions:
 
             setattr(upper_case_name, "short_description", "yada")
             """,
-            settings,
         )
 
     def test_module_description(self):
@@ -525,7 +502,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_boolean(self):
@@ -548,7 +524,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_empty_value(self):
@@ -571,7 +546,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_ordering(self):
@@ -594,7 +568,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_all(self):
@@ -625,7 +598,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_all_existing_decorator(self):
@@ -658,7 +630,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_module_gis(self):
@@ -681,7 +652,6 @@ class TestDisplayFunctions:
                 ...
 
             """,
-            settings,
         )
 
     def test_class_unknown_attribute(self):
@@ -695,7 +665,6 @@ class TestDisplayFunctions:
 
                 is_published.long_description = "yada"
             """,
-            settings,
         )
 
     def test_class_description(self):
@@ -722,7 +691,6 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_boolean(self):
@@ -749,7 +717,6 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_empty_value(self):
@@ -776,7 +743,6 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_ordering(self):
@@ -803,7 +769,6 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_many(self):
@@ -834,7 +799,6 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_many_existing_decorator(self):
@@ -867,7 +831,6 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )
 
     def test_class_gis(self):
@@ -894,5 +857,4 @@ class TestDisplayFunctions:
                     ...
 
             """,
-            settings,
         )

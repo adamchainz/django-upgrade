@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_unrecognized_import_format():
@@ -15,7 +18,6 @@ def test_unrecognized_import_format():
         urls.url("hahaha")
         urls.re_path("hahaha")
         """,
-        settings,
     )
 
 
@@ -26,7 +28,6 @@ def test_url_alias_not_supported():
 
         u("hahaha")
         """,
-        settings,
     )
 
 
@@ -37,7 +38,6 @@ def test_re_path_alias_not_supported():
 
         pr("hahaha")
         """,
-        settings,
     )
 
 
@@ -46,7 +46,6 @@ def test_conf_urls_unrecognized_name():
         """\
         from django.conf.urls import something
         """,
-        settings,
     )
 
 
@@ -55,7 +54,6 @@ def test_urls_unrecognized_name():
         """\
         from django.urls import something
         """,
-        settings,
     )
 
 
@@ -71,7 +69,6 @@ def test_include():
 
         include('example.urls')
         """,
-        settings,
     )
 
 
@@ -80,7 +77,6 @@ def test_url_not_used():
         """\
         from django.conf.urls import url
         """,
-        settings,
     )
 
 
@@ -89,7 +85,6 @@ def test_re_path_not_used():
         """\
         from django.urls import re_path
         """,
-        settings,
     )
 
 
@@ -100,7 +95,6 @@ def test_url_unsupported_call_format():
 
         url(regex=r"^$", views.index)
         """,
-        settings,
     )
 
 
@@ -111,7 +105,6 @@ def test_re_path_unsupported_call_format():
 
         re_path(regex=r"^$", views.index)
         """,
-        settings,
     )
 
 
@@ -127,7 +120,6 @@ def test_url_unconverted_regex():
 
         re_path(r'^[abc]{123}$', views.example)
         """,
-        settings,
     )
 
 
@@ -138,7 +130,6 @@ def test_re_path_unconverted_regex():
 
         re_path(r'^[abc]{123}$', views.example)
         """,
-        settings,
     )
 
 
@@ -156,7 +147,6 @@ def test_url_translation():
 
         re_path(_(r'^about/$'), views.about)
         """,
-        settings,
     )
 
 
@@ -168,7 +158,6 @@ def test_re_path_translation():
 
         re_path(_(r'^about/$'), views.about)
         """,
-        settings,
     )
 
 
@@ -186,7 +175,6 @@ def test_url_variable():
         path = r'^$'
         re_path(path, views.index)
         """,
-        settings,
     )
 
 
@@ -198,7 +186,6 @@ def test_re_path_variable():
         path = r'^$'
         re_path(path, views.index)
         """,
-        settings,
     )
 
 
@@ -209,7 +196,6 @@ def test_re_path_unanchored_end():
 
         re_path(r'^weblog/', views.blog)
         """,
-        settings,
     )
 
 
@@ -226,7 +212,6 @@ def test_re_path_unanchored_end_with_include():
 
         path('accounts/', include('allauth.urls'))
         """,
-        settings,
     )
 
 
@@ -242,7 +227,6 @@ def test_url_unanchored_end_with_include():
 
         path('accounts/', include('allauth.urls'))
         """,
-        settings,
     )
 
 
@@ -258,7 +242,6 @@ def test_path_empty():
 
         path('', views.index)
         """,
-        settings,
     )
 
 
@@ -274,7 +257,6 @@ def test_path_empty_double_quoted():
 
         path("", views.index)
         """,
-        settings,
     )
 
 
@@ -290,7 +272,6 @@ def test_path_simple():
 
         path('about/', views.about, name='about')
         """,
-        settings,
     )
 
 
@@ -306,7 +287,6 @@ def test_path_unanchored_start():
 
         path('about/', views.about)
         """,
-        settings,
     )
 
 
@@ -322,7 +302,6 @@ def test_path_unanchored_end():
 
         re_path(r'^weblog/', views.blog)
         """,
-        settings,
     )
 
 
@@ -338,7 +317,6 @@ def test_path_with_dash():
 
         path('more-info/', views.more_info)
         """,
-        settings,
     )
 
 
@@ -354,7 +332,6 @@ def test_path_int_converter_1():
 
         path('page/<int:number>/', views.page)
         """,
-        settings,
     )
 
 
@@ -370,7 +347,6 @@ def test_path_int_converter_1_double_quotes():
 
         path("page/<int:number>/", views.page)
         """,
-        settings,
     )
 
 
@@ -386,7 +362,6 @@ def test_path_int_converter_2():
 
         path('page/<int:number>/', views.page)
         """,
-        settings,
     )
 
 
@@ -402,7 +377,6 @@ def test_path_path_converter():
 
         path('<path:subpath>/', views.default)
         """,
-        settings,
     )
 
 
@@ -418,7 +392,6 @@ def test_path_slug_converter():
 
         path('post/<slug:slug>/', views.post)
         """,
-        settings,
     )
 
 
@@ -434,7 +407,6 @@ def test_path_str_converter():
 
         path('about/<str:name>/', views.about)
         """,
-        settings,
     )
 
 
@@ -451,7 +423,6 @@ def test_path_uuid_converter():
 
         path('uuid/<uuid:uuid>/', by_uuid)
         """,
-        settings,
     )
 
 
@@ -479,7 +450,6 @@ def test_complete():
             path('weblog/', include('blog.urls')),
         ]
         """,
-        settings,
     )
 
 
@@ -495,7 +465,6 @@ def test_re_path_empty():
 
         path('', views.index)
         """,
-        settings,
     )
 
 
@@ -511,7 +480,6 @@ def test_re_path_simple():
 
         path('about/', views.about, name='about')
         """,
-        settings,
     )
 
 
@@ -527,7 +495,6 @@ def test_re_path_unanchored_start():
 
         path('about/', views.about)
         """,
-        settings,
     )
 
 
@@ -544,7 +511,6 @@ def test_re_path_multiple_import():
 
         path('more-info/', views.more_info)
         """,
-        settings,
     )
 
 
@@ -560,7 +526,6 @@ def test_re_path_int_converter_1():
 
         path('page/<int:number>/', views.page)
         """,
-        settings,
     )
 
 
@@ -576,7 +541,6 @@ def test_re_path_int_converter_2():
 
         path('page/<int:number>/', views.page)
         """,
-        settings,
     )
 
 
@@ -592,7 +556,6 @@ def test_re_path_path_converter():
 
         path('<path:subpath>/', views.default)
         """,
-        settings,
     )
 
 
@@ -608,7 +571,6 @@ def test_re_path_slug_converter():
 
         path('post/<slug:slug>/', views.post)
         """,
-        settings,
     )
 
 
@@ -624,7 +586,6 @@ def test_re_path_str_converter():
 
         path('about/<str:name>/', views.about)
         """,
-        settings,
     )
 
 
@@ -641,7 +602,6 @@ def test_re_path_uuid_converter():
 
         path('uuid/<uuid:uuid>/', by_uuid)
         """,
-        settings,
     )
 
 
@@ -670,7 +630,6 @@ def test_re_path_complete():
             re_path(r'^post/(?P<year>[0-9]{4})/$', views.post, name='post'),
         ]
         """,
-        settings,
     )
 
 
@@ -695,7 +654,6 @@ def test_combined_keep_re_path():
             re_path(r'^weblog/[0-9]{4}', include('blog.urls')),
         ]
         """,
-        settings,
     )
 
 
@@ -720,7 +678,6 @@ def test_combined_rewrite_all():
             path('weblog/', include('blog.urls')),
         ]
         """,
-        settings,
     )
 
 
@@ -745,7 +702,6 @@ def test_combined_3():
             re_path(r'^weblog/[0-9]{4}', include('blog.urls')),
         ]
         """,
-        settings,
     )
 
 
@@ -769,7 +725,6 @@ def test_combined_4():
             path('weblog/', include('blog.urls')),
         ]
         """,
-        settings,
     )
 
 
@@ -789,7 +744,6 @@ def test_combined_5():
         include('example.urls')
         path('', views.index)
         """,
-        settings,
     )
 
 
@@ -802,5 +756,4 @@ def test_two_imported_used():
         path('whatever')
         re_path('whatever')
         """,
-        settings,
     )

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_header_access():
@@ -12,7 +15,6 @@ def test_not_header_access():
         """\
         request.META['QUERY_STRING']
         """,
-        settings,
     )
 
 
@@ -21,7 +23,6 @@ def test_not_string():
         """\
         request.META[123]
         """,
-        settings,
     )
 
 
@@ -30,7 +31,6 @@ def test_assignment():
         """\
         request.META['HTTP_SERVER'] = 'something'
         """,
-        settings,
     )
 
 
@@ -39,7 +39,6 @@ def test_delete():
         """\
         del request.META['HTTP_SERVER']
         """,
-        settings,
     )
 
 
@@ -48,7 +47,6 @@ def test_in_not_header():
         """\
         'QUERY_STRING' in request.META
         """,
-        settings,
     )
 
 
@@ -57,7 +55,6 @@ def test_not_in_not_header():
         """\
         'QUERY_STRING' not in request.META
         """,
-        settings,
     )
 
 
@@ -69,7 +66,6 @@ def test_subscript_simple():
         """\
         request.headers['server']
         """,
-        settings,
     )
 
 
@@ -81,7 +77,6 @@ def test_subscript_assigned():
         """\
         server = request.headers['server']
         """,
-        settings,
     )
 
 
@@ -99,7 +94,6 @@ def test_subscript_assigned_multiple():
             request.headers['x-powered-by'],
         )
         """,
-        settings,
     )
 
 
@@ -111,7 +105,6 @@ def test_subscript_simple_double_quotes():
         """\
         request.headers["server"]
         """,
-        settings,
     )
 
 
@@ -123,7 +116,6 @@ def test_subscript_two_words():
         """\
         request.headers['accept-encoding']
         """,
-        settings,
     )
 
 
@@ -135,7 +127,6 @@ def test_subscript_three_words():
         """\
         request.headers['x-powered-by']
         """,
-        settings,
     )
 
 
@@ -147,7 +138,6 @@ def test_subscript_self_request():
         """\
         self.request.headers['accept-encoding']
         """,
-        settings,
     )
 
 
@@ -159,7 +149,6 @@ def test_get_simple():
         """\
         request.headers.get('server')
         """,
-        settings,
     )
 
 
@@ -171,7 +160,6 @@ def test_get_content_length():
         """\
         request.headers.get('content-length')
         """,
-        settings,
     )
 
 
@@ -183,7 +171,6 @@ def test_get_content_type():
         """\
         request.headers.get('content-type')
         """,
-        settings,
     )
 
 
@@ -195,7 +182,6 @@ def test_get_default():
         """\
         request.headers.get('server', '')
         """,
-        settings,
     )
 
 
@@ -207,7 +193,6 @@ def test_get_self_request():
         """\
         request.headers.get('server')
         """,
-        settings,
     )
 
 
@@ -219,7 +204,6 @@ def test_in():
         """\
         'authorization' in request.headers
         """,
-        settings,
     )
 
 
@@ -231,7 +215,6 @@ def test_in_double_quotes():
         """\
         "authorization" in request.headers
         """,
-        settings,
     )
 
 
@@ -245,7 +228,6 @@ def test_in_within_if():
         if 'authorization' in request.headers:
             print('hi')
         """,
-        settings,
     )
 
 
@@ -259,7 +241,6 @@ def test_in_get_combined():
         if 'authorization' in request.headers:
             print(request.headers.get('authorization'))
         """,
-        settings,
     )
 
 
@@ -273,7 +254,6 @@ def test_in_double_statement():
         if 'authorization' in request.headers and 'server' in request.headers:
             print('hi')
         """,
-        settings,
     )
 
 
@@ -285,7 +265,6 @@ def test_not_in():
         """\
         'server' not in request.headers
         """,
-        settings,
     )
 
 
@@ -299,7 +278,6 @@ def test_not_in_within_if():
         if 'authorization' not in request.headers:
             print('hi')
         """,
-        settings,
     )
 
 
@@ -313,7 +291,6 @@ def test_not_in_get_combined():
         if 'authorization' not in request.headers:
             print(request.headers.get('authorization'))
         """,
-        settings,
     )
 
 
@@ -329,5 +306,4 @@ def test_not_in_double_statement():
               'server' not in request.headers:
             print('hi')
         """,
-        settings,
     )

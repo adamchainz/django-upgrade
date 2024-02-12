@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_deprecated_alias():
@@ -14,7 +17,6 @@ def test_no_deprecated_alias():
 
         ArrayField("My array field")
         """,
-        settings,
     )
 
 
@@ -25,7 +27,6 @@ def test_unmatched_import():
 
         FloatRangeField("My range of numbers")
         """,
-        settings,
     )
 
 
@@ -45,7 +46,6 @@ def test_direct_import():
         class MyModel(Model):
             my_field = DecimalRangeField("My range of numbers")
         """,
-        settings,
     )
 
 
@@ -61,5 +61,4 @@ def test_success_alias():
 
         FRF("yada")
         """,
-        settings,
     )

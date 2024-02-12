@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(4, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_settings_file():
@@ -12,7 +15,6 @@ def test_not_settings_file():
         """\
         DEFAULT_FILE_STORAGE = "example.backend"
         """,
-        settings,
     )
 
 
@@ -22,7 +24,6 @@ def test_not_within_module():
         if PRODUCTION:
             DEFAULT_FILE_STORAGE = "example.backend"
         """,
-        settings,
     )
 
 
@@ -31,7 +32,6 @@ def test_not_constant():
         """\
         DEFAULT_FILE_STORAGE = get_storage_backend()
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -41,7 +41,6 @@ def test_not_string():
         """\
         DEFAULT_FILE_STORAGE = 1
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -52,7 +51,6 @@ def test_one_not_string():
         DEFAULT_FILE_STORAGE = get_storage_backend()
         STATICFILES_STORAGE = "example.backend"
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -63,7 +61,6 @@ def test_duplicated():
         DEFAULT_FILE_STORAGE = "example.backend"
         DEFAULT_FILE_STORAGE = "example.other.backend"
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -77,7 +74,6 @@ def test_already_up_to_date():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -92,7 +88,6 @@ def test_setting_exists():
         }
         STATICFILES_STORAGE = "example.other.backend"
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -112,7 +107,6 @@ def test_default_only():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -132,7 +126,6 @@ def test_static_only():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -153,7 +146,6 @@ def test_both():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -174,7 +166,6 @@ def test_both_staticfiles_first():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -194,7 +185,6 @@ def test_retains_quoting():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -216,7 +206,6 @@ def test_star_import_not_settings():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -236,7 +225,6 @@ def test_star_import_base_settings():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )
 
@@ -256,6 +244,5 @@ def test_star_import_extended_module_path():
             },
         }
         """,
-        settings,
         filename="settings.py",
     )

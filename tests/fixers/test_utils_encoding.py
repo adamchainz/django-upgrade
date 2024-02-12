@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 0))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_deprecated_alias():
@@ -14,7 +17,6 @@ def test_no_deprecated_alias():
 
         something("yada")
         """,
-        settings,
     )
 
 
@@ -32,7 +34,6 @@ def test_encoding_module_imported():
         encoding.force_str("yada")
         encoding.smart_str("yada")
         """,
-        settings,
     )
 
 
@@ -56,7 +57,6 @@ def test_direct_import():
                 smart_str("yada"),
             )
         """,
-        settings,
     )
 
 
@@ -72,5 +72,4 @@ def test_success_alias():
 
         ft("yada")
         """,
-        settings,
     )

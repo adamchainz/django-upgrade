@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 0))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_false():
@@ -17,7 +20,6 @@ def test_false():
 
         upper_case_name.allow_tags = False
         """,
-        settings,
     )
 
 
@@ -31,7 +33,6 @@ def test_not_name():
 
         upper_case_name.allow_tags = maybe()
         """,
-        settings,
     )
 
 
@@ -43,7 +44,6 @@ def test_no_import():
 
         upper_case_name.allow_tags = True
         """,
-        settings,
     )
 
 
@@ -64,7 +64,6 @@ def test_basic():
             ...
 
         """,
-        settings,
     )
 
 
@@ -85,5 +84,4 @@ def test_basic_gis():
             ...
 
         """,
-        settings,
     )

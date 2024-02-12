@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import sys
+from functools import partial
 
 import pytest
 
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(1, 7))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_custom_admin_class():
@@ -19,7 +21,6 @@ def test_no_custom_admin_class():
 
         admin.site.register(Author)
         """,
-        settings,
     )
 
 
@@ -36,7 +37,6 @@ def test_kwargs_not_supported():
             pass
         admin.site.register(Author, AuthorAdmin, save_as=True)
         """,
-        settings,
     )
 
 
@@ -49,7 +49,6 @@ def test_imported_custom_admin():
 
         admin.site.register(Author, AuthorAdmin)
         """,
-        settings,
     )
 
 
@@ -63,7 +62,6 @@ def test_already_using_decorator_registration():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings,
     )
 
 
@@ -82,7 +80,6 @@ def test_py2_style_init_super():
 
         admin.site.register(Author, AuthorAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -98,7 +95,6 @@ def test_py2_style_init_super_with_inheritance():
 
         admin.site.register(Author, AuthorAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -115,7 +111,6 @@ def test_py2_style_init_super_with_outer_branching():
 
         admin.site.register(Author, AuthorAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -132,7 +127,6 @@ def test_py2_style_init_super_delayed():
 
         admin.site.register(Author, AuthorAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -148,7 +142,6 @@ def test_register_different_parent():
         if True:
             admin.site.register(Author, AuthorAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -194,7 +187,6 @@ def test_py2_style_init_super_with_inner_branching():
 
         admin.site.register(Spam, SpamAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -220,7 +212,6 @@ def test_py3_style_init_super():
                 super().__init__(*args, **kwargs)
 
         """,
-        settings=settings,
     )
 
 
@@ -236,7 +227,6 @@ def test_py2_style_new_super():
 
         admin.site.register(Author, AuthorAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -258,7 +248,6 @@ def test_rewrite():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -280,7 +269,6 @@ def test_rewrite_gis():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -304,7 +292,6 @@ def test_rewrite_indented():
             class AuthorAdmin(admin.ModelAdmin):
                 pass
         """,
-        settings=settings,
     )
 
 
@@ -326,7 +313,6 @@ def test_rewrite_kwarg():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -352,7 +338,6 @@ def test_rewrite_class_decorator():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -380,7 +365,6 @@ def test_rewrite_class_decorator_multiple():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -411,7 +395,6 @@ def test_rewrite_class_decorator_multiline():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -433,7 +416,6 @@ def test_rewrite_comment():
         class AuthorAdmin(admin.ModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -465,7 +447,6 @@ def test_multiple_rewrite():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -493,7 +474,6 @@ def test_py2_style_init_inside_async_function():
                     super(AuthorAdmin, self).__init__(*args, **kwargs)
 
         """,
-        settings=settings,
     )
 
 
@@ -521,7 +501,6 @@ def test_py2_style_init_inside_inner_class():
                     super(AuthorAdmin, self).__init__(*args, **kwargs)
 
         """,
-        settings=settings,
     )
 
 
@@ -545,7 +524,6 @@ def test_custom_model_admin_base_class():
         class AuthorAdmin(CustomModelAdmin):
             pass
         """,
-        settings=settings,
     )
 
 
@@ -570,7 +548,6 @@ def test_multiple_model_multiline_registration():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -595,7 +572,6 @@ def test_multiple_model_multiline_registration_sorted():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -619,7 +595,6 @@ def test_multiple_model_tuple_registration():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -643,7 +618,6 @@ def test_multiple_model_list_registration():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -667,7 +641,6 @@ def test_multiple_model_registration_with_kwarg():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -693,7 +666,6 @@ def test_multiple_model_mixed_registration():
             pass
 
         """,
-        settings=settings,
     )
 
 
@@ -730,7 +702,6 @@ def test_complete():
 
         admin.site.register(Blog, MyImportedAdmin)
         """,
-        settings=settings,
     )
 
 
@@ -745,7 +716,6 @@ def test_custom_admin_not_an_admin_file():
 
         custom_site.register(MyModel, MyModelAdmin)
         """,
-        settings,
         filename="a_d_m_i_n.py",
     )
 
@@ -761,7 +731,6 @@ def test_custom_admin_not_an_admin_model():
 
         custom_site.register(MyModel, Custom)
         """,
-        settings,
         filename="admin.py",
     )
 
@@ -777,7 +746,6 @@ def test_custom_admin_doesnt_end_with_site():
 
         app.register(MyModel, MyModelAdmin)
         """,
-        settings,
         filename="admin.py",
     )
 
@@ -794,7 +762,6 @@ def test_custom_admin_site_defined_after_admin():
 
         custom_site.register(MyModel, MyModelAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -811,7 +778,6 @@ def test_custom_admin_site_defined_after_admin_import():
 
         custom_site.register(MyModel, MyModelAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -828,7 +794,6 @@ def test_custom_admin_site_defined_after_admin_import_as():
 
         custom_site.register(MyModel, MyModelAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -853,7 +818,6 @@ def test_custom_admin_site():
             pass
 
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -880,7 +844,6 @@ def test_multiple_admin_sites():
             pass
 
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -907,7 +870,6 @@ def test_multiple_admin_sites_not_admin_file():
 
         custom_site.register(MyModel, MyModelAdmin)
         """,
-        settings=settings,
         filename="a_d_m_i_n.py",
     )
 
@@ -936,7 +898,6 @@ def test_multiple_admin_sites_sorted():
             pass
 
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -953,7 +914,6 @@ def test_unregister():
         admin.site.unregister(MyModel1)
         admin.site.register(MyModel1, MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -972,7 +932,6 @@ def test_unregister_reoccurring():
         admin.site.unregister(MyModel1)
         admin.site.register(MyModel1, MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -999,7 +958,6 @@ def test_unregister_no_effect_if_register_precedes():
 
         admin.site.unregister(MyModel1)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1016,7 +974,6 @@ def test_unregister_at_least_one_model_leaves_register():
         admin.site.unregister([MyModel1])
         admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1033,7 +990,6 @@ def test_unregister_kwarg():
         admin.site.unregister(model_or_iterable=MyModel1)
         admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1050,7 +1006,6 @@ def test_unregister_undetectable_names():
         admin.site.unregister(*some_models())
         admin.site.register([MyModel1, MyModel2], MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1068,7 +1023,6 @@ def test_unregister_undetectable_names_and_more():
         admin.site.unregister(MyModel2)
         admin.site.register(MyModel1, MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1090,7 +1044,6 @@ def test_unregister_multiple_admins():
 
         admin.site.register(MyModel1, MyOtherCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1127,7 +1080,6 @@ def test_unregister_multiple_admins_different_models():
             pass
 
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1157,7 +1109,6 @@ def test_unregister_multiple_models_for_model_admin():
         admin.site.unregister([MyModel1, MyModel2])
         admin.site.register((MyModel1, MyModel2), MyCustomAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1188,7 +1139,6 @@ def test_unregister_custom_admin_unregister():
         custom_site.unregister([MyModel])
         custom_site.register(MyModel, MyModelAdmin)
         """,
-        settings=settings,
         filename="admin.py",
     )
 
@@ -1219,6 +1169,5 @@ def test_unregister_not_admin_file():
         custom_site.register(MyModel, MyModelAdmin)
         secret_site.register(MyModel, MyModelAdmin)
         """,
-        settings=settings,
         filename="a_d_m_i_n.py",
     )

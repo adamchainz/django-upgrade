@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(1, 10))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_request():
@@ -12,7 +15,6 @@ def test_not_request():
         """\
         user.is_authenticated()
         """,
-        settings,
     )
 
 
@@ -21,7 +23,6 @@ def test_not_self_request():
         """\
         self.user.is_authenticated()
         """,
-        settings,
     )
 
 
@@ -30,7 +31,6 @@ def test_not_user():
         """\
         request.is_authenticated()
         """,
-        settings,
     )
 
 
@@ -39,7 +39,6 @@ def test_not_self_user():
         """\
         self.request.is_authenticated()
         """,
-        settings,
     )
 
 
@@ -51,7 +50,6 @@ def test_request_user_is_anonymous_simple():
         """\
         request.user.is_anonymous
         """,
-        settings,
     )
 
 
@@ -63,7 +61,6 @@ def test_request_user_is_authenticated_simple():
         """\
         request.user.is_authenticated
         """,
-        settings,
     )
 
 
@@ -75,7 +72,6 @@ def test_self_request_user_is_anonymous_simple():
         """\
         self.request.user.is_anonymous
         """,
-        settings,
     )
 
 
@@ -87,7 +83,6 @@ def test_self_request_user_is_authenticated_simple():
         """\
         self.request.user.is_authenticated
         """,
-        settings,
     )
 
 
@@ -101,7 +96,6 @@ def test_if_request_user_is_anonymous():
         if request.user.is_anonymous:
             ...
         """,
-        settings,
     )
 
 
@@ -115,7 +109,6 @@ def test_if_request_user_is_authenticated():
         if request.user.is_authenticated:
             ...
         """,
-        settings,
     )
 
 
@@ -129,7 +122,6 @@ def test_if_self_request_user_is_anonymous():
         if self.request.user.is_anonymous:
             ...
         """,
-        settings,
     )
 
 
@@ -143,14 +135,12 @@ def test_if_self_request_user_is_authenticated():
         if self.request.user.is_authenticated:
             ...
         """,
-        settings,
     )
 
 
 def test_spaces_between_noop():
     check_noop(
         "request . user . is_authenticated ",
-        settings,
     )
 
 
@@ -158,7 +148,6 @@ def test_spaces_between():
     check_transformed(
         "request . user . is_authenticated ( )",
         "request . user . is_authenticated ",
-        settings,
     )
 
 
@@ -171,7 +160,6 @@ def test_comment_between():
         """\
         request.user.is_anonymous
         """,
-        settings,
     )
 
 
@@ -185,7 +173,6 @@ def test_spaces_and_comments_noop():
         ):
             ...
         """,
-        settings,
     )
 
 
@@ -209,5 +196,4 @@ def test_spaces_and_comments():
         ):
             ...
         """,
-        settings,
     )

@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import sys
+from functools import partial
 
 import pytest
 
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 if sys.version_info < (3, 9):
     pytest.skip("Python 3.9+", allow_module_level=True)
 
 settings = Settings(target_version=(4, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_non_test_file():
@@ -19,7 +21,6 @@ def test_non_test_file():
         """\
         self.client.get("/", HTTP_HOST="example.com")
         """,
-        settings,
     )
 
 
@@ -29,7 +30,6 @@ def test_instantiation_custom_client_class():
         from example.test import Client
         Client(HTTP_HOST="example.com")
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -40,7 +40,6 @@ def test_instantiation_unpacked_kwargs():
         from example.test import Client
         Client(**maybe_has_headers, HTTP_HOST="example.com")
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -50,7 +49,6 @@ def test_custom_client_call():
         """
         self.custom_client.get("/", HTTP_HOST="example.com"),
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -60,7 +58,6 @@ def test_client_call_non_http_kwarg():
         """
         self.client.get("/", SCRIPT_NAME="/app/"),
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -70,7 +67,6 @@ def test_client_call_unpacked_kwargs():
         """
         self.client.get("/", HTTP_ACCEPT="text/plain", **maybe_has_headers)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -85,7 +81,6 @@ def test_instantiation_request_factory():
         from django.test import RequestFactory
         RequestFactory(headers={"host": "example.com"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -100,7 +95,6 @@ def test_instantiation():
         from django.test import Client
         Client(headers={"host": "example.com"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -115,7 +109,6 @@ def test_instantiation_other_arg():
         from django.test import Client
         Client(enforce_csrf_checks=False, headers={"host": "example.com"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -134,7 +127,6 @@ def test_instantiation_multiline():
             headers={"host": "example.com"}
         )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -149,7 +141,6 @@ def test_instantiation_multiple():
         from django.test import Client
         Client(headers={"a": "1", "b": "2"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -164,7 +155,6 @@ def test_instantiation_multiple_surrounding_existing():
         from django.test import Client
         Client(headers={"b": "2", "a": "1", "c": "3"}, )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -179,7 +169,6 @@ def test_instantiation_multiple_before_existing():
         from django.test import Client
         Client(headers={"c": "3", "a": "1", "b": "2"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -194,7 +183,6 @@ def test_instantiation_multiple_after_existing():
         from django.test import Client
         Client(headers={"c": "3", "a": "1", "b": "2"}, )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -209,7 +197,6 @@ def test_instantiation_unpacked_args():
         from django.test import Client
         Client(*args, headers={"host": "example.com"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -224,7 +211,6 @@ def test_instantiation_existing_empty():
         from django.test import Client
         Client(headers={"a": "1"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -248,7 +234,6 @@ def test_instantiation_existing_comment():
             "a": "1"}
         )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -260,7 +245,6 @@ def test_instantiation_existing_variable():
         headers = {}
         Client(HTTP_A="1", headers=headers)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -272,7 +256,6 @@ def test_instantiation_existing_dict_comp():
         names = ["header1"]
         Client(HTTP_A="1", headers={h: "yes" for h in names})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -285,7 +268,6 @@ def test_client_call():
         """\
         self.client.get("/", headers={"host": "example.com"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -298,7 +280,6 @@ def test_client_call_multiple():
         """\
         self.client.get("/", headers={"host": "example.com", "accept": "text/plain"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -311,7 +292,6 @@ def test_client_call_extra_arg():
         """\
         self.client.get("/", headers={"host": "example.com"}, SCRIPT_NAME="/app/")
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -324,7 +304,6 @@ def test_client_call_unpacked_args():
         """\
         self.client.get(*args, headers={"host": "example.com"})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -337,7 +316,6 @@ def test_client_call_extra_arg_in_between():
         """\
         self.client.get("/", headers={"a": "1", "b": "2"}, SCRIPT_NAME="/app/", )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -358,7 +336,6 @@ def test_client_call_multiline():
             headers={"host": "example.com"}
         )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -379,7 +356,6 @@ def test_client_call_multiline_comment():
             headers={"host": "example.com"}  # set host
         )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -401,7 +377,6 @@ def test_client_call_multiline_multiple():
             headers={"host": "example.com", "accept": "text/plain"}
         )
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -414,7 +389,6 @@ def test_client_variable():
         """\
         self.client.get("/", headers={"host": host})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -427,7 +401,6 @@ def test_client_expression():
         """\
         self.client.get("/", headers={"host": (name + tld)})
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -444,6 +417,5 @@ def test_client_expression_multiline():
             name + tld
         )})
         """,
-        settings,
         filename="tests.py",
     )

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from functools import partial
+
 import pytest
 
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_invalid_assign_target():
@@ -14,7 +17,6 @@ def test_invalid_assign_target():
         """\
         app_config = 'nope'
         """,
-        settings,
         filename="__init__.py",
     )
 
@@ -25,7 +27,6 @@ def test_gated():
         if 1:
             default_app_config = 'something'
         """,
-        settings,
         filename="__init__.py",
     )
 
@@ -35,7 +36,6 @@ def test_not_string():
         """\
         default_app_config = 123
         """,
-        settings,
         filename="__init__.py",
     )
 
@@ -45,7 +45,6 @@ def test_dynamic():
         """\
         default_app_config = "a" + "b"
         """,
-        settings,
         filename="__init__.py",
     )
 
@@ -56,7 +55,6 @@ def test_invalid_filename(filename: str) -> None:
         """\
         default_app_config = 'myapp.apps.MyAppConfig'
         """,
-        settings,
         filename=filename,
     )
 
@@ -70,7 +68,6 @@ def test_simple_case(filename: str) -> None:
         default_app_config = 'myapp.apps.MyAppConfig'
         """,
         "",
-        settings,
         filename=filename,
     )
 
@@ -81,7 +78,6 @@ def test_with_comment() -> None:
         default_app_config = 'myapp.apps.MyAppConfig'  # django < 3.2
         """,
         "",
-        settings,
         filename="__init__.py",
     )
 
@@ -97,6 +93,5 @@ def test_with_other_lines():
         import django
         widgets = 12
         """,
-        settings,
         filename="__init__.py",
     )

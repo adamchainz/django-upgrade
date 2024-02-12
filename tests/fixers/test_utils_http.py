@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import sys
+from functools import partial
 
 import pytest
 
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 0))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_deprecated_alias():
@@ -18,7 +20,6 @@ def test_no_deprecated_alias():
 
         something
         """,
-        settings,
     )
 
 
@@ -34,7 +35,6 @@ def test_one_local_name():
 
         x = url_has_allowed_host_and_scheme(y)
         """,
-        settings,
     )
 
 
@@ -50,7 +50,6 @@ def test_one_urllib_name():
 
         x = quote(y)
         """,
-        settings,
     )
 
 
@@ -67,7 +66,6 @@ def test_one_f_string():
 
         f"{quote(y)}"
         """,
-        settings,
     )
 
 
@@ -81,7 +79,6 @@ def test_one_urllib_name_indented():
         if True:
             from urllib.parse import quote
         """,
-        settings,
     )
 
 
@@ -99,7 +96,6 @@ def test_all_names():
 
         quote(quote_plus(unquote(unquote_plus(21))))
         """,
-        settings,
     )
 
 
@@ -120,7 +116,6 @@ def test_all_names_different_format():
 
         quote(quote_plus(unquote(unquote_plus(21))))
         """,
-        settings,
     )
 
 
@@ -136,7 +131,6 @@ def test_single_alias():
 
         v = q("x")
         """,
-        settings,
     )
 
 
@@ -154,5 +148,4 @@ def test_mixed_aliases():
 
         v = q("x")
         """,
-        settings,
     )

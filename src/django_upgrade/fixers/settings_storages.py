@@ -26,6 +26,7 @@ from django_upgrade.tokens import insert
 fixer = Fixer(
     __name__,
     min_version=(4, 2),
+    condition=lambda state: state.looks_like_settings_file,
 )
 
 # Keep track of seen assignments
@@ -85,8 +86,7 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_settings_file
-        and len(node.targets) == 1
+        len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and (
             (name := node.targets[0].id)

@@ -22,6 +22,7 @@ from django_upgrade.tokens import str_repr_matching
 fixer = Fixer(
     __name__,
     min_version=(1, 9),
+    condition=lambda state: state.looks_like_settings_file,
 )
 
 
@@ -32,8 +33,7 @@ def visit_Dict(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_settings_file
-        and len(parents) >= 2
+        len(parents) >= 2
         and isinstance(parents[-1], ast.Dict)
         and isinstance((db_setting := parents[-2]), ast.Assign)
         and len(db_setting.targets) == 1

@@ -101,12 +101,12 @@ def visit(
     settings: Settings,
     filename: str,
 ) -> dict[Offset, list[TokenFunc]]:
-    ast_funcs = get_ast_funcs(settings.target_version)
     initial_state = State(
         settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
+    ast_funcs = get_ast_funcs(initial_state)
 
     nodes: list[tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
     parents: list[ast.AST] = [tree]
@@ -150,12 +150,18 @@ def visit(
 
 
 class Fixer:
-    __slots__ = ("name", "min_version", "ast_funcs")
+    __slots__ = ("name", "min_version", "ast_funcs", "condition")
 
-    def __init__(self, name: str, min_version: tuple[int, int]) -> None:
+    def __init__(
+        self,
+        name: str,
+        min_version: tuple[int, int],
+        condition: Callable[[State], bool] | None = None,
+    ) -> None:
         self.name = name
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
+        self.condition = condition
 
         FIXERS.append(self)
 
@@ -183,10 +189,12 @@ def _import_fixers() -> None:
 _import_fixers()
 
 
-def get_ast_funcs(target_version: tuple[int, int]) -> ASTCallbackMapping:
+def get_ast_funcs(state: State) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
     for fixer in FIXERS:
-        if target_version >= fixer.min_version:
+        if fixer.min_version <= state.settings.target_version and (
+            fixer.condition is None or fixer.condition(state)
+        ):
             for type_, type_funcs in fixer.ast_funcs.items():
                 ast_funcs[type_].extend(type_funcs)
     return ast_funcs

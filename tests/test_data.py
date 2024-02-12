@@ -258,7 +258,7 @@ def test_all_fixers_are_documented() -> None:
     readme = (Path(__name__).parent.parent / "README.rst").read_text()
     docs = set()
     for line in readme.splitlines():
-        match = re.match(r"Name: ``(.+)``", line)
+        match = re.match(r"\*\*Name:\*\* ``(.+)``", line)
         if not match:
             continue
         docs.add(match[1])

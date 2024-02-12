@@ -35,6 +35,7 @@ from django_upgrade.tokens import insert
 fixer = Fixer(
     __name__,
     min_version=(4, 2),
+    condition=lambda state: state.looks_like_test_file,
 )
 
 HEADERS_KWARG = "headers"
@@ -49,14 +50,11 @@ if sys.version_info >= (3, 9):
         node: ast.Call,
         parents: list[ast.AST],
     ) -> Iterable[tuple[Offset, TokenFunc]]:
-        if state.looks_like_test_file and (
-            (
-                isinstance(node.func, ast.Name)
-                and node.func.id in ("Client", "RequestFactory")
-                and node.func.id in state.from_imports["django.test"]
-            )
-            or looks_like_test_client_call(node, "client")
-        ):
+        if (
+            isinstance(node.func, ast.Name)
+            and node.func.id in ("Client", "RequestFactory")
+            and node.func.id in state.from_imports["django.test"]
+        ) or looks_like_test_client_call(node, "client"):
             has_http_kwarg = False
             headers_keyword = None
             for keyword in node.keywords:

@@ -23,6 +23,7 @@ from django_upgrade.tokens import find
 fixer = Fixer(
     __name__,
     min_version=(3, 1),
+    condition=lambda state: state.looks_like_settings_file,
 )
 
 OLD_NAME = "PASSWORD_RESET_TIMEOUT_DAYS"
@@ -36,8 +37,7 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_settings_file
-        and len(node.targets) == 1
+        len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == OLD_NAME
     ):

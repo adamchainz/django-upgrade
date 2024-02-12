@@ -22,6 +22,7 @@ from django_upgrade.tokens import find_last_token
 fixer = Fixer(
     __name__,
     min_version=(2, 2),
+    condition=lambda state: state.looks_like_test_file,
 )
 
 
@@ -32,8 +33,7 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_test_file
-        and isinstance(parents[-1], ast.ClassDef)
+        isinstance(parents[-1], ast.ClassDef)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id in ("allow_database_queries", "multi_db")

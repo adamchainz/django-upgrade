@@ -20,6 +20,7 @@ from django_upgrade.tokens import erase_node
 fixer = Fixer(
     __name__,
     min_version=(4, 0),
+    condition=lambda state: state.looks_like_settings_file,
 )
 
 
@@ -30,8 +31,7 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_settings_file
-        and len(node.targets) == 1
+        len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == "USE_L10N"
         and isinstance(node.value, ast.Constant)

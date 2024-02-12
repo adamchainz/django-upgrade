@@ -27,6 +27,7 @@ from django_upgrade.tokens import update_import_names
 fixer = Fixer(
     __name__,
     min_version=(3, 1),
+    condition=lambda state: state.looks_like_models_file,
 )
 
 
@@ -36,11 +37,7 @@ def visit_ImportFrom(
     node: ast.ImportFrom,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        state.looks_like_models_file
-        and is_rewritable_import_from(node)
-        and node.module == "django.db.models"
-    ):
+    if is_rewritable_import_from(node) and node.module == "django.db.models":
         yield ast_start_offset(node), partial(
             update_import_names,
             node=node,
@@ -54,19 +51,16 @@ def visit_Call(
     node: ast.Call,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if state.looks_like_models_file and (
-        (
-            isinstance(node.func, ast.Name)
-            and "NullBooleanField" in state.from_imports["django.db.models"]
-            and node.func.id == "NullBooleanField"
-        )
-        or (
-            isinstance(node.func, ast.Attribute)
-            and node.func.attr == "NullBooleanField"
-            and "models" in state.from_imports["django.db"]
-            and isinstance(node.func.value, ast.Name)
-            and node.func.value.id == "models"
-        )
+    if (
+        isinstance(node.func, ast.Name)
+        and "NullBooleanField" in state.from_imports["django.db.models"]
+        and node.func.id == "NullBooleanField"
+    ) or (
+        isinstance(node.func, ast.Attribute)
+        and node.func.attr == "NullBooleanField"
+        and "models" in state.from_imports["django.db"]
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "models"
     ):
         yield ast_start_offset(node), partial(fix_null_boolean_field, node=node)
 

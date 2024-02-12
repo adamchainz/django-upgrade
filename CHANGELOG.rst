@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Run per-file conditions once, yielding a performance improvement of ~2% measured on a real-world project.
+
 1.16.0 (2024-02-11)
 -------------------
 

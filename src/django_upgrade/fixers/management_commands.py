@@ -20,6 +20,7 @@ from django_upgrade.tokens import replace
 fixer = Fixer(
     __name__,
     min_version=(3, 2),
+    condition=lambda state: state.looks_like_command_file,
 )
 
 
@@ -30,8 +31,7 @@ def visit_Assign(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_command_file
-        and isinstance(parents[-1], ast.ClassDef)
+        isinstance(parents[-1], ast.ClassDef)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id == "requires_system_checks"

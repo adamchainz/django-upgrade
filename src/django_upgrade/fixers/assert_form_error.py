@@ -33,6 +33,7 @@ from django_upgrade.tokens import reverse_consume
 fixer = Fixer(
     __name__,
     min_version=(4, 1),
+    condition=lambda state: state.looks_like_test_file,
 )
 
 
@@ -43,8 +44,7 @@ def visit_Call(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_test_file
-        and isinstance(node.func, ast.Attribute)
+        isinstance(node.func, ast.Attribute)
         and (func_name := node.func.attr) in ("assertFormError", "assertFormsetError")
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "self"

@@ -21,6 +21,7 @@ from django_upgrade.tokens import find_and_replace_name
 fixer = Fixer(
     __name__,
     min_version=(4, 2),
+    condition=lambda state: state.looks_like_test_file,
 )
 
 MODULE = "django.test.testcase"
@@ -37,8 +38,7 @@ def visit_Call(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_test_file
-        and isinstance(func := node.func, ast.Attribute)
+        isinstance(func := node.func, ast.Attribute)
         and (name := func.attr) in NAMES
         and isinstance(func.value, ast.Name)
         and func.value.id == "self"

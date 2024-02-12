@@ -18,11 +18,20 @@ def test_not_settings_file():
     )
 
 
-def test_not_within_module():
+def test_not_module_level():
     check_noop(
         """\
         if PRODUCTION:
             DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        filename="settings.py",
+    )
+
+
+def test_not_expected_name():
+    check_noop(
+        """\
+        CUSTOM_FILE_STORAGE = "example.backend"
         """,
         filename="settings.py",
     )

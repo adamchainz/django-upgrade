@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_settings_file():
@@ -12,7 +15,6 @@ def test_not_settings_file():
         """\
         PASSWORD_RESET_TIMEOUT_DAYS = 4
         """,
-        settings,
     )
 
 
@@ -24,7 +26,6 @@ def test_success():
         """\
         PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -37,7 +38,6 @@ def test_success_settings_subfolder():
         """\
         PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
         """,
-        settings,
         filename="myapp/settings/prod.py",
     )
 
@@ -52,7 +52,6 @@ def test_success_function_call():
         import os
         PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * int(os.environ["PASS_TIMEOUT"])
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -71,6 +70,5 @@ def test_success_function_call_multiline():
             os.environ["PASSWORD_RESET_TIMEOUT_DAYS"]
         )
         """,
-        settings,
         filename="myapp/settings.py",
     )

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_deprecated_arg():
@@ -13,7 +16,6 @@ def test_no_deprecated_arg():
         from django.dispatch import Signal
         Signal(use_caching=True)
         """,
-        settings,
     )
 
 
@@ -27,7 +29,6 @@ def test_pos_arg_alone():
         from django.dispatch import Signal
         Signal()
         """,
-        settings,
     )
 
 
@@ -41,7 +42,6 @@ def test_pos_arg_alone_module_imported():
         from django import dispatch
         dispatch.Signal()
         """,
-        settings,
     )
 
 
@@ -58,7 +58,6 @@ def test_pos_arg_alone_multiline():
         from django.dispatch import Signal
         my_signal = Signal()
         """,
-        settings,
     )
 
 
@@ -72,7 +71,6 @@ def test_pos_arg_with_caching():
         from django.dispatch import Signal
         Signal(None, True)
         """,
-        settings,
     )
 
 
@@ -86,7 +84,6 @@ def test_kwarg_alone():
         from django.dispatch import Signal
         Signal()
         """,
-        settings,
     )
 
 
@@ -100,7 +97,6 @@ def test_kwarg_with_caching():
         from django.dispatch import Signal
         Signal(use_caching=True)
         """,
-        settings,
     )
 
 
@@ -114,7 +110,6 @@ def test_kwarg_with_caching_no_space():
         from django.dispatch import Signal
         Signal(use_caching=True)
         """,
-        settings,
     )
 
 
@@ -128,7 +123,6 @@ def test_kwarg_with_caching_reordered():
         from django.dispatch import Signal
         Signal(use_caching=True)
         """,
-        settings,
     )
 
 
@@ -147,7 +141,6 @@ def test_kwarg_with_caching_multiline():
             use_caching=True,
         )
         """,
-        settings,
     )
 
 
@@ -169,5 +162,4 @@ def test_kwarg_with_all_extras():
             use_caching=True,
         )
         """,
-        settings,
     )

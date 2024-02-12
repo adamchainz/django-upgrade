@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_command_file():
@@ -15,7 +18,6 @@ def test_not_command_file():
         class Command(BaseCommand):
             requires_system_checks = False
         """,
-        settings,
     )
 
 
@@ -27,7 +29,6 @@ def test_no_assignment():
         class Command(BaseCommand):
             pass
         """,
-        settings,
         filename="myapp/management/commands/do_thing.py",
     )
 
@@ -41,7 +42,6 @@ def test_not_in_classdef():
             pass
         requires_system_checks = False
         """,
-        settings,
         filename="myapp/management/commands/do_thing.py",
     )
 
@@ -54,7 +54,6 @@ def test_already_empty_list():
         class Command(BaseCommand):
             requires_system_checks = []
         """,
-        settings,
         filename="myapp/management/commands/do_thing.py",
     )
 
@@ -67,7 +66,6 @@ def test_already_all():
         class Command(BaseCommand):
             requires_system_checks = "__all__"
         """,
-        settings,
         filename="myapp/management/commands/do_thing.py",
     )
 
@@ -86,7 +84,6 @@ def test_false():
         class Command(BaseCommand):
             requires_system_checks = []
         """,
-        settings,
         filename="myapp/management/commands/do_thing.py",
     )
 
@@ -105,6 +102,5 @@ def test_true():
         class Command(BaseCommand):
             requires_system_checks = "__all__"
         """,
-        settings,
         filename="myapp/management/commands/do_thing.py",
     )

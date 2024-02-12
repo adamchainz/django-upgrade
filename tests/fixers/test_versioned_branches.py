@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(4, 0))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_future_version_gt():
@@ -15,7 +18,6 @@ def test_future_version_gt():
         if django.VERSION > (4, 1):
             foo()
         """,
-        settings,
     )
 
 
@@ -27,7 +29,6 @@ def test_future_version_gte():
         if django.VERSION >= (4, 1):
             foo()
         """,
-        settings,
     )
 
 
@@ -39,7 +40,6 @@ def test_future_version_lt():
         if django.VERSION < (4, 1):
             foo()
         """,
-        settings,
     )
 
 
@@ -51,7 +51,6 @@ def test_future_version_lte():
         if django.VERSION <= (4, 1):
             foo()
         """,
-        settings,
     )
 
 
@@ -65,7 +64,6 @@ def test_elif():
         elif django.VERSION >= (4, 0):
             foo()
         """,
-        settings,
     )
 
 
@@ -79,7 +77,6 @@ def test_if_elif():
         elif unrelated:
             foo()
         """,
-        settings,
     )
 
 
@@ -91,7 +88,6 @@ def test_float_version():
         if django.VERSION >= (4.0, 0):
             foo()
         """,
-        settings,
     )
 
 
@@ -109,7 +105,6 @@ def test_old_version_lt():
 
         bar()
         """,
-        settings,
     )
 
 
@@ -128,7 +123,6 @@ def test_old_version_lt_with_else():
 
         bar()
         """,
-        settings,
     )
 
 
@@ -147,7 +141,6 @@ def test_old_version_lte():
 
         bar()
         """,
-        settings,
     )
 
 
@@ -164,7 +157,6 @@ def test_current_version_gte():
 
         foo()
         """,
-        settings,
     )
 
 
@@ -183,7 +175,6 @@ def test_current_version_gte_in_function():
         def foo():
             bar()
         """,
-        settings,
     )
 
 
@@ -202,7 +193,6 @@ def test_current_version_gte_in_if():
         if something:
             bar()
         """,
-        settings,
     )
 
 
@@ -221,7 +211,6 @@ def test_current_version_gte_with_else():
 
         foo()
         """,
-        settings,
     )
 
 
@@ -238,5 +227,4 @@ def test_current_version_gt():
 
         foo()
         """,
-        settings,
     )

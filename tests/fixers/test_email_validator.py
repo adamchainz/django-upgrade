@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_unmatched_import():
@@ -13,7 +16,6 @@ def test_unmatched_import():
         from example import EmailValidator
         EmailValidator(whitelist=["example.org"])
         """,
-        settings,
     )
 
 
@@ -23,7 +25,6 @@ def test_no_keyword_arguments():
         from django.core.validators import EmailValidator
         EmailValidator("a", "b", ["example.org"])
         """,
-        settings,
     )
 
 
@@ -37,7 +38,6 @@ def test_whitelist():
         from django.core.validators import EmailValidator
         EmailValidator(allowlist=["example.com"])
         """,
-        settings,
     )
 
 
@@ -57,5 +57,4 @@ def test_other_args():
             allowlist=["example.com"],
         )
         """,
-        settings,
     )

@@ -1,16 +1,18 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(4, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_empty():
     check_noop(
         "",
-        settings,
     )
 
 
@@ -19,7 +21,6 @@ def test_unmatched_import():
         """\
         from datetime.timezone import utc
         """,
-        settings,
     )
 
 
@@ -28,7 +29,6 @@ def test_unmatched_import_name():
         """\
         from django.utils.timezone import now
         """,
-        settings,
     )
 
 
@@ -38,7 +38,6 @@ def test_import_used_otherwise():
         from django.utils import timezone
         timezone.now()
         """,
-        settings,
     )
 
 
@@ -49,7 +48,6 @@ def test_no_datetime_import():
 
         do_a_thing(timezone.utc)
         """,
-        settings,
     )
 
 
@@ -59,7 +57,6 @@ def test_attr_no_import():
         import datetime as dt
         timezone.utc
         """,
-        settings,
     )
 
 
@@ -69,7 +66,6 @@ def test_not_imported_utc_name():
         utc = 1
         utc
         """,
-        settings,
     )
 
 
@@ -84,7 +80,6 @@ def test_basic():
         import datetime
         do_a_thing(datetime.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -101,7 +96,6 @@ def test_other_imports():
         from myapp import timezone
         do_a_thing(datetime.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -118,7 +112,6 @@ def test_docstring():
         import datetime
         do_a_thing(datetime.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -133,7 +126,6 @@ def test_import_aliased():
         import datetime as dt
         do_a_thing(dt.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -148,7 +140,6 @@ def test_import_paired():
         import datetime, os
         do_a_thing(datetime.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -163,7 +154,6 @@ def test_import_paired_alias():
         import numpy as np, datetime as dt
         do_a_thing(dt.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -180,7 +170,6 @@ def test_multiple():
         do_a_thing(datetime.timezone.utc)
         do_a_thing(datetime.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -197,7 +186,6 @@ def test_fix_skips_other_utc_names():
         dt.timezone.utc
         myobj.utc
         """,
-        settings,
     )
 
 
@@ -215,7 +203,6 @@ def test_attr():
 
         do_a_thing(datetime.timezone.utc)
         """,
-        settings,
     )
 
 
@@ -233,5 +220,4 @@ def test_attr_import_aliased():
 
         do_a_thing(dt.timezone.utc)
         """,
-        settings,
     )

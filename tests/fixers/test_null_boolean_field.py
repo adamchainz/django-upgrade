@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_unmatched_import():
@@ -13,7 +16,6 @@ def test_unmatched_import():
         from example import NullBooleanField
         NullBooleanField()
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -24,7 +26,6 @@ def test_untransformed_in_migration_file():
         from django.db.models import NullBooleanField
         field = NullBooleanField()
         """,
-        settings,
         filename="example/core/migrations/0001_initial.py",
     )
 
@@ -43,7 +44,6 @@ def test_transform_in_class():
         class Book(Model):
             valuable = BooleanField("Valuable", null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -58,7 +58,6 @@ def test_transform():
         from django.db.models import BooleanField
         field = BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -73,7 +72,6 @@ def test_transform_import_exists():
         from django.db.models import BooleanField
         field = BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -88,7 +86,6 @@ def test_transform_import_exists_second():
         from django.db.models import BooleanField
         field = BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -103,7 +100,6 @@ def test_transform_module_import():
         from django.db import models
         field = models.BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -118,7 +114,6 @@ def test_transform_with_pos_arg():
         from django.db.models import BooleanField
         field = BooleanField("My Field", null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -133,7 +128,6 @@ def test_transform_with_kwarg():
         from django.db.models import BooleanField
         field = BooleanField(verbose_name="My Field", null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -148,7 +142,6 @@ def test_transform_with_kwarg_ending_comma():
         from django.db.models import BooleanField
         field = BooleanField(verbose_name="My Field", null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -163,7 +156,6 @@ def test_transform_with_kwargs():
         from django.db.models import BooleanField
         field = BooleanField(verbose_name="My Field", validators=[], null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -182,7 +174,6 @@ def test_transform_with_kwargs_multiline():
             verbose_name="My Field",
          null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -197,7 +188,6 @@ def test_transform_with_star_pos_arg():
         from django.db.models import BooleanField
         field = BooleanField(*names, null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -212,7 +202,6 @@ def test_transform_with_star_kwargs():
         from django.db.models import BooleanField
         field = BooleanField(**kwargs, null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -227,7 +216,6 @@ def test_transform_with_null_is_true_kwarg_relative_import():
         from django.db import models
         models.BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -242,7 +230,6 @@ def test_transform_with_null_is_true_kwarg_absolute_import_renamed():
         from django.db.models import BooleanField
         BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -257,7 +244,6 @@ def test_transform_with_null_is_true_kwarg_absolute_import_removed():
         from django.db.models import BooleanField
         BooleanField(null=True)
         """,
-        settings,
         filename="models/blog.py",
     )
 
@@ -272,6 +258,5 @@ def test_transform_with_null_is_function():
         from django.db.models import BooleanField
         BooleanField(null=f())
         """,
-        settings,
         filename="models/blog.py",
     )

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(3, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_providing_length_as_pos_arg():
@@ -13,7 +16,6 @@ def test_providing_length_as_pos_arg():
         from django.utils.crypto import get_random_string
         get_random_string(12)
         """,
-        settings,
     )
 
 
@@ -23,7 +25,6 @@ def test_providing_length_as_pos_arg_module():
         from django.utils import crypto
         crypto.get_random_string(12)
         """,
-        settings,
     )
 
 
@@ -33,7 +34,6 @@ def test_providing_length_as_kwarg():
         from django.utils.crypto import get_random_string
         get_random_string(length=12)
         """,
-        settings,
     )
 
 
@@ -47,7 +47,6 @@ def test_no_pos_arg():
         from django.utils.crypto import get_random_string
         my_password = get_random_string(length=12) + "!"
         """,
-        settings,
     )
 
 
@@ -61,7 +60,6 @@ def test_no_pos_arg_module_imported():
         from django.utils import crypto
         my_password = crypto.get_random_string(length=12) + "!"
         """,
-        settings,
     )
 
 
@@ -75,5 +73,4 @@ def test_no_pos_arg_with_allowed_chars():
         from django.utils.crypto import get_random_string
         my_password = get_random_string(length=12, allowed_chars="123") + "!"
         """,
-        settings,
     )

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_test_file():
@@ -13,7 +16,6 @@ def test_not_test_file():
         class MyTests:
             allow_database_queries = True
         """,
-        settings,
     )
 
 
@@ -24,7 +26,6 @@ def test_not_in_class_def():
             pass
         allow_database_queries = True
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -41,7 +42,6 @@ def test_simple_test_case_conditional():
             def test_something(self):
                 self.assertEqual(2 * 2, 4)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -66,7 +66,6 @@ def test_simple_test_case_true():
             def test_something(self):
                 self.assertEqual(2 * 2, 4)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -91,7 +90,6 @@ def test_simple_test_case_false():
             def test_something(self):
                 self.assertEqual(2 * 2, 4)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -116,7 +114,6 @@ def test_test_case_true():
             def test_something(self):
                 self.assertEqual(2 * 2, 4)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -141,7 +138,6 @@ def test_test_case_false():
             def test_something(self):
                 self.assertEqual(2 * 2, 4)
         """,
-        settings,
         filename="tests.py",
     )
 
@@ -160,6 +156,5 @@ def test_mixin():
 
             my_custom_property = [True]
         """,
-        settings,
         filename="tests.py",
     )

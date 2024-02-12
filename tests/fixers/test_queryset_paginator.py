@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_deprecated_alias():
@@ -12,7 +15,6 @@ def test_no_deprecated_alias():
         """\
         from django.core.paginator import Paginator
         """,
-        settings,
     )
 
 
@@ -28,7 +30,6 @@ def test_paginator_module_imported():
 
         paginator.Paginator
         """,
-        settings,
     )
 
 
@@ -44,7 +45,6 @@ def test_success():
 
         Paginator(...)
         """,
-        settings,
     )
 
 
@@ -56,7 +56,6 @@ def test_success_other_names():
         """\
         from django.core.paginator import Paginator, foo, bar as baz
         """,
-        settings,
     )
 
 
@@ -68,5 +67,4 @@ def test_success_aliased():
         """\
         from django.core.paginator import Paginator as P
         """,
-        settings,
     )

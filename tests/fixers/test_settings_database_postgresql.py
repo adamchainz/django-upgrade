@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(1, 9))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_not_settings_file():
@@ -17,7 +20,6 @@ def test_not_settings_file():
             }
         }
         """,
-        settings,
     )
 
 
@@ -31,7 +33,6 @@ def test_wrong_engine():
             }
         }
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -46,7 +47,6 @@ def test_wrong_setting():
             }
         }
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -61,7 +61,6 @@ def test_already_up_to_date():
             }
         }
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -92,7 +91,6 @@ def test_success():
             }
         }
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -115,7 +113,6 @@ def test_success_two_databases():
             "analytics": {"ENGINE": 'django.db.backends.postgresql'},
         }
         """,
-        settings,
         filename="myapp/settings.py",
     )
 
@@ -152,6 +149,5 @@ def test_success_with_merged_settings():
             }
         }
         """,
-        settings,
         filename="myapp/settings.py",
     )

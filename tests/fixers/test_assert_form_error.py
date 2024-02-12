@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from functools import partial
+
 import pytest
 
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(4, 1))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 class TestForm:
@@ -15,7 +18,6 @@ class TestForm:
             """\
             self.assertFormError(form, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -24,7 +26,6 @@ class TestForm:
             """\
             self.assertFormError(form, "user", "woops", "My form")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -33,7 +34,6 @@ class TestForm:
             """\
             self.assertFormError(response, "form", "user", "woops", "!!!", None)
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -42,7 +42,6 @@ class TestForm:
             """\
             self.assertFormError(response, "form")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -51,7 +50,6 @@ class TestForm:
             """\
             self.assertFormError(response, "form", "user", err="woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -60,7 +58,6 @@ class TestForm:
             """\
             self.assertFormError(response, "form", "user", "woops", msg="!!!")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -69,7 +66,6 @@ class TestForm:
             """\
             self.assertFormError(page, form, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -80,7 +76,6 @@ class TestForm:
                 page = self.client.poke()
                 self.assertFormError(page, "form", "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -91,7 +86,6 @@ class TestForm:
                 page = Client().get()
                 self.assertFormError(page, "form", "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -102,7 +96,6 @@ class TestForm:
                 self.assertFormError(page, "form", "user", "woops")
                 page = self.client.get()
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -114,7 +107,6 @@ class TestForm:
                     page = self.client.get()
                 self.assertFormError(page, "form", "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -126,7 +118,6 @@ class TestForm:
                     page = self.client.get()
                 self.assertFormError(page, "form", "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -138,7 +129,6 @@ class TestForm:
                     page = self.client.get()
                 self.assertFormError(page, "form", "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -149,7 +139,6 @@ class TestForm:
                 page = "whatever"
                 self.assertFormError(page, "form", "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -159,7 +148,6 @@ class TestForm:
             def f(n = self.assertFormError(page, "form", "user", "woops")):
                 ...
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -171,7 +159,6 @@ class TestForm:
             """\
             self.assertFormError(response.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -183,7 +170,6 @@ class TestForm:
             """\
             self.assertFormError(response.context['form'], 'user', 'woops')
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -195,7 +181,6 @@ class TestForm:
             """\
             self.assertFormError(response.context["form"], "user", "woops", "My form")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -207,7 +192,6 @@ class TestForm:
             """\
             self.assertFormError(page_response1.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -227,7 +211,6 @@ class TestForm:
             f"""\
             self.assertFormError({name}.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -245,7 +228,6 @@ class TestForm:
                 page = self.client.get()
                 self.assertFormError(page.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -261,7 +243,6 @@ class TestForm:
                 page = await self.async_client.get()
                 self.assertFormError(page.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -279,7 +260,6 @@ class TestForm:
                     page = self.client.get()
                 self.assertFormError(page.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -297,7 +277,6 @@ class TestForm:
                     page = self.client.get()
                 self.assertFormError(page.context["form"], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -311,7 +290,6 @@ class TestForm:
             formname = "magicform"
             self.assertFormError(response.context[formname], "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -323,7 +301,6 @@ class TestForm:
             """\
             self.assertFormError( response.context["form"] , "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -337,7 +314,6 @@ class TestForm:
             self.assertFormError(response.context["form"],
                 "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -351,7 +327,6 @@ class TestForm:
             self.assertFormError(response.context["form"],
                 "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -372,7 +347,6 @@ class TestForm:
                 "woops",
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -384,7 +358,6 @@ class TestForm:
             """\
             self.assertFormError(response.context["form"], "user", errors="woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -400,7 +373,6 @@ class TestForm:
                 response.context["form"], "user", "woops", msg_prefix="!!!"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -416,7 +388,6 @@ class TestForm:
                 response.context["form"], "user", errors="woops", msg_prefix="!!!"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -428,7 +399,6 @@ class TestForm:
             """\
             self.assertFormError(response.context["form"], "user", [])
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -440,7 +410,6 @@ class TestForm:
             """\
             self.assertFormError(response.context["form"], "user", errors=[])
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -451,7 +420,6 @@ class TestFormset:
             """\
             self.assertFormsetError(formset, "user", 0, "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -460,7 +428,6 @@ class TestFormset:
             """\
             self.assertFormsetError(formset, "user", 0, "woops", "My form")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -469,7 +436,6 @@ class TestFormset:
             """\
             self.assertFormsetError(page, formset, 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -480,7 +446,6 @@ class TestFormset:
                 response, "formset", 0, "user", "woops", "!!!", None
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -489,7 +454,6 @@ class TestFormset:
             """\
             self.assertFormsetError(response, "formset", 0)
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -498,7 +462,6 @@ class TestFormset:
             """\
             self.assertFormsetError(response, "formset", 0, "user", err="woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -507,7 +470,6 @@ class TestFormset:
             """\
             self.assertFormsetError(response, "formset", 0, "user", "woops", msg="!!!")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -518,7 +480,6 @@ class TestFormset:
                 page = self.client.poke()
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -529,7 +490,6 @@ class TestFormset:
                 page = Client().get()
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -540,7 +500,6 @@ class TestFormset:
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
                 page = self.client.get()
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -552,7 +511,6 @@ class TestFormset:
                     page = self.client.get()
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -564,7 +522,6 @@ class TestFormset:
                     page = self.client.get()
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -576,7 +533,6 @@ class TestFormset:
                     page = self.client.get()
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -587,7 +543,6 @@ class TestFormset:
                 page = "whatever"
                 self.assertFormsetError(page, "formset", 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -597,7 +552,6 @@ class TestFormset:
             def f(n = self.assertFormsetError(page, "formset", 0, "user", "woops")):
                 ...
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -609,7 +563,6 @@ class TestFormset:
             """\
             self.assertFormsetError(response.context["formset"], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -625,7 +578,6 @@ class TestFormset:
                 response.context["formset"], 0, "user", "woops", "My form",
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -641,7 +593,6 @@ class TestFormset:
                 response.context["formset"], 0, None, "woops"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -657,7 +608,6 @@ class TestFormset:
                 page_response1.context["formset"], 0, "user", "woops"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -677,7 +627,6 @@ class TestFormset:
             f"""\
             self.assertFormsetError({name}.context["formset"], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -693,7 +642,6 @@ class TestFormset:
                 page = self.client.get()
                 self.assertFormsetError(page.context["formset"], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -709,7 +657,6 @@ class TestFormset:
                 page = await self.async_client.get()
                 self.assertFormsetError(page.context["formset"], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -727,7 +674,6 @@ class TestFormset:
                     page = self.client.get()
                 self.assertFormsetError(page.context["formset"], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -745,7 +691,6 @@ class TestFormset:
                     page = self.client.get()
                 self.assertFormsetError(page.context["formset"], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -759,7 +704,6 @@ class TestFormset:
             setname = "magicform"
             self.assertFormsetError(response.context[setname], 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -771,7 +715,6 @@ class TestFormset:
             """\
             self.assertFormsetError( response.context["formset"] , 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -785,7 +728,6 @@ class TestFormset:
             self.assertFormsetError(response.context["formset"],
                 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -799,7 +741,6 @@ class TestFormset:
             self.assertFormsetError(response.context["formset"],
                 0, "user", "woops")
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -822,7 +763,6 @@ class TestFormset:
                 "woops",
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -838,7 +778,6 @@ class TestFormset:
                 response.context["formset"], 0, "user", errors="woops"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -854,7 +793,6 @@ class TestFormset:
                 response.context["formset"], 0, "user", "woops", msg_prefix="!!!"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -870,7 +808,6 @@ class TestFormset:
                 response.context["formset"], 0, "user", errors="woops", msg_prefix="!!!"
             )
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -882,7 +819,6 @@ class TestFormset:
             """\
             self.assertFormsetError(response.context["formset"], 0, "user", [])
             """,
-            settings,
             filename="tests.py",
         )
 
@@ -894,6 +830,5 @@ class TestFormset:
             """\
             self.assertFormsetError(response.context["formset"], 0, "user", errors=[])
             """,
-            settings,
             filename="tests.py",
         )

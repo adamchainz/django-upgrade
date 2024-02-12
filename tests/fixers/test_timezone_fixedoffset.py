@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from functools import partial
+
 from django_upgrade.data import Settings
-from tests.fixers.tools import check_noop
-from tests.fixers.tools import check_transformed
+from tests.fixers import tools
 
 settings = Settings(target_version=(2, 2))
+check_noop = partial(tools.check_noop, settings=settings)
+check_transformed = partial(tools.check_transformed, settings=settings)
 
 
 def test_no_deprecated_alias():
@@ -12,7 +15,6 @@ def test_no_deprecated_alias():
         """\
         from django.utils.timezone import now
         """,
-        settings,
     )
 
 
@@ -23,7 +25,6 @@ def test_unrecognized_import_format():
 
         timezone.FixedOffset
         """,
-        settings,
     )
 
 
@@ -35,7 +36,6 @@ def test_lone_import_erased():
         """\
         from datetime import timedelta, timezone
         """,
-        settings,
     )
 
 
@@ -49,7 +49,6 @@ def test_lone_import_erased_but_not_following():
         from datetime import timedelta, timezone
         import sys
         """,
-        settings,
     )
 
 
@@ -62,7 +61,6 @@ def test_name_import_erased():
         from datetime import timedelta, timezone
         from django.utils.timezone import now
         """,
-        settings,
     )
 
 
@@ -75,7 +73,6 @@ def test_name_import_erased_other_order():
         from datetime import timedelta, timezone
         from django.utils.timezone import now
         """,
-        settings,
     )
 
 
@@ -88,7 +85,6 @@ def test_name_import_erased_alongside_alias():
         from datetime import timedelta, timezone
         from django.utils.timezone import now as timezone_now
         """,
-        settings,
     )
 
 
@@ -106,7 +102,6 @@ def test_name_import_erased_multiline():
             now,
         )
         """,
-        settings,
     )
 
 
@@ -121,7 +116,6 @@ def test_added_import_matches_indentation():
             from datetime import timedelta, timezone
             from django.utils.timezone import now
         """,
-        settings,
     )
 
 
@@ -139,7 +133,6 @@ def test_name_import_erased_multiline_with_comments():
             now,  # this too
         )
         """,
-        settings,
     )
 
 
@@ -153,7 +146,6 @@ def test_call_rewritten():
         from datetime import timedelta, timezone
         timezone(timedelta(minutes=120))
         """,
-        settings,
     )
 
 
@@ -167,7 +159,6 @@ def test_call_with_extra_arg_rewritten():
         from datetime import timedelta, timezone
         timezone(timedelta(minutes=120), "Super time")
         """,
-        settings,
     )
 
 
@@ -182,7 +173,6 @@ def test_call_with_star_args_not_rewritten():
         from datetime import timedelta, timezone
         FixedOffset(*(120,))
         """,
-        settings,
     )
 
 
@@ -197,7 +187,6 @@ def test_call_with_star_star_args_not_rewritten():
         from datetime import timedelta, timezone
         FixedOffset(**{'offset': 120})
         """,
-        settings,
     )
 
 
@@ -211,7 +200,6 @@ def test_call_with_keyword_arguments_rewritten():
         from datetime import timedelta, timezone
         timezone(offset=timedelta(minutes=120), name="Super time")
         """,
-        settings,
     )
 
 
@@ -227,7 +215,6 @@ def test_call_with_keyword_arguments_reordered_rewritten():
         timezone(name="Super time",
             offset=timedelta(minutes=120))
         """,
-        settings,
     )
 
 
@@ -239,5 +226,4 @@ def test_call_different_class_not_rewritten():
         """\
         FixedOffset("hi")
         """,
-        settings,
     )

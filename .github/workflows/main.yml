@@ -37,7 +37,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        python -m pip install --upgrade 'tox>=4.0.0rc3'
+        python -m pip install --upgrade 'tox>=4.0.0rc3' tox-uv
 
     - name: Run tox targets for ${{ matrix.python-version }}
       run: tox run -f py$(echo ${{ matrix.python-version }} | tr -d .)

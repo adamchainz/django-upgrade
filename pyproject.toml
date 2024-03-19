@@ -44,9 +44,6 @@ urls = {Changelog = "https://github.com/adamchainz/django-upgrade/blob/main/CHAN
 [project.scripts]
 django-upgrade = "django_upgrade.main:main"
 
-[tool.black]
-target-version = ['py38']
-
 [tool.isort]
 add_imports = [
     "from __future__ import annotations"

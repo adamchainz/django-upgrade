@@ -104,6 +104,37 @@ def test_main_stdin_no_changes(capsys):
     assert err == ""
 
 
+@pytest.mark.parametrize(
+    "fixer_args",
+    [
+        [],  # no fixer specified so applies all fixers
+        ["--fixer", "queryset_paginator"],
+        ["--fixer", "queryset_paginator", "--fixer", "another"],
+    ],
+)
+def test_main_select_fixer_with_changes(tmp_path, fixer_args):
+    input_ = "from django.core.paginator import QuerySetPaginator\n"
+    path = tmp_path / "example.py"
+    path.write_text(input_)
+
+    result = main([str(path)] + fixer_args)
+
+    assert result == 1
+    assert path.read_text() == "from django.core.paginator import Paginator\n"
+
+
+def test_main_select_fixer_no_changes(tmp_path):
+    # a different fixer specified so leaves QuerySetPaginator unchanged
+    input_ = "from django.core.paginator import QuerySetPaginator\n"
+    path = tmp_path / "example.py"
+    path.write_text(input_)
+
+    result = main([str(path), "--fixer", "other"])
+
+    assert result == 0
+    assert path.read_text() == input_
+
+
 def test_main_stdin_with_changes(capsys):
     input_ = "from django.core.paginator import QuerySetPaginator\n"
     stdin = io.TextIOWrapper(io.BytesIO(input_.encode()), "UTF-8")

@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add ``--fixer <some-fixer>`` (repeatable) option to only run a subset of fixers.
+
+  Thanks to David Szotten in `PR #333 <https://github.com/adamchainz/django-upgrade/pull/333>`__.
+
 * Run per-file conditions once, yielding a performance improvement of ~2% measured on a real-world project.
 
 1.16.0 (2024-02-11)

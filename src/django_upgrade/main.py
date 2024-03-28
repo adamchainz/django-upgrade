@@ -46,6 +46,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         ],
     )
     parser.add_argument(
+        "--fixers",
+        action="append",
+        help="only apply the specified fixer(s)",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f'%(prog)s {metadata.version("django-upgrade")}',
@@ -58,6 +63,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     settings = Settings(
         target_version=target_version,
+        fixers=args.fixers,
     )
 
     ret = 0

@@ -21,10 +21,13 @@ from django_upgrade import fixers
 
 
 class Settings:
-    __slots__ = ("target_version",)
+    __slots__ = ("target_version", "fixers")
 
-    def __init__(self, target_version: tuple[int, int]) -> None:
+    def __init__(
+        self, target_version: tuple[int, int], fixers: list[str] | None = None
+    ) -> None:
         self.target_version = target_version
+        self.fixers = fixers
 
 
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
@@ -106,7 +109,7 @@ def visit(
         filename=filename,
         from_imports=defaultdict(set),
     )
-    ast_funcs = get_ast_funcs(initial_state)
+    ast_funcs = get_ast_funcs(initial_state, settings.fixers)
 
     nodes: list[tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
     parents: list[ast.AST] = [tree]
@@ -150,15 +153,22 @@ def visit(
 
 
 class Fixer:
-    __slots__ = ("name", "min_version", "ast_funcs", "condition")
+    __slots__ = (
+        "name",
+        "module",
+        "min_version",
+        "ast_funcs",
+        "condition",
+    )
 
     def __init__(
         self,
-        name: str,
+        module: str,
         min_version: tuple[int, int],
         condition: Callable[[State], bool] | None = None,
     ) -> None:
-        self.name = name
+        self.module = module
+        self.name = module.rpartition(".")[2]
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
         self.condition = condition
@@ -189,9 +199,11 @@ def _import_fixers() -> None:
 _import_fixers()
 
 
-def get_ast_funcs(state: State) -> ASTCallbackMapping:
+def get_ast_funcs(state: State, fixers: list[str] | None) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
     for fixer in FIXERS:
+        if fixers is not None and fixer.name not in fixers:
+            continue
         if fixer.min_version <= state.settings.target_version and (
             fixer.condition is None or fixer.condition(state)
         ):

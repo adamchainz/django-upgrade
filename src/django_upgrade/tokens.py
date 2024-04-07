@@ -20,7 +20,6 @@ OP = "OP"
 PHYSICAL_NEWLINE = "NL"
 STRING = "STRING"
 
-
 # Basic functions
 
 
@@ -68,30 +67,28 @@ def find_first_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     """
     Find the first token corresponding to the given ast node.
     """
-    j = i
-    while tokens[j].line is None or tokens[j].line < node.lineno:
-        j += 1
+    while tokens[i].line is None or tokens[i].line < node.lineno:
+        i += 1
     while (
-        tokens[j].utf8_byte_offset is None
-        or tokens[j].utf8_byte_offset < node.col_offset
+        tokens[i].utf8_byte_offset is None
+        or tokens[i].utf8_byte_offset < node.col_offset
     ):
-        j += 1
-    return j
+        i += 1
+    return i
 
 
 def find_last_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     """
     Find the last token corresponding to the given ast node.
     """
-    j = i
-    while tokens[j].line is None or tokens[j].line < node.end_lineno:
-        j += 1
+    while tokens[i].line is None or tokens[i].line < node.end_lineno:
+        i += 1
     while (
-        tokens[j].utf8_byte_offset is None
-        or tokens[j].utf8_byte_offset < node.end_col_offset
+        tokens[i].utf8_byte_offset is None
+        or tokens[i].utf8_byte_offset < node.end_col_offset
     ):
-        j += 1
-    return j - 1
+        i += 1
+    return i - 1
 
 
 def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
@@ -99,13 +96,12 @@ def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
     If the previous token is and indent, return its position and the
     indentation string. Otherwise return the current position and "".
     """
-    j = i
-    if j > 0 and tokens[j - 1].name in (INDENT, UNIMPORTANT_WS):
-        j -= 1
-        indent = tokens[j].src
+    if i > 0 and tokens[i - 1].name in (INDENT, UNIMPORTANT_WS):
+        i -= 1
+        indent = tokens[i].src
     else:
         indent = ""
-    return (j, indent)
+    return (i, indent)
 
 
 def alone_on_line(tokens: list[Token], start_idx: int, end_idx: int) -> bool:
@@ -122,8 +118,8 @@ def alone_on_line(tokens: list[Token], start_idx: int, end_idx: int) -> bool:
 
 # More complex mini-parsers
 
-
 BRACES = {"(": ")", "[": "]", "{": "}"}
+OPENING, CLOSING = frozenset(BRACES), frozenset(BRACES.values())
 
 
 def parse_call_args(
@@ -157,10 +153,6 @@ def parse_call_args(
         i += 1
 
     return args, i
-
-
-BRACES = {"(": ")", "[": "]", "{": "}"}
-OPENING, CLOSING = frozenset(BRACES), frozenset(BRACES.values())
 
 
 def find_block_start(tokens: list[Token], i: int) -> int:

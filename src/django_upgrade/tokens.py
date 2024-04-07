@@ -20,10 +20,6 @@ OP = "OP"
 PHYSICAL_NEWLINE = "NL"
 STRING = "STRING"
 
-
-BRACES = {"(": ")", "[": "]", "{": "}"}
-OPENING, CLOSING = frozenset(BRACES), frozenset(BRACES.values())
-
 # Basic functions
 
 
@@ -121,6 +117,11 @@ def alone_on_line(tokens: list[Token], start_idx: int, end_idx: int) -> bool:
 
 
 # More complex mini-parsers
+
+BRACES = {"(": ")", "[": "]", "{": "}"}
+OPENING, CLOSING = frozenset(BRACES), frozenset(BRACES.values())
+
+
 def parse_call_args(
     tokens: list[Token],
     i: int,

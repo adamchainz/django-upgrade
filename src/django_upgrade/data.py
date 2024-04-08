@@ -21,10 +21,33 @@ from django_upgrade import fixers
 
 
 class Settings:
-    __slots__ = ("target_version",)
+    __slots__ = (
+        "target_version",
+        "specific_fixture_names",
+    )
 
-    def __init__(self, target_version: tuple[int, int]) -> None:
+    def __init__(
+        self,
+        target_version: tuple[int, int],
+        only_fixers: list[str] | None = None,
+        skip_fixers: list[str] | None = None,
+    ) -> None:
         self.target_version = target_version
+        self.specific_fixture_names = self._calculate_specific_fixtures(
+            only_fixers, skip_fixers
+        )
+
+    def _calculate_specific_fixtures(
+        self,
+        only_fixers: list[str] | None,
+        skip_fixers: list[str] | None,
+    ) -> list[str]:
+        fixer_names: list[str] = [f.name for f in FIXERS]
+        if only_fixers is not None:
+            fixer_names = [f for f in fixer_names if f in only_fixers]
+        if skip_fixers is not None:
+            fixer_names = [f for f in fixer_names if f not in skip_fixers]
+        return fixer_names
 
 
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
@@ -106,7 +129,7 @@ def visit(
         filename=filename,
         from_imports=defaultdict(set),
     )
-    ast_funcs = get_ast_funcs(initial_state)
+    ast_funcs = get_ast_funcs(initial_state, settings)
 
     nodes: list[tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
     parents: list[ast.AST] = [tree]
@@ -149,16 +172,28 @@ def visit(
     return ret
 
 
+def list_fixers() -> None:
+    for fixer in sorted(FIXERS, key=lambda f: f.name):
+        print(fixer.name)
+
+
 class Fixer:
-    __slots__ = ("name", "min_version", "ast_funcs", "condition")
+    __slots__ = (
+        "name",
+        "module",
+        "min_version",
+        "ast_funcs",
+        "condition",
+    )
 
     def __init__(
         self,
-        name: str,
+        module: str,
         min_version: tuple[int, int],
         condition: Callable[[State], bool] | None = None,
     ) -> None:
-        self.name = name
+        self.module = module
+        self.name: str = module.rpartition(".")[2]
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
         self.condition = condition
@@ -189,9 +224,11 @@ def _import_fixers() -> None:
 _import_fixers()
 
 
-def get_ast_funcs(state: State) -> ASTCallbackMapping:
+def get_ast_funcs(state: State, settings: Settings) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
     for fixer in FIXERS:
+        if fixer.name not in settings.specific_fixture_names:
+            continue
         if fixer.min_version <= state.settings.target_version and (
             fixer.condition is None or fixer.condition(state)
         ):

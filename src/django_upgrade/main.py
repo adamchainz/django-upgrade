@@ -16,13 +16,14 @@ from tokenize_rt import tokens_to_src
 
 from django_upgrade.ast import ast_parse
 from django_upgrade.data import Settings
+from django_upgrade.data import list_fixers
 from django_upgrade.data import visit
 from django_upgrade.tokens import DEDENT
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("filenames", nargs="+")
+    parser.add_argument("filenames", nargs="*")
     parser.add_argument(
         "--target-version",
         default="2.2",
@@ -56,14 +57,42 @@ def main(argv: Sequence[str] | None = None) -> int:
         version=metadata.version("django-upgrade"),
         help="Show the version number and exit.",
     )
+    parser.add_argument(
+        "--only",
+        action="append",
+        help="Only run the selected fixers",
+    )
+    parser.add_argument(
+        "--skip",
+        action="append",
+        help="Skip the selected fixers",
+    )
+    parser.add_argument(
+        "--list-fixers",
+        action="store_true",
+    )
+
     args = parser.parse_args(argv)
+
+    if args.list_fixers:
+        list_fixers()
+        return 0
+
+    if not args.filenames:
+        print(
+            "error: the following arguments are required: filenames\n", file=sys.stderr
+        )
+        raise SystemExit(2)
 
     target_version: tuple[int, int] = cast(
         Tuple[int, int],
         tuple(int(x) for x in args.target_version.split(".", 1)),
     )
+
     settings = Settings(
         target_version=target_version,
+        only_fixers=args.only,
+        skip_fixers=args.skip,
     )
 
     ret = 0

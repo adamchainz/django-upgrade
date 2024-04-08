@@ -4,6 +4,16 @@ Changelog
 
 * Run per-file conditions once, yielding a performance improvement of ~2% measured on a real-world project.
 
+* Add ability to run specific fixers with ``--only <fixer_name>``
+
+* Add ability to skip specific fixers with ``--skip <fixer_name>``
+
+* Add ability to list all possible fixers with ``--list-fixers``
+
+  Thanks to Gav O'Connor in `PR #443 <https://github.com/adamchainz/django-upgrade/pull/443>`__.
+
+  Thanks to David Szotten in `PR #333 <https://github.com/adamchainz/django-upgrade/pull/333>`__.
+
 1.16.0 (2024-02-11)
 -------------------
 

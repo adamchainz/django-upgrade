@@ -11,6 +11,7 @@ from tokenize_rt import UNIMPORTANT_WS
 from tokenize_rt import src_to_tokens
 
 from django_upgrade import __main__  # noqa: F401
+from django_upgrade.data import FIXERS
 from django_upgrade.main import fixup_dedent_tokens
 from django_upgrade.main import main
 from django_upgrade.tokens import DEDENT
@@ -27,6 +28,15 @@ def test_main_no_files(capsys):
     out, err = capsys.readouterr()
     assert "error: the following arguments are required: filenames\n" in err
     assert out == ""
+
+
+def test_main_no_files_with_list_fixers():
+    """
+    Main should pass without any files as argument, if `--list-fixers` is passed in
+    """
+    result = main(["--list-fixers"])
+
+    assert result == 0
 
 
 def test_main_help():
@@ -136,3 +146,109 @@ def test_fixup_dedent_tokens():
 
     assert tokens[14].name == DEDENT
     assert tokens[15].name == UNIMPORTANT_WS
+
+
+def test_main_list_fixers(tmp_path, capsys):
+    """
+    Main with `--list-fixers` should not attempt to transform files
+    """
+    path = tmp_path / "example.py"
+    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+
+    result = main(["--list-fixers", str(path)])
+
+    assert result == 0
+    out, err = capsys.readouterr()
+    assert not err
+    assert "Rewriting" not in err
+    assert "Rewriting" not in out
+
+
+def test_main_list_fixers_lists_fixers(tmp_path, capsys):
+    """
+    Main with `--list-fixers` should not attempt to transform files
+    """
+    result = main(["--list-fixers"])
+
+    fixers = {fixer.name for fixer in FIXERS}
+
+    assert result == 0
+    out, err = capsys.readouterr()
+    assert not err
+    for fixer in fixers:
+        assert fixer in out
+
+
+def test_main_only_limits_fixers_invalid_fixer(tmp_path, capsys):
+    """
+    Main with --only invalid_fixer doesn't fix any files
+    """
+    path = tmp_path / "example.py"
+    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+
+    result = main(["--only", "invalid_fixer", str(path)])
+
+    assert result == 0
+    out, err = capsys.readouterr()
+    assert not err
+    assert "Rewriting" not in err
+    assert "Rewriting" not in out
+
+
+def test_main_skip_excludes_fixers_invalid_fixer(tmp_path, capsys):
+    """
+    Main with --skip invalid_fixer fixes code as expected
+    """
+    path = tmp_path / "example.py"
+    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+
+    result = main(["--skip", "invalid_fixer", str(path)])
+
+    assert result == 1
+    _, err = capsys.readouterr()
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == "from django.core.paginator import Paginator\n"
+
+
+def test_main_only_limits_fixers_valid_fixer(tmp_path, capsys):
+    """
+    Main with --only queryset_paginator limits fixes to that fixer
+    """
+    # Correctly fixes paginator code
+    path = tmp_path / "example.py"
+    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+
+    result = main(["--only", "queryset_paginator", str(path)])
+
+    assert result == 1
+    _, err = capsys.readouterr()
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == "from django.core.paginator import Paginator\n"
+
+    # Doesn't touch assert_form_error code
+    path = tmp_path / "example2.py"
+    path.write_text('self.assertFormError(response, "form", "user", "woops")\n')
+
+    result = main(["--only", "queryset_paginator", str(path)])
+
+    assert result == 0
+    out, err = capsys.readouterr()
+    assert not err
+    assert "Rewriting" not in err
+    assert "Rewriting" not in out
+
+
+def test_main_skip_excludes_fixers_valid_fixer(tmp_path, capsys):
+    """
+    Main with --skip queryset_paginator ignores bad code
+    """
+    path = tmp_path / "example.py"
+    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+
+    result = main(["--skip", "queryset_paginator", str(path)])
+
+    assert result == 0
+    out, err = capsys.readouterr()
+    assert not err
+    assert "Rewriting" not in err
+    assert "Rewriting" not in out

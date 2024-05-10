@@ -60,16 +60,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--only",
         action="append",
-        help="Only run the selected fixers",
+        help="Run only the selected fixers.",
     )
     parser.add_argument(
         "--skip",
         action="append",
-        help="Skip the selected fixers",
+        help="Skip the selected fixers.",
     )
     parser.add_argument(
-        "--list-fixers",
-        action="store_true",
+        "--list-fixers", action="store_true", help="List all fixer names."
     )
 
     args = parser.parse_args(argv)

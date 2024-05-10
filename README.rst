@@ -123,38 +123,42 @@ See the list of available versions with ``django-upgrade --help``.
 Exit with a zero return code even if files have changed.
 By default, django-upgrade uses the failure return code 1 if it changes any files, which may stop scripts or CI pipelines.
 
-Listing Available Fixers
-------------------------
+``--only <fixer_name>``
+-----------------------
 
-It's possible to list all available fixers using the ``--list-fixers`` flag. All other options will be ignored when listing fixers.
+This option makes django-upgrade run only the named fixer (names are documented below).
+The fixer must still be enabled by ``--target-version``.
+Select multiple fixers with multiple ``--only`` options.
 
-Example:
+For example:
+
+.. code-block:: sh
+
+    django-upgrade --target-version 5.0 --only admin_allow_tags --only admin_decorators example/core/admin.py
+
+``--skip <fixer_name>``
+-----------------------
+
+This option makes django-upgrade skip the named fixer.
+Skip multiple fixers with multiple ``--skip`` options.
+
+For example:
+
+.. code-block:: sh
+
+    django-upgrade --target-version 5.0 --skip admin_register example/core/admin.py
+
+``--list-fixers``
+-----------------
+
+This option makes django-upgrade list all available fixers’ names and then exit.
+All other options are ignored when listing fixers.
+
+For example:
 
 .. code-block:: sh
 
     django-upgrade --list-fixers
-
-Only Execute Specific Fixers
-------------------------------
-
-Using the ``--only <fixer_name>`` flag, only the fixer passed in will be executed. Multiple fixers can be chained by using multiple ``--only``
-
-Example:
-
-.. code-block:: sh
-
-    django-upgrade --only admin_allow_tags --only admin_decorators example/core/admin.py
-
-Skip Specific Fixers
-------------------------------
-
-Using the ``--skip <fixer_name>`` flag, all fixers except the ones passed in will be executed. Multiple fixers can be chained by using multiple ``--skip``
-
-Example:
-
-.. code-block:: sh
-
-    django-upgrade --skip admin_register example/core/admin.py
 
 History
 =======

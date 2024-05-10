@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.17.0 (2024-05-10)
+-------------------
+
 * Add fixer selection options: ``--only <name>``, ``--skip <name>``, and ``--list-fixers``.
 
   Thanks to Gav O'Connor and David Szotten in `PR #443 <https://github.com/adamchainz/django-upgrade/pull/443>`__.

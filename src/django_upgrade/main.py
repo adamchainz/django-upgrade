@@ -4,6 +4,7 @@ import argparse
 import sys
 import tokenize
 from importlib import metadata
+from typing import Any
 from typing import Sequence
 from typing import Tuple
 from typing import cast
@@ -15,6 +16,7 @@ from tokenize_rt import src_to_tokens
 from tokenize_rt import tokens_to_src
 
 from django_upgrade.ast import ast_parse
+from django_upgrade.data import FIXERS
 from django_upgrade.data import Settings
 from django_upgrade.data import visit
 from django_upgrade.tokens import DEDENT
@@ -56,14 +58,33 @@ def main(argv: Sequence[str] | None = None) -> int:
         version=metadata.version("django-upgrade"),
         help="Show the version number and exit.",
     )
+    parser.add_argument(
+        "--only",
+        action="append",
+        type=fixer_type,
+        help="Run only the selected fixers.",
+    )
+    parser.add_argument(
+        "--skip",
+        action="append",
+        type=fixer_type,
+        help="Skip the selected fixers.",
+    )
+    parser.add_argument(
+        "--list-fixers", nargs=0, action=ListFixersAction, help="List all fixer names."
+    )
+
     args = parser.parse_args(argv)
 
     target_version: tuple[int, int] = cast(
         Tuple[int, int],
         tuple(int(x) for x in args.target_version.split(".", 1)),
     )
+
     settings = Settings(
         target_version=target_version,
+        only_fixers=set(args.only) if args.only else None,
+        skip_fixers=set(args.skip) if args.skip else None,
     )
 
     ret = 0
@@ -75,6 +96,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
     return ret
+
+
+def fixer_type(string: str) -> str:
+    if string not in FIXERS:
+        raise argparse.ArgumentTypeError(f"Unknown fixer: {string!r}")
+    return string
+
+
+class ListFixersAction(argparse.Action):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
+    ) -> None:
+        for name in sorted(FIXERS):
+            print(name)
+        parser.exit()
 
 
 def fix_file(

@@ -136,3 +136,152 @@ def test_fixup_dedent_tokens():
 
     assert tokens[14].name == DEDENT
     assert tokens[15].name == UNIMPORTANT_WS
+
+
+def test_main_only(tmp_path, capsys):
+    """
+    Main with --only runs that fixer only.
+    """
+    path = tmp_path / "example.py"
+    path.write_text(
+        # For queryset_paginator, will change
+        "from django.core.paginator import QuerySetPaginator\n"
+        # For request_headers, will not change
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+    )
+
+    result = main(["--only", "queryset_paginator", str(path)])
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == (
+        "from django.core.paginator import Paginator\n"
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+    )
+
+
+def test_main_only_multiple(tmp_path, capsys):
+    """
+    Main with multiple --only options selects multiple fixers.
+    """
+    path = tmp_path / "example.py"
+    path.write_text(
+        # For queryset_paginator, will change
+        "from django.core.paginator import QuerySetPaginator\n"
+        # For request_headers, will change
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+        # For timezone_fixedoffset, will not change
+        "from django.utils.timezone import FixedOffset\n"
+        'FixedOffset(120, "Super time")\n'
+    )
+
+    result = main(
+        ["--only", "queryset_paginator", "--only", "request_headers", str(path)]
+    )
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == (
+        "from django.core.paginator import Paginator\n"
+        "request.headers['accept-encoding']\n"
+        "from django.utils.timezone import FixedOffset\n"
+        'FixedOffset(120, "Super time")\n'
+    )
+
+
+def test_main_only_nonexistent_fixer(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--only", "nonexistent", "example.py"])
+
+    assert excinfo.value.code == 2
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert "error: argument --only: Unknown fixer: 'nonexistent'\n" in err
+
+
+def test_main_skip(tmp_path, capsys):
+    """
+    Main with --skip does not run that fixer.
+    """
+    path = tmp_path / "example.py"
+    source = "from django.core.paginator import QuerySetPaginator\n"
+    path.write_text(source)
+
+    result = main(["--skip", "queryset_paginator", str(path)])
+
+    assert result == 0
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
+    assert path.read_text() == source
+
+
+def test_main_skip_multiple(tmp_path, capsys):
+    """
+    Main with multiple --skip options does not run those fixers.
+    """
+    path = tmp_path / "example.py"
+    path.write_text(
+        # For queryset_paginator, will not change
+        "from django.core.paginator import QuerySetPaginator\n"
+        # For request_headers, will not change
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+        # For timezone_fixedoffset, will change
+        "from django.utils.timezone import FixedOffset\n"
+        'FixedOffset(120, "Super time")\n'
+    )
+
+    result = main(
+        ["--skip", "queryset_paginator", "--skip", "request_headers", str(path)]
+    )
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == (
+        "from django.core.paginator import QuerySetPaginator\n"
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+        "from datetime import timedelta, timezone\n"
+        'timezone(timedelta(minutes=120), "Super time")\n'
+    )
+
+
+def test_main_skip_nonexistent_fixer(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--skip", "nonexistent", "example.py"])
+
+    assert excinfo.value.code == 2
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert "error: argument --skip: Unknown fixer: 'nonexistent'\n" in err
+
+
+def test_main_list_fixers(tmp_path, capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--list-fixers"])
+
+    assert excinfo.value.code == 0
+    out, err = capsys.readouterr()
+    assert out.startswith("admin_allow_tags\n")
+    assert err == ""
+
+
+def test_main_list_fixers_filename(tmp_path, capsys):
+    """
+    Main with --list-fixers does not change files.
+    """
+    path = tmp_path / "example.py"
+    source = "from django.core.paginator import QuerySetPaginator\n"
+    path.write_text(source)
+
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--list-fixers", str(path)])
+
+    assert excinfo.value.code == 0
+    # No change
+    assert path.read_text() == source

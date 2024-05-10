@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add fixer selection options: ``--only <name>``, ``--skip <name>``, and ``--list-fixers``.
+
+  Thanks to Gav O'Connor and David Szotten in `PR #443 <https://github.com/adamchainz/django-upgrade/pull/443>`__.
+
 * Run per-file conditions once, yielding a performance improvement of ~2% measured on a real-world project.
 
 1.16.0 (2024-02-11)

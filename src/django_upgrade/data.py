@@ -21,10 +21,24 @@ from django_upgrade import fixers
 
 
 class Settings:
-    __slots__ = ("target_version",)
+    __slots__ = (
+        "target_version",
+        "enabled_fixers",
+    )
 
-    def __init__(self, target_version: tuple[int, int]) -> None:
+    def __init__(
+        self,
+        target_version: tuple[int, int],
+        only_fixers: set[str] | None = None,
+        skip_fixers: set[str] | None = None,
+    ) -> None:
         self.target_version = target_version
+        self.enabled_fixers = {
+            name
+            for name in FIXERS
+            if (only_fixers is None or name in only_fixers)
+            and (skip_fixers is None or name not in skip_fixers)
+        }
 
 
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
@@ -106,7 +120,7 @@ def visit(
         filename=filename,
         from_imports=defaultdict(set),
     )
-    ast_funcs = get_ast_funcs(initial_state)
+    ast_funcs = get_ast_funcs(initial_state, settings)
 
     nodes: list[tuple[State, ast.AST, ast.AST]] = [(initial_state, tree, tree)]
     parents: list[ast.AST] = [tree]
@@ -150,20 +164,25 @@ def visit(
 
 
 class Fixer:
-    __slots__ = ("name", "min_version", "ast_funcs", "condition")
+    __slots__ = (
+        "name",
+        "min_version",
+        "ast_funcs",
+        "condition",
+    )
 
     def __init__(
         self,
-        name: str,
+        module_name: str,
         min_version: tuple[int, int],
         condition: Callable[[State], bool] | None = None,
     ) -> None:
-        self.name = name
+        self.name = module_name.rpartition(".")[2]
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
         self.condition = condition
 
-        FIXERS.append(self)
+        FIXERS[self.name] = self
 
     def register(
         self, type_: type[AST_T]
@@ -175,7 +194,7 @@ class Fixer:
         return decorator
 
 
-FIXERS: list[Fixer] = []
+FIXERS: dict[str, Fixer] = {}
 
 
 def _import_fixers() -> None:
@@ -189,9 +208,11 @@ def _import_fixers() -> None:
 _import_fixers()
 
 
-def get_ast_funcs(state: State) -> ASTCallbackMapping:
+def get_ast_funcs(state: State, settings: Settings) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
-    for fixer in FIXERS:
+    for fixer in FIXERS.values():
+        if fixer.name not in settings.enabled_fixers:
+            continue
         if fixer.min_version <= state.settings.target_version and (
             fixer.condition is None or fixer.condition(state)
         ):

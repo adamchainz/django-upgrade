@@ -138,79 +138,65 @@ def test_fixup_dedent_tokens():
     assert tokens[15].name == UNIMPORTANT_WS
 
 
-def test_main_only_limits_fixers_invalid_fixer(tmp_path, capsys):
+def test_main_only(tmp_path, capsys):
     """
-    Main with --only invalid_fixer doesn't fix any files
-    """
-    path = tmp_path / "example.py"
-    path.write_text("from django.core.paginator import QuerySetPaginator\n")
-
-    result = main(["--only", "invalid_fixer", str(path)])
-
-    assert result == 0
-    out, err = capsys.readouterr()
-    assert not err
-    assert "Rewriting" not in err
-    assert "Rewriting" not in out
-
-
-def test_main_skip_excludes_fixers_invalid_fixer(tmp_path, capsys):
-    """
-    Main with --skip invalid_fixer fixes code as expected
-    """
-    path = tmp_path / "example.py"
-    path.write_text("from django.core.paginator import QuerySetPaginator\n")
-
-    result = main(["--skip", "invalid_fixer", str(path)])
-
-    assert result == 1
-    _, err = capsys.readouterr()
-    assert err == f"Rewriting {path}\n"
-    assert path.read_text() == "from django.core.paginator import Paginator\n"
-
-
-def test_main_only_limits_fixers_valid_fixer(tmp_path, capsys):
-    """
-    Main with --only queryset_paginator limits fixes to that fixer
+    Main with --only runs that fixer only.
     """
     # Correctly fixes paginator code
     path = tmp_path / "example.py"
-    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+    path.write_text(
+        # For queryset_paginator, will change
+        "from django.core.paginator import QuerySetPaginator\n"
+        # For request_headers, will not change
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+    )
 
     result = main(["--only", "queryset_paginator", str(path)])
 
     assert result == 1
     _, err = capsys.readouterr()
     assert err == f"Rewriting {path}\n"
-    assert path.read_text() == "from django.core.paginator import Paginator\n"
+    assert path.read_text() == (
+        "from django.core.paginator import Paginator\n"
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+    )
 
-    # Doesn't touch assert_form_error code
-    path = tmp_path / "example2.py"
-    path.write_text('self.assertFormError(response, "form", "user", "woops")\n')
 
-    result = main(["--only", "queryset_paginator", str(path)])
+def test_main_only_nonexistent_fixer(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--only", "nonexistent", "example.py"])
 
-    assert result == 0
+    assert excinfo.value.code == 2
     out, err = capsys.readouterr()
-    assert not err
-    assert "Rewriting" not in err
-    assert "Rewriting" not in out
+    assert out == ""
+    assert "error: argument --only: Unknown fixer: 'nonexistent'\n" in err
 
 
 def test_main_skip_excludes_fixers_valid_fixer(tmp_path, capsys):
     """
-    Main with --skip queryset_paginator ignores bad code
+    Main with --skip does not run that fixer.
     """
     path = tmp_path / "example.py"
-    path.write_text("from django.core.paginator import QuerySetPaginator\n")
+    source = "from django.core.paginator import QuerySetPaginator\n"
+    path.write_text(source)
 
     result = main(["--skip", "queryset_paginator", str(path)])
 
     assert result == 0
     out, err = capsys.readouterr()
-    assert not err
-    assert "Rewriting" not in err
-    assert "Rewriting" not in out
+    assert out == ""
+    assert err == ""
+    assert path.read_text() == source
+
+
+def test_main_skip_nonexistent_fixer(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--skip", "nonexistent", "example.py"])
+
+    assert excinfo.value.code == 2
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert "error: argument --skip: Unknown fixer: 'nonexistent'\n" in err
 
 
 def test_main_list_fixers(tmp_path, capsys):
@@ -225,7 +211,7 @@ def test_main_list_fixers(tmp_path, capsys):
 
 def test_main_list_fixers_filename(tmp_path, capsys):
     """
-    Main with `--list-fixers` should not attempt to transform files
+    Main with --list-fixers does not change files.
     """
     path = tmp_path / "example.py"
     source = "from django.core.paginator import QuerySetPaginator\n"

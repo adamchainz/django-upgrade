@@ -61,11 +61,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--only",
         action="append",
+        type=fixer_type,
         help="Run only the selected fixers.",
     )
     parser.add_argument(
         "--skip",
         action="append",
+        type=fixer_type,
         help="Skip the selected fixers.",
     )
     parser.add_argument(
@@ -96,6 +98,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     return ret
 
 
+def fixer_type(string: str) -> str:
+    if string not in FIXERS:
+        raise argparse.ArgumentTypeError(f"Unknown fixer: {string!r}")
+    return string
+
+
 class ListFixersAction(argparse.Action):
     def __call__(
         self,
@@ -104,7 +112,7 @@ class ListFixersAction(argparse.Action):
         values: str | Sequence[Any] | None,
         option_string: str | None = None,
     ) -> None:
-        for name in sorted([f.name for f in FIXERS]):
+        for name in sorted(FIXERS):
             print(name)
         parser.exit()
 

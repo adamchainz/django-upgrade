@@ -33,21 +33,12 @@ class Settings:
         skip_fixers: list[str] | None = None,
     ) -> None:
         self.target_version = target_version
-        self.specific_fixture_names = self._calculate_specific_fixtures(
-            only_fixers, skip_fixers
-        )
-
-    def _calculate_specific_fixtures(
-        self,
-        only_fixers: list[str] | None,
-        skip_fixers: list[str] | None,
-    ) -> list[str]:
-        fixer_names: list[str] = [f.name for f in FIXERS]
-        if only_fixers is not None:
-            fixer_names = [f for f in fixer_names if f in only_fixers]
-        if skip_fixers is not None:
-            fixer_names = [f for f in fixer_names if f not in skip_fixers]
-        return fixer_names
+        self.specific_fixture_names = [
+            name
+            for name in FIXERS
+            if (only_fixers is None or name in only_fixers)
+            and (skip_fixers is None or name not in skip_fixers)
+        ]
 
 
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
@@ -193,7 +184,7 @@ class Fixer:
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
         self.condition = condition
 
-        FIXERS.append(self)
+        FIXERS[self.name] = self
 
     def register(
         self, type_: type[AST_T]
@@ -205,7 +196,7 @@ class Fixer:
         return decorator
 
 
-FIXERS: list[Fixer] = []
+FIXERS: dict[str, Fixer] = {}
 
 
 def _import_fixers() -> None:
@@ -221,7 +212,7 @@ _import_fixers()
 
 def get_ast_funcs(state: State, settings: Settings) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
-    for fixer in FIXERS:
+    for fixer in FIXERS.values():
         if fixer.name not in settings.specific_fixture_names:
             continue
         if fixer.min_version <= state.settings.target_version and (

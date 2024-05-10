@@ -263,10 +263,10 @@ def test_all_fixers_are_documented() -> None:
             continue
         docs.add(match[1])
 
-    fixers = {fixer.name for fixer in FIXERS}
+    names = set(FIXERS)
 
-    invalid = docs - fixers
+    invalid = docs - names
     assert not invalid
 
-    undocumented = fixers - docs
+    undocumented = names - docs
     assert not undocumented

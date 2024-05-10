@@ -166,7 +166,6 @@ def visit(
 class Fixer:
     __slots__ = (
         "name",
-        "module",
         "min_version",
         "ast_funcs",
         "condition",
@@ -174,12 +173,11 @@ class Fixer:
 
     def __init__(
         self,
-        module: str,
+        module_name: str,
         min_version: tuple[int, int],
         condition: Callable[[State], bool] | None = None,
     ) -> None:
-        self.module = module
-        self.name: str = module.rpartition(".")[2]
+        self.name = module_name.rpartition(".")[2]
         self.min_version = min_version
         self.ast_funcs: ASTCallbackMapping = defaultdict(list)
         self.condition = condition

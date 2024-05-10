@@ -172,11 +172,6 @@ def visit(
     return ret
 
 
-def list_fixers() -> None:
-    for fixer in sorted(FIXERS, key=lambda f: f.name):
-        print(fixer.name)
-
-
 class Fixer:
     __slots__ = (
         "name",

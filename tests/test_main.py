@@ -11,7 +11,6 @@ from tokenize_rt import UNIMPORTANT_WS
 from tokenize_rt import src_to_tokens
 
 from django_upgrade import __main__  # noqa: F401
-from django_upgrade.data import FIXERS
 from django_upgrade.main import fixup_dedent_tokens
 from django_upgrade.main import main
 from django_upgrade.tokens import DEDENT
@@ -28,15 +27,6 @@ def test_main_no_files(capsys):
     out, err = capsys.readouterr()
     assert "error: the following arguments are required: filenames\n" in err
     assert out == ""
-
-
-def test_main_no_files_with_list_fixers():
-    """
-    Main should pass without any files as argument, if `--list-fixers` is passed in
-    """
-    result = main(["--list-fixers"])
-
-    assert result == 0
 
 
 def test_main_help():
@@ -148,37 +138,6 @@ def test_fixup_dedent_tokens():
     assert tokens[15].name == UNIMPORTANT_WS
 
 
-def test_main_list_fixers(tmp_path, capsys):
-    """
-    Main with `--list-fixers` should not attempt to transform files
-    """
-    path = tmp_path / "example.py"
-    path.write_text("from django.core.paginator import QuerySetPaginator\n")
-
-    result = main(["--list-fixers", str(path)])
-
-    assert result == 0
-    out, err = capsys.readouterr()
-    assert not err
-    assert "Rewriting" not in err
-    assert "Rewriting" not in out
-
-
-def test_main_list_fixers_lists_fixers(tmp_path, capsys):
-    """
-    Main with `--list-fixers` should not attempt to transform files
-    """
-    result = main(["--list-fixers"])
-
-    fixers = {fixer.name for fixer in FIXERS}
-
-    assert result == 0
-    out, err = capsys.readouterr()
-    assert not err
-    for fixer in fixers:
-        assert fixer in out
-
-
 def test_main_only_limits_fixers_invalid_fixer(tmp_path, capsys):
     """
     Main with --only invalid_fixer doesn't fix any files
@@ -252,3 +211,29 @@ def test_main_skip_excludes_fixers_valid_fixer(tmp_path, capsys):
     assert not err
     assert "Rewriting" not in err
     assert "Rewriting" not in out
+
+
+def test_main_list_fixers(tmp_path, capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--list-fixers"])
+
+    assert excinfo.value.code == 0
+    out, err = capsys.readouterr()
+    assert out.startswith("admin_allow_tags\n")
+    assert err == ""
+
+
+def test_main_list_fixers_filename(tmp_path, capsys):
+    """
+    Main with `--list-fixers` should not attempt to transform files
+    """
+    path = tmp_path / "example.py"
+    source = "from django.core.paginator import QuerySetPaginator\n"
+    path.write_text(source)
+
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--list-fixers", str(path)])
+
+    assert excinfo.value.code == 0
+    # No change
+    assert path.read_text() == source

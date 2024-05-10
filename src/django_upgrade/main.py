@@ -4,6 +4,7 @@ import argparse
 import sys
 import tokenize
 from importlib import metadata
+from typing import Any
 from typing import Sequence
 from typing import Tuple
 from typing import cast
@@ -15,15 +16,15 @@ from tokenize_rt import src_to_tokens
 from tokenize_rt import tokens_to_src
 
 from django_upgrade.ast import ast_parse
+from django_upgrade.data import FIXERS
 from django_upgrade.data import Settings
-from django_upgrade.data import list_fixers
 from django_upgrade.data import visit
 from django_upgrade.tokens import DEDENT
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("filenames", nargs="*")
+    parser.add_argument("filenames", nargs="+")
     parser.add_argument(
         "--target-version",
         default="2.2",
@@ -68,20 +69,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Skip the selected fixers.",
     )
     parser.add_argument(
-        "--list-fixers", action="store_true", help="List all fixer names."
+        "--list-fixers", nargs=0, action=ListFixersAction, help="List all fixer names."
     )
 
     args = parser.parse_args(argv)
-
-    if args.list_fixers:
-        list_fixers()
-        return 0
-
-    if not args.filenames:
-        print(
-            "error: the following arguments are required: filenames\n", file=sys.stderr
-        )
-        raise SystemExit(2)
 
     target_version: tuple[int, int] = cast(
         Tuple[int, int],
@@ -103,6 +94,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
     return ret
+
+
+class ListFixersAction(argparse.Action):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
+    ) -> None:
+        for name in sorted([f.name for f in FIXERS]):
+            print(name)
+        parser.exit()
 
 
 def fix_file(

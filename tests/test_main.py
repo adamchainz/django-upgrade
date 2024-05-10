@@ -142,7 +142,6 @@ def test_main_only(tmp_path, capsys):
     """
     Main with --only runs that fixer only.
     """
-    # Correctly fixes paginator code
     path = tmp_path / "example.py"
     path.write_text(
         # For queryset_paginator, will change
@@ -154,11 +153,43 @@ def test_main_only(tmp_path, capsys):
     result = main(["--only", "queryset_paginator", str(path)])
 
     assert result == 1
-    _, err = capsys.readouterr()
+    out, err = capsys.readouterr()
+    assert out == ""
     assert err == f"Rewriting {path}\n"
     assert path.read_text() == (
         "from django.core.paginator import Paginator\n"
         "request.META['HTTP_ACCEPT_ENCODING']\n"
+    )
+
+
+def test_main_only_multiple(tmp_path, capsys):
+    """
+    Main with multiple --only options selects multiple fixers.
+    """
+    path = tmp_path / "example.py"
+    path.write_text(
+        # For queryset_paginator, will change
+        "from django.core.paginator import QuerySetPaginator\n"
+        # For request_headers, will change
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+        # For timezone_fixedoffset, will not change
+        "from django.utils.timezone import FixedOffset\n"
+        'FixedOffset(120, "Super time")\n'
+    )
+
+    result = main(
+        ["--only", "queryset_paginator", "--only", "request_headers", str(path)]
+    )
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == (
+        "from django.core.paginator import Paginator\n"
+        "request.headers['accept-encoding']\n"
+        "from django.utils.timezone import FixedOffset\n"
+        'FixedOffset(120, "Super time")\n'
     )
 
 
@@ -172,7 +203,7 @@ def test_main_only_nonexistent_fixer(capsys):
     assert "error: argument --only: Unknown fixer: 'nonexistent'\n" in err
 
 
-def test_main_skip_excludes_fixers_valid_fixer(tmp_path, capsys):
+def test_main_skip(tmp_path, capsys):
     """
     Main with --skip does not run that fixer.
     """
@@ -187,6 +218,37 @@ def test_main_skip_excludes_fixers_valid_fixer(tmp_path, capsys):
     assert out == ""
     assert err == ""
     assert path.read_text() == source
+
+
+def test_main_skip_multiple(tmp_path, capsys):
+    """
+    Main with multiple --skip options does not run those fixers.
+    """
+    path = tmp_path / "example.py"
+    path.write_text(
+        # For queryset_paginator, will not change
+        "from django.core.paginator import QuerySetPaginator\n"
+        # For request_headers, will not change
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+        # For timezone_fixedoffset, will change
+        "from django.utils.timezone import FixedOffset\n"
+        'FixedOffset(120, "Super time")\n'
+    )
+
+    result = main(
+        ["--skip", "queryset_paginator", "--skip", "request_headers", str(path)]
+    )
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == f"Rewriting {path}\n"
+    assert path.read_text() == (
+        "from django.core.paginator import QuerySetPaginator\n"
+        "request.META['HTTP_ACCEPT_ENCODING']\n"
+        "from datetime import timedelta, timezone\n"
+        'timezone(timedelta(minutes=120), "Super time")\n'
+    )
 
 
 def test_main_skip_nonexistent_fixer(capsys):

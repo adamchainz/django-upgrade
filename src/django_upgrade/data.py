@@ -23,22 +23,22 @@ from django_upgrade import fixers
 class Settings:
     __slots__ = (
         "target_version",
-        "specific_fixture_names",
+        "enabled_fixers",
     )
 
     def __init__(
         self,
         target_version: tuple[int, int],
-        only_fixers: list[str] | None = None,
-        skip_fixers: list[str] | None = None,
+        only_fixers: set[str] | None = None,
+        skip_fixers: set[str] | None = None,
     ) -> None:
         self.target_version = target_version
-        self.specific_fixture_names = [
+        self.enabled_fixers = {
             name
             for name in FIXERS
             if (only_fixers is None or name in only_fixers)
             and (skip_fixers is None or name not in skip_fixers)
-        ]
+        }
 
 
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
@@ -213,7 +213,7 @@ _import_fixers()
 def get_ast_funcs(state: State, settings: Settings) -> ASTCallbackMapping:
     ast_funcs: ASTCallbackMapping = defaultdict(list)
     for fixer in FIXERS.values():
-        if fixer.name not in settings.specific_fixture_names:
+        if fixer.name not in settings.enabled_fixers:
             continue
         if fixer.min_version <= state.settings.target_version and (
             fixer.condition is None or fixer.condition(state)

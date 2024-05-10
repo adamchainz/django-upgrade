@@ -83,8 +83,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     settings = Settings(
         target_version=target_version,
-        only_fixers=args.only,
-        skip_fixers=args.skip,
+        only_fixers=set(args.only) if args.only else None,
+        skip_fixers=set(args.skip) if args.skip else None,
     )
 
     ret = 0

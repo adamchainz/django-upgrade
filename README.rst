@@ -126,7 +126,7 @@ By default, django-upgrade uses the failure return code 1 if it changes any file
 ``--only <fixer_name>``
 -----------------------
 
-This option makes django-upgrade run only the named fixer (names are documented below).
+Run only the named fixer (names are documented below).
 The fixer must still be enabled by ``--target-version``.
 Select multiple fixers with multiple ``--only`` options.
 
@@ -139,7 +139,7 @@ For example:
 ``--skip <fixer_name>``
 -----------------------
 
-This option makes django-upgrade skip the named fixer.
+Skip the named fixer.
 Skip multiple fixers with multiple ``--skip`` options.
 
 For example:
@@ -151,7 +151,7 @@ For example:
 ``--list-fixers``
 -----------------
 
-This option makes django-upgrade list all available fixers’ names and then exit.
+List all available fixers’ names and then exit.
 All other options are ignored when listing fixers.
 
 For example:

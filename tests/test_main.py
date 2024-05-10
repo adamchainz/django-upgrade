@@ -43,7 +43,7 @@ def test_main_version(capsys):
     out, err = capsys.readouterr()
 
     assert excinfo.value.code == 0
-    assert re.fullmatch(r"__main__\.py \d+\.\d+\.\d+\n", out)
+    assert re.fullmatch(r"\d+\.\d+\.\d+\n", out)
     assert err == ""
 
 

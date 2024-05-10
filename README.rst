@@ -70,18 +70,14 @@ Usage
 =====
 
 ``django-upgrade`` is a commandline tool that rewrites files in place.
-Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag.
-django-upgrade will run all its fixers for versions up to and including the target version.
-These fixers rewrite your code to avoid ``DeprecationWarning``\s and use some new features.
+Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag and a list of files.
+django-upgrade’s fixers will rewrite your code to avoid ``DeprecationWarning``\s and use some new features.
 
 For example:
 
 .. code-block:: sh
 
     django-upgrade --target-version 5.0 example/core/models.py example/settings.py
-
-The ``--target-version`` flag defaults to 2.2, the oldest supported version when this project was created.
-For more on usage run ``django-upgrade --help``.
 
 ``django-upgrade`` focuses on upgrading your code and not on making it look nice.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
@@ -108,6 +104,24 @@ __ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core
     git ls-files -- '*.py' | %{django-upgrade --target-version 5.0 $_}
 
 The full list of fixers is documented below.
+
+Options
+=======
+
+``--target-version``
+--------------------
+
+The version of Django to target, in the format ``<major>.<minor>``.
+django-upgrade enables all of its fixers for versions up to and including the target version.
+
+This option defaults to 2.2, the oldest supported version when this project was created.
+See the list of available versions with ``django-upgrade --help``.
+
+``--exit-zero-even-if-changed``
+-------------------------------
+
+Exit with a zero return code even if files have changed.
+By default, django-upgrade uses the failure return code 1 if it changes any files, which may stop scripts or CI pipelines.
 
 History
 =======

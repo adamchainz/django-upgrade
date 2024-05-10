@@ -23,7 +23,6 @@ from django_upgrade.tokens import DEDENT
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("filenames", nargs="+")
-    parser.add_argument("--exit-zero-even-if-changed", action="store_true")
     parser.add_argument(
         "--target-version",
         default="2.2",
@@ -44,11 +43,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             "4.2",
             "5.0",
         ],
+        help="The version of Django to target.",
+    )
+    parser.add_argument(
+        "--exit-zero-even-if-changed",
+        action="store_true",
+        help="Exit with a zero return code even if files have changed.",
     )
     parser.add_argument(
         "--version",
         action="version",
-        version=f'%(prog)s {metadata.version("django-upgrade")}',
+        version=metadata.version("django-upgrade"),
+        help="Show the version number and exit.",
     )
     args = parser.parse_args(argv)
 

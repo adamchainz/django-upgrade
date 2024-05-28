@@ -44,6 +44,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "4.1",
             "4.2",
             "5.0",
+            "5.1",
         ],
         help="The version of Django to target.",
     )

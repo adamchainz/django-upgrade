@@ -1114,3 +1114,10 @@ Django 5.0
 `Release Notes <https://docs.djangoproject.com/en/5.0/releases/5.0/>`__
 
 No fixers yet.
+
+Django 5.1
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/5.1/releases/5.1/>`__
+
+No fixers yet.

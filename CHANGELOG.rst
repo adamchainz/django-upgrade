@@ -4,6 +4,8 @@ Changelog
 
 * Support Django 5.1 as a target version.
 
+* Add Django 5.1+ fixer to rewrite the ``check`` keyword argument of ``CheckConstraint`` to ``condition``.
+
 1.17.0 (2024-05-10)
 -------------------
 

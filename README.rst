@@ -1120,4 +1120,14 @@ Django 5.1
 
 `Release Notes <https://docs.djangoproject.com/en/5.1/releases/5.1/>`__
 
-No fixers yet.
+``CheckConstraint`` ``condition`` argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``check_constraint_condition``
+
+Rewrites calls to ``CheckConstraint`` and built-in subclasses from the old ``check`` argument to the new name ``condition``.
+
+.. code-block:: diff
+
+   -CheckConstraint(check=Q(amount__gte=0))
+   +CheckConstraint(condition=Q(amount__gte=0))

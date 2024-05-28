@@ -1127,6 +1127,8 @@ Django 5.1
 
 Rewrites calls to ``CheckConstraint`` and built-in subclasses from the old ``check`` argument to the new name ``condition``.
 
+Requires Python 3.9+ due to changes in ``ast.keyword``.
+
 .. code-block:: diff
 
    -CheckConstraint(check=Q(amount__gte=0))

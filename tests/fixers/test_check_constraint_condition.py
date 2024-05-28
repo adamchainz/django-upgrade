@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import sys
 from functools import partial
+
+import pytest
 
 from django_upgrade.data import Settings
 from tests.fixers import tools
+
+if sys.version_info < (3, 9):
+    pytest.skip("Python 3.9+", allow_module_level=True)
 
 settings = Settings(target_version=(5, 1))
 check_noop = partial(tools.check_noop, settings=settings)

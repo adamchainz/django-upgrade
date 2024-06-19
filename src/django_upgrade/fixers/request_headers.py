@@ -74,8 +74,7 @@ def visit_Compare(
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node, ast.Compare)
-        and len(node.ops) == 1
+        len(node.ops) == 1
         and isinstance(node.ops[0], (ast.In, ast.NotIn))
         and len(node.comparators) == 1
         and is_request_or_self_request_meta(node.comparators[0])

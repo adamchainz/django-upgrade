@@ -57,8 +57,8 @@ def visit_Attribute(
         and isinstance(node.value, ast.Name)
         and node.value.id == "timezone"
         and "timezone" in state.from_imports["django.utils"]
-        and (details := get_import_details(state, parents[0]))
-        and details.datetime_module is not None
+        and (details := get_import_details(state, parents[0])).datetime_module
+        is not None
     ):
         new_src = f"{details.datetime_module}.timezone"
         yield ast_start_offset(node), partial(replace, src=new_src)

@@ -161,8 +161,7 @@ class ResponseAssignmentVisitor(ast.NodeVisitor):
 
     def visit_Assign(self, node: ast.Assign) -> Any:
         if (
-            isinstance(node, ast.Assign)
-            and len(node.targets) == 1
+            len(node.targets) == 1
             and isinstance(node.targets[0], ast.Name)
             and node.targets[0].id == self.name
             and (

@@ -199,7 +199,7 @@ FIXERS: dict[str, Fixer] = {}
 
 def _import_fixers() -> None:
     # https://github.com/python/mypy/issues/1422
-    fixers_path: str = fixers.__path__  # type: ignore
+    fixers_path: str = fixers.__path__  # type: ignore [assignment]
     mod_infos = pkgutil.walk_packages(fixers_path, f"{fixers.__name__}.")
     for _, name, _ in mod_infos:
         __import__(name, fromlist=["_trash"])

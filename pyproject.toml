@@ -8,11 +8,10 @@ requires = [
 name = "django-upgrade"
 version = "1.18.0"
 description = "Automatically upgrade your Django project code."
-readme = { file = "README.rst", content-type = "text/x-rst" }
+readme = "README.rst"
 keywords = [
   "Django",
 ]
-license = { text = "MIT" }
 authors = [
   { name = "Adam Johnson", email = "me@adamj.eu" },
 ]

@@ -306,6 +306,23 @@ Requires Python 3.9+ due to changes in ``ast.keyword``.
     -RequestFactory(HTTP_USER_AGENT="curl")
     +RequestFactory(headers={"user-agent": "curl"})
 
+
+``index_together`` deprecation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``index_together``
+
+Rewrites ``index_together`` declarations into ``indexes`` declarations in model ``Meta`` classes.
+
+.. code-block:: diff
+
+     from django.db import models
+
+     class Duck(models.Model):
+         class Meta:
+    -       index_together = [["bill", "tail"]]
+    +       indexes = [models.Index(fields=["bill", "tail"]]
+
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

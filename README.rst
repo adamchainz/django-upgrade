@@ -809,6 +809,13 @@ With multiple databases you can save some test time by limiting test cases to th
          def test_something(self):
              self.assertEqual(2 * 2, 4)
 
+Django 2.1
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/2.1/releases/2.1/>`__
+
+No fixers yet.
+
 Django 2.0
 ----------
 
@@ -1056,6 +1063,13 @@ Whilst mentioned in the `Django 3.1 release notes <https://docs.djangoproject.co
 
     -from django.forms.forms import pretty_name
     +from django.forms.utils import pretty_name
+
+Django 1.8
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/stable/releases/1.8/>`__
+
+No fixers yet.
 
 Django 1.7
 ----------

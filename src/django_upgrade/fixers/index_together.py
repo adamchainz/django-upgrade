@@ -10,6 +10,7 @@ import ast
 from functools import partial
 from typing import Iterable
 
+from tokenize_rt import UNIMPORTANT_WS
 from tokenize_rt import Offset
 from tokenize_rt import Token
 
@@ -18,7 +19,10 @@ from django_upgrade.compat import str_removesuffix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import DEDENT
+from django_upgrade.tokens import INDENT
 from django_upgrade.tokens import OP
+from django_upgrade.tokens import PHYSICAL_NEWLINE
 from django_upgrade.tokens import erase_node
 from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find_last_token
@@ -163,7 +167,12 @@ def extend_indexes(
 ) -> None:
     assert isinstance(indexes.value, (ast.List, ast.Tuple))  # type checked above
     closing_punctuation = find_last_token(tokens, i, node=indexes.value)
-    if len(indexes.value.elts) == 0:
+    if len(indexes.value.elts) == 0 or tokens[closing_punctuation - 1].name in (
+        INDENT,
+        DEDENT,
+        UNIMPORTANT_WS,
+        PHYSICAL_NEWLINE,
+    ):
         prefix = ""
     else:
         j = find_last_token(tokens, i, node=indexes.value.elts[-1])

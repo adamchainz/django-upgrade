@@ -93,7 +93,7 @@ def find_last_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
 
 def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
     """
-    If the previous token is and indent, return its position and the
+    If the previous token is an indent, return its position and the
     indentation string. Otherwise return the current position and "".
     """
     if i > 0 and tokens[i - 1].name in (INDENT, UNIMPORTANT_WS):

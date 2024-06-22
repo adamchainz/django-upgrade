@@ -19,6 +19,7 @@ from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import erase_node
+from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find_last_token
 from django_upgrade.tokens import insert
 
@@ -82,9 +83,7 @@ def visit_ClassDef(
         try:
             indexes = indexeses[0]
         except IndexError:
-            # TODO: handle no 'indexes'
-            # indexes = None
-            return
+            indexes = None
 
         if "models" in state.from_imports["django.db"]:
             index_ref = "models.Index"
@@ -130,12 +129,13 @@ def visit_ClassDef(
         yield ast_start_offset(index_together), partial(
             remove_index_together_and_maybe_add_indexes,
             index_together=index_together,
-            add_indexes=False,
+            add_indexes=(indexes is None),
             index_src=index_src,
         )
-        yield ast_start_offset(indexes), partial(
-            extend_indexes, indexes=indexes, index_src=index_src
-        )
+        if indexes is not None:
+            yield ast_start_offset(indexes), partial(
+                extend_indexes, indexes=indexes, index_src=index_src
+            )
 
 
 def remove_index_together_and_maybe_add_indexes(
@@ -146,11 +146,10 @@ def remove_index_together_and_maybe_add_indexes(
     add_indexes: bool,
     index_src: str,
 ) -> None:
-    if add_indexes:
-        # TODO
-        pass
-
+    j, indent = extract_indent(tokens, i)
     erase_node(tokens, i, node=index_together)
+    if add_indexes:
+        insert(tokens, j, new_src=f"{indent}indexes = [{index_src}]\n")
 
 
 def extend_indexes(

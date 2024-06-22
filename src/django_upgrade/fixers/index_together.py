@@ -88,9 +88,8 @@ def visit_ClassDef(
 
         if "models" in state.from_imports["django.db"]:
             index_ref = "models.Index"
-        # TODO
-        # elif "Index" in state.from_imports['django.db.models']:
-        #     index_ref = "Index"
+        elif "Index" in state.from_imports["django.db.models"]:
+            index_ref = "Index"
         else:
             return
 

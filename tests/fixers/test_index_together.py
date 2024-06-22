@@ -131,19 +131,6 @@ def test_no_models_import():
     )
 
 
-def test_index_imported():
-    check_noop(
-        """\
-        from django.db.models import Index
-
-        class Duck:
-            class Meta:
-                index_together = [["bill", "tail"]]
-                indexes = []
-        """,
-    )
-
-
 def test_list_indexes_present():
     check_transformed(
         """\
@@ -328,5 +315,25 @@ def test_mixed_indexes_absent():
         class Duck(models.Model):
             class Meta:
                 indexes = [models.Index(fields=('bill', 'tail')), models.Index(fields=('nape', 'mantle'))]
+        """,
+    )
+
+
+def test_index_imported():
+    check_transformed(
+        """\
+        from django.db.models import Index
+
+        class Duck:
+            class Meta:
+                index_together = [["bill", "tail"]]
+                indexes = []
+        """,
+        """\
+        from django.db.models import Index
+
+        class Duck:
+            class Meta:
+                indexes = [Index(fields=['bill', 'tail'])]
         """,
     )

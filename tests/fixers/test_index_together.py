@@ -146,7 +146,7 @@ def test_list_indexes_present():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=['bill', 'tail'])]
+                indexes = [models.Index(fields=["bill", "tail"])]
         """,
     )
 
@@ -166,7 +166,7 @@ def test_tuple_indexes_present():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=('bill', 'tail'))]
+                indexes = [models.Index(fields=("bill", "tail"))]
         """,
     )
 
@@ -189,7 +189,7 @@ def test_mixed_indexes_present():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=('bill', 'tail')), models.Index(fields=('nape', 'mantle'))]
+                indexes = [models.Index(fields=("bill", "tail")), models.Index(fields=("nape", "mantle"))]
         """,
     )
 
@@ -209,7 +209,7 @@ def test_indexes_nonempty_no_trailing_comma():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index("bill"), models.Index(fields=('bill', 'tail'))]
+                indexes = [models.Index("bill"), models.Index(fields=("bill", "tail"))]
         """,
     )
 
@@ -229,7 +229,7 @@ def test_indexes_nonempty_trailing_comma():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index("bill"), models.Index(fields=('bill', 'tail'))]
+                indexes = [models.Index("bill"), models.Index(fields=("bill", "tail"))]
         """,
     )
 
@@ -254,7 +254,7 @@ def test_indexes_nonempty_multiline():
             class Meta:
                 indexes = [
                     models.Index("bill"),
-                 models.Index(fields=('bill', 'tail'))]
+                 models.Index(fields=("bill", "tail"))]
         """,
     )
 
@@ -273,7 +273,7 @@ def test_list_indexes_absent():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=['bill', 'tail'])]
+                indexes = [models.Index(fields=["bill", "tail"])]
         """,
     )
 
@@ -292,7 +292,7 @@ def test_tuple_indexes_absent():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=('bill', 'tail'))]
+                indexes = [models.Index(fields=("bill", "tail"))]
         """,
     )
 
@@ -314,7 +314,7 @@ def test_mixed_indexes_absent():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=('bill', 'tail')), models.Index(fields=('nape', 'mantle'))]
+                indexes = [models.Index(fields=("bill", "tail")), models.Index(fields=("nape", "mantle"))]
         """,
     )
 
@@ -334,6 +334,26 @@ def test_index_imported():
 
         class Duck:
             class Meta:
-                indexes = [Index(fields=['bill', 'tail'])]
+                indexes = [Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
+def test_single_quotes_rewritten():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck:
+            class Meta:
+                index_together = [['bill', 'tail']]
+                indexes = []
+        """,
+        """\
+        from django.db import models
+
+        class Duck:
+            class Meta:
+                indexes = [models.Index(fields=["bill", "tail"])]
         """,
     )

@@ -9,12 +9,12 @@ from __future__ import annotations
 import ast
 from functools import partial
 from typing import Iterable
-from typing import cast
 
 from tokenize_rt import Offset
 from tokenize_rt import Token
 
 from django_upgrade.ast import ast_start_offset
+from django_upgrade.compat import str_removesuffix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
@@ -23,6 +23,7 @@ from django_upgrade.tokens import erase_node
 from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find_last_token
 from django_upgrade.tokens import insert
+from django_upgrade.tokens import str_repr_matching
 
 fixer = Fixer(
     __name__,
@@ -105,15 +106,16 @@ def visit_ClassDef(
             else:
                 index_src += "["
 
-            # TODO: can we get quote matching in? generate this string within
-            # the tokens function...
             assert isinstance(indexnode, (ast.List, ast.Tuple))  # type checked above
-            index_src += ", ".join(
-                [
-                    repr(cast(ast.Constant, subelt).value)  # type checked above
-                    for subelt in indexnode.elts
-                ]
-            )
+            for const in indexnode.elts:
+                # type checked above:
+                assert isinstance(const, ast.Constant)
+                assert isinstance(const.value, str)
+                # Default to double quotes because they’re fashionable
+                index_src += str_repr_matching(const.value, match_quotes='"')
+                index_src += ", "
+
+            index_src = str_removesuffix(index_src, ", ")
 
             if isinstance(indexnode, ast.Tuple):
                 index_src += ")"

@@ -42,106 +42,103 @@ def visit_ClassDef(
     node: ast.ClassDef,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if node.name == "Meta" and isinstance(parents[-1], ast.ClassDef):
-        # Find rewritable index_together declaration
-        index_togethers: list[ast.Assign] = []
-        for subnode in node.body:
-            if (
-                isinstance(subnode, ast.Assign)
-                and len(subnode.targets) == 1
-                and isinstance(subnode.targets[0], ast.Name)
-                and subnode.targets[0].id == "index_together"
-                and isinstance(subnode.value, (ast.List, ast.Tuple))
+    if node.name != "Meta" or not isinstance(parents[-1], ast.ClassDef):
+        return
+
+    # Find rewritable index_together declaration
+    index_togethers: list[ast.Assign] = []
+    for subnode in node.body:
+        if (
+            isinstance(subnode, ast.Assign)
+            and len(subnode.targets) == 1
+            and isinstance(subnode.targets[0], ast.Name)
+            and subnode.targets[0].id == "index_together"
+            and isinstance(subnode.value, (ast.List, ast.Tuple))
+            and all(
+                isinstance(elt, (ast.List, ast.Tuple))
                 and all(
-                    isinstance(elt, (ast.List, ast.Tuple))
-                    and all(
-                        (
-                            isinstance(subelt, ast.Constant)
-                            and isinstance(subelt.value, str)
-                        )
-                        for subelt in elt.elts
-                    )
-                    for elt in subnode.value.elts
+                    (isinstance(subelt, ast.Constant) and isinstance(subelt.value, str))
+                    for subelt in elt.elts
                 )
-            ):
-                index_togethers.append(subnode)
-
-        if len(index_togethers) != 1:
-            return
-
-        index_together = index_togethers[0]
-
-        # Try to find an indexes declaration to extend
-        indexeses: list[ast.Assign] = []
-        for subnode in node.body:
-            if (
-                isinstance(subnode, ast.Assign)
-                and len(subnode.targets) == 1
-                and isinstance(subnode.targets[0], ast.Name)
-                and subnode.targets[0].id == "indexes"
-                and isinstance(subnode.value, (ast.List, ast.Tuple))
-            ):
-                indexeses.append(subnode)
-
-        if len(indexeses) > 1:
-            return
-
-        try:
-            indexes = indexeses[0]
-        except IndexError:
-            indexes = None
-
-        if "models" in state.from_imports["django.db"]:
-            index_ref = "models.Index"
-        elif "Index" in state.from_imports["django.db.models"]:
-            index_ref = "Index"
-        else:
-            return
-
-        src_chunks = []
-        assert isinstance(
-            index_together.value, (ast.List, ast.Tuple)
-        )  # type checked above
-        for indexnode in index_together.value.elts:
-            index_src = index_ref
-            index_src += "(fields="
-            if isinstance(indexnode, ast.Tuple):
-                index_src += "("
-            else:
-                index_src += "["
-
-            assert isinstance(indexnode, (ast.List, ast.Tuple))  # type checked above
-            for const in indexnode.elts:
-                # type checked above:
-                assert isinstance(const, ast.Constant)
-                assert isinstance(const.value, str)
-                # Default to double quotes because they’re fashionable
-                index_src += str_repr_matching(const.value, match_quotes='"')
-                index_src += ", "
-
-            index_src = str_removesuffix(index_src, ", ")
-
-            if isinstance(indexnode, ast.Tuple):
-                index_src += ")"
-            else:
-                index_src += "]"
-
-            index_src += ")"
-
-            src_chunks.append(index_src)
-
-        index_src = ", ".join(src_chunks)
-
-        yield ast_start_offset(index_together), partial(
-            remove_index_together_and_maybe_add_indexes,
-            index_together=index_together,
-            add_indexes=(indexes is None),
-            index_src=index_src,
-        )
-        if indexes is not None:
-            yield ast_start_offset(indexes), partial(
-                extend_indexes, indexes=indexes, index_src=index_src
+                for elt in subnode.value.elts
             )
+        ):
+            index_togethers.append(subnode)
+
+    if len(index_togethers) != 1:
+        return
+
+    index_together = index_togethers[0]
+
+    # Try to find an indexes declaration to extend
+    indexeses: list[ast.Assign] = []
+    for subnode in node.body:
+        if (
+            isinstance(subnode, ast.Assign)
+            and len(subnode.targets) == 1
+            and isinstance(subnode.targets[0], ast.Name)
+            and subnode.targets[0].id == "indexes"
+            and isinstance(subnode.value, (ast.List, ast.Tuple))
+        ):
+            indexeses.append(subnode)
+
+    if len(indexeses) > 1:
+        return
+
+    try:
+        indexes = indexeses[0]
+    except IndexError:
+        indexes = None
+
+    if "models" in state.from_imports["django.db"]:
+        index_ref = "models.Index"
+    elif "Index" in state.from_imports["django.db.models"]:
+        index_ref = "Index"
+    else:
+        return
+
+    src_chunks = []
+    assert isinstance(index_together.value, (ast.List, ast.Tuple))  # type checked above
+    for indexnode in index_together.value.elts:
+        index_src = index_ref
+        index_src += "(fields="
+        if isinstance(indexnode, ast.Tuple):
+            index_src += "("
+        else:
+            index_src += "["
+
+        assert isinstance(indexnode, (ast.List, ast.Tuple))  # type checked above
+        for const in indexnode.elts:
+            # type checked above:
+            assert isinstance(const, ast.Constant)
+            assert isinstance(const.value, str)
+            # Default to double quotes because they’re fashionable
+            index_src += str_repr_matching(const.value, match_quotes='"')
+            index_src += ", "
+
+        index_src = str_removesuffix(index_src, ", ")
+
+        if isinstance(indexnode, ast.Tuple):
+            index_src += ")"
+        else:
+            index_src += "]"
+
+        index_src += ")"
+
+        src_chunks.append(index_src)
+
+    index_src = ", ".join(src_chunks)
+
+    yield ast_start_offset(index_together), partial(
+        remove_index_together_and_maybe_add_indexes,
+        index_together=index_together,
+        add_indexes=(indexes is None),
+        index_src=index_src,
+    )
+    if indexes is not None:
+        yield ast_start_offset(indexes), partial(
+            extend_indexes, indexes=indexes, index_src=index_src
+        )
 
 
 def remove_index_together_and_maybe_add_indexes(

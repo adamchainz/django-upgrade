@@ -18,6 +18,7 @@ from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
+from django_upgrade.tokens import OP
 from django_upgrade.tokens import erase_node
 from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find_last_token
@@ -159,6 +160,17 @@ def extend_indexes(
     indexes: ast.Assign,
     index_src: str,
 ) -> None:
+    assert isinstance(indexes.value, (ast.List, ast.Tuple))  # type checked above
     closing_punctuation = find_last_token(tokens, i, node=indexes.value)
-    # TODO: handle case where indexes has values already with/without trailing comma
-    insert(tokens, closing_punctuation, new_src=index_src)
+    if len(indexes.value.elts) == 0:
+        prefix = ""
+    else:
+        j = find_last_token(tokens, i, node=indexes.value.elts[-1])
+        if any(
+            t.name == OP and t.src == "," for t in tokens[j + 1 : closing_punctuation]
+        ):
+            prefix = " "
+        else:
+            prefix = ", "
+
+    insert(tokens, closing_punctuation, new_src=f"{prefix}{index_src}")

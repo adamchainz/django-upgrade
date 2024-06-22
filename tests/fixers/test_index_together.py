@@ -207,6 +207,71 @@ def test_mixed_indexes_present():
     )
 
 
+def test_indexes_nonempty_no_trailing_comma():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = [("bill", "tail")]
+                indexes = [models.Index("bill")]
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index("bill"), models.Index(fields=('bill', 'tail'))]
+        """,
+    )
+
+
+def test_indexes_nonempty_trailing_comma():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = [("bill", "tail")]
+                indexes = [models.Index("bill"),]
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index("bill"), models.Index(fields=('bill', 'tail'))]
+        """,
+    )
+
+
+def test_indexes_nonempty_multiline():
+    # Leave user’s formatter to sort this out
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = [("bill", "tail")]
+                indexes = [
+                    models.Index("bill"),
+                ]
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index("bill"),
+                 models.Index(fields=('bill', 'tail'))]
+        """,
+    )
+
+
 def test_list_indexes_absent():
     check_transformed(
         """\

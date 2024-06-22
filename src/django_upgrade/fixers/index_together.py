@@ -42,7 +42,10 @@ def visit_ClassDef(
     node: ast.ClassDef,
     parents: list[ast.AST],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if node.name != "Meta" or not isinstance(parents[-1], ast.ClassDef):
+    if (
+        node.name != "Meta"
+        or sum(isinstance(p, ast.ClassDef) for p in parents[1:]) != 1
+    ):
         return
 
     # Find rewritable index_together declaration

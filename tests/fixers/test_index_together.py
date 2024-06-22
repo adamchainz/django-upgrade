@@ -25,20 +25,6 @@ def test_not_meta_class():
     )
 
 
-def test_not_in_classdef():
-    check_noop(
-        """\
-        from django.db import models
-
-        class Duck(models.Model):
-            if True:
-                class Meta:
-                    index_together = [["bill", "tail"]]
-                    indexes = []
-        """,
-    )
-
-
 def test_no_index_together():
     check_noop(
         """\
@@ -127,6 +113,20 @@ def test_no_models_import():
             class Meta:
                 index_together = [["bill", "tail"]]
                 indexes = []
+        """,
+    )
+
+
+def test_triply_nested():
+    check_noop(
+        """\
+        from django.db import models
+
+        class Quackers:
+            class Duck(models.Model):
+                class Meta:
+                    index_together = [["bill", "tail"]]
+                    indexes = []
         """,
     )
 
@@ -426,5 +426,49 @@ def test_single_quotes_rewritten():
         class Duck:
             class Meta:
                 indexes = [models.Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
+def test_conditional_model_class():
+    check_transformed(
+        """\
+        from django.db import models
+
+        if True:
+            class Duck(models.Model):
+                class Meta:
+                    index_together = [["bill", "tail"]]
+                    indexes = []
+        """,
+        """\
+        from django.db import models
+
+        if True:
+            class Duck(models.Model):
+                class Meta:
+                    indexes = [models.Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
+def test_conditional_meta_class():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            if True:
+                class Meta:
+                    index_together = [["bill", "tail"]]
+                    indexes = []
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            if True:
+                class Meta:
+                    indexes = [models.Index(fields=["bill", "tail"])]
         """,
     )

@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 from functools import partial
 from typing import Iterable
+from typing import cast
 
 from tokenize_rt import Offset
 from tokenize_rt import Token
@@ -43,9 +44,9 @@ def visit_ClassDef(
                 and len(subnode.targets) == 1
                 and isinstance(subnode.targets[0], ast.Name)
                 and subnode.targets[0].id == "index_together"
-                and isinstance(subnode.value, (ast.Tuple, ast.List))
+                and isinstance(subnode.value, (ast.List, ast.Tuple))
                 and all(
-                    isinstance(elt, (ast.Tuple, ast.List))
+                    isinstance(elt, (ast.List, ast.Tuple))
                     and all(
                         (
                             isinstance(subelt, ast.Constant)
@@ -63,7 +64,7 @@ def visit_ClassDef(
 
         index_together = index_togethers[0]
 
-        # Optionally find indexes declaration to extend
+        # Try to find an indexes declaration to extend
         indexeses: list[ast.Assign] = []
         for subnode in node.body:
             if (
@@ -71,7 +72,7 @@ def visit_ClassDef(
                 and len(subnode.targets) == 1
                 and isinstance(subnode.targets[0], ast.Name)
                 and subnode.targets[0].id == "indexes"
-                and isinstance(subnode.value, (ast.Tuple, ast.List))
+                and isinstance(subnode.value, (ast.List, ast.Tuple))
             ):
                 indexeses.append(subnode)
 
@@ -81,12 +82,50 @@ def visit_ClassDef(
         try:
             indexes = indexeses[0]
         except IndexError:
-            # TODO: handle none case
+            # TODO: handle no 'indexes'
             # indexes = None
             return
 
-        # TODO: actually generate this, require existing django.db.models import or 'from django.db.models import Index'
-        index_src = "models.Index(fields=[...])"
+        if "models" in state.from_imports["django.db"]:
+            index_ref = "models.Index"
+        # TODO
+        # elif "Index" in state.from_imports['django.db.models']:
+        #     index_ref = "Index"
+        else:
+            return
+
+        src_chunks = []
+        assert isinstance(
+            index_together.value, (ast.List, ast.Tuple)
+        )  # type checked above
+        for indexnode in index_together.value.elts:
+            index_src = index_ref
+            index_src += "(fields="
+            if isinstance(indexnode, ast.Tuple):
+                index_src += "("
+            else:
+                index_src += "["
+
+            # TODO: can we get quote matching in? generate this string within
+            # the tokens function...
+            assert isinstance(indexnode, (ast.List, ast.Tuple))  # type checked above
+            index_src += ", ".join(
+                [
+                    repr(cast(ast.Constant, subelt).value)  # type checked above
+                    for subelt in indexnode.elts
+                ]
+            )
+
+            if isinstance(indexnode, ast.Tuple):
+                index_src += ")"
+            else:
+                index_src += "]"
+
+            index_src += ")"
+
+            src_chunks.append(index_src)
+
+        index_src = ", ".join(src_chunks)
 
         yield ast_start_offset(index_together), partial(
             remove_index_together_and_maybe_add_indexes,

@@ -25,7 +25,7 @@ def test_success_indexes_present():
 
         class Duck(models.Model):
             class Meta:
-                indexes = [models.Index(fields=["bill", "tail"])]
+                indexes = [models.Index(fields=['bill', 'tail'])]
         """,
         filename="example/models.py",
     )

@@ -131,6 +131,51 @@ def test_triply_nested():
     )
 
 
+def test_conditional_index_together():
+    check_noop(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                if something:
+                    index_together = [["bill", "tail"]]
+                else:
+                    index_together = []
+        """,
+    )
+
+
+def test_conditional_index_together_mutation():
+    check_noop(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = []
+                if something:
+                    index_together.append(["bill", "tail"])
+        """,
+    )
+
+
+def test_conditional_indexes():
+    check_noop(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = [["bill", "tail"]]
+                if something:
+                    indexes = [models.Index(fields=["nape"])]
+                else:
+                    indexes = []
+        """,
+    )
+
+
 def test_list_indexes_present():
     check_transformed(
         """\

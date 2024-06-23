@@ -45,6 +45,7 @@ def visit_ClassDef(
     if (
         node.name != "Meta"
         or sum(isinstance(p, ast.ClassDef) for p in parents[1:]) != 1
+        or not all(isinstance(subnode, ast.Assign) for subnode in node.body)
     ):
         return
 
@@ -55,9 +56,9 @@ def visit_ClassDef(
     # Find rewritable index_together declaration
     index_togethers: list[ast.Assign] = []
     for subnode in node.body:
+        assert isinstance(subnode, ast.Assign)  # type checked above
         if (
-            isinstance(subnode, ast.Assign)
-            and len(subnode.targets) == 1
+            len(subnode.targets) == 1
             and isinstance(subnode.targets[0], ast.Name)
             and subnode.targets[0].id == "index_together"
             and isinstance(subnode.value, (ast.List, ast.Tuple))
@@ -80,9 +81,9 @@ def visit_ClassDef(
     # Try to find an indexes declaration to extend
     indexeses: list[ast.Assign] = []
     for subnode in node.body:
+        assert isinstance(subnode, ast.Assign)  # type checked above
         if (
-            isinstance(subnode, ast.Assign)
-            and len(subnode.targets) == 1
+            len(subnode.targets) == 1
             and isinstance(subnode.targets[0], ast.Name)
             and subnode.targets[0].id == "indexes"
             and isinstance(subnode.value, (ast.List, ast.Tuple))

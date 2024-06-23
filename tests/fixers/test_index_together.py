@@ -66,7 +66,7 @@ def test_not_sequence():
     )
 
 
-def not_sub_sequence():
+def test_not_sub_sequence():
     check_noop(
         """\
         from django.db import models

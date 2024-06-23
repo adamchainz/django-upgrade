@@ -3,6 +3,8 @@ Changelog
 =========
 
 * Add Django 4.2+ fixer to rewrite ``index_together`` declarations into ``indexes`` declarations in model ``Meta`` classes.
+  This fixer can make changes that require migrations.
+  Add a `test for pending migrations <https://adamj.eu/tech/2024/06/23/django-test-pending-migrations/>`__ to ensure that you do not miss these.
 
   `PR #464 <https://github.com/adamchainz/django-upgrade/pull/464>`__.
 

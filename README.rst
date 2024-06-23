@@ -82,6 +82,13 @@ For example:
 ``django-upgrade`` focuses on upgrading your code and not on making it look nice.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
 
+Some of django-upgrade’s fixers make changes to models that need migrations:
+
+* ``index_together``
+* ``null_boolean_field``
+
+Add a `test for pending migrations <https://adamj.eu/tech/2024/06/23/django-test-pending-migrations/>`__ to ensure that you do not miss these.
+
 ``django-upgrade`` does not have any ability to recurse through directories.
 Use the pre-commit integration, globbing, or another technique for applying to many files.
 Some fixers depend on the names of containing directories to activate, so ensure you run django-upgrade with paths relative to the root of your project.

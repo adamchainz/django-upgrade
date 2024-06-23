@@ -2,6 +2,22 @@
 Changelog
 =========
 
+* Fix tracking of AST node parents.
+  This may have fixed some subtle bugs in these fixers:
+
+  * ``admin_register``
+  * ``assert_form_error``
+  * ``default_app_config``
+  * ``management_commands``
+  * ``request_headers``
+  * ``settings_database_postgresql``
+  * ``settings_storages``
+  * ``testcase_databases``
+  * ``use_l10n``
+  * ``utils_timezone``
+
+  If you see any new changes, or had them previously disabled, please report an issue so we can extra tests to the test suite.
+
 1.18.0 (2024-05-28)
 -------------------
 

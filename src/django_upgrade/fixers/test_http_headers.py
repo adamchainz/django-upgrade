@@ -48,7 +48,7 @@ if sys.version_info >= (3, 9):
     def visit_Call(
         state: State,
         node: ast.Call,
-        parents: list[ast.AST],
+        parents: tuple[ast.AST, ...],
     ) -> Iterable[tuple[Offset, TokenFunc]]:
         if (
             isinstance(node.func, ast.Name)

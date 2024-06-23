@@ -30,7 +30,7 @@ fixer = Fixer(
 def visit_Dict(
     state: State,
     node: ast.Dict,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         len(parents) >= 2

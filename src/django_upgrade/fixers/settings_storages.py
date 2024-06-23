@@ -66,7 +66,7 @@ settings_details: MutableMapping[State, SettingsDetails] = WeakKeyDictionary()
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.names[0].name == "*"
@@ -83,7 +83,7 @@ def visit_ImportFrom(
 def visit_Assign(
     state: State,
     node: ast.Assign,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         len(node.targets) == 1

@@ -40,7 +40,7 @@ fixer = Fixer(
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module == "django.conf.urls"
@@ -136,7 +136,7 @@ def update_django_urls_import(
 def visit_Call(
     state: State,
     node: ast.Call,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if isinstance(node.func, ast.Name):
         if (

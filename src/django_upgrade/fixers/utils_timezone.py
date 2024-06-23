@@ -31,7 +31,7 @@ fixer = Fixer(
 def visit_Name(
     state: State,
     node: ast.Name,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.id == "utc"
@@ -50,7 +50,7 @@ def visit_Name(
 def visit_Attribute(
     state: State,
     node: ast.Attribute,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.attr == "utc"

@@ -40,7 +40,7 @@ fixer = Fixer(
 def visit_ClassDef(
     state: State,
     node: ast.ClassDef,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.name != "Meta"

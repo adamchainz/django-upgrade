@@ -18,6 +18,8 @@ Changelog
 
   If you see any new changes, or had them previously disabled, please report an issue so we can extra tests to the test suite.
 
+  `PR #465 <https://github.com/adamchainz/django-upgrade/pull/465>`__.
+
 1.18.0 (2024-05-28)
 -------------------
 

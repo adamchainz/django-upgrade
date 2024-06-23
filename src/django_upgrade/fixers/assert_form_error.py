@@ -41,7 +41,7 @@ fixer = Fixer(
 def visit_Call(
     state: State,
     node: ast.Call,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
@@ -178,7 +178,7 @@ class ResponseAssignmentVisitor(ast.NodeVisitor):
 
 
 def is_response_from_client(
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
     node: ast.Call,
     name: str,
 ) -> bool:

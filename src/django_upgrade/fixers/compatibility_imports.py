@@ -166,7 +166,7 @@ def _get_replacements(
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if not is_rewritable_import_from(node) or node.module is None:
         return

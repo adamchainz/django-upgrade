@@ -33,7 +33,7 @@ fixer = Fixer(
 def visit_If(
     state: State,
     node: ast.If,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.test, ast.Compare)

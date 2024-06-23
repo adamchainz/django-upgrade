@@ -39,7 +39,7 @@ NAME_MAP = {
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         node.module in MODULES
@@ -55,7 +55,7 @@ def visit_ImportFrom(
 def visit_Name(
     state: State,
     node: ast.Name,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in NAME_MAP and any(
         name in state.from_imports[m] for m in MODULES

@@ -34,7 +34,7 @@ RENAMES = {
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if node.module == MODULE and is_rewritable_import_from(node):
         name_map = {}
@@ -54,7 +54,7 @@ def visit_ImportFrom(
 def visit_Name(
     state: State,
     node: ast.Name,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in RENAMES and name in state.from_imports[MODULE]:
         new_name = RENAMES[name]

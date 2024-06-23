@@ -37,7 +37,7 @@ fixer = Fixer(
 def visit_Module(
     state: State,
     node: ast.Module,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     yield from visit_Module_or_ClassDef(state, node, parents)
 
@@ -46,7 +46,7 @@ def visit_Module(
 def visit_ClassDef(
     state: State,
     node: ast.ClassDef,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     yield from visit_Module_or_ClassDef(state, node, parents)
 
@@ -83,7 +83,7 @@ class FunctionDetails:
 def visit_Module_or_ClassDef(
     state: State,
     node: ast.Module | ast.ClassDef,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     # Potential action and display functions to details of assigned attributes
     funcs: dict[str, FunctionDetails] = {}

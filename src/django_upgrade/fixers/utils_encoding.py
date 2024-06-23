@@ -35,7 +35,7 @@ NAMES = {
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if node.module == MODULE and is_rewritable_import_from(node):
         yield ast_start_offset(node), partial(
@@ -47,7 +47,7 @@ def visit_ImportFrom(
 def visit_Name(
     state: State,
     node: ast.Name,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in NAMES and name in state.from_imports[MODULE]:
         yield ast_start_offset(node), partial(
@@ -59,7 +59,7 @@ def visit_Name(
 def visit_Attribute(
     state: State,
     node: ast.Attribute,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (name := node.attr) in NAMES

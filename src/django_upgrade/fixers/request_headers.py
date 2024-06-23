@@ -33,7 +33,7 @@ fixer = Fixer(
 def visit_Subscript(
     state: State,
     node: ast.Subscript,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         is_request_or_self_request_meta(node.value)
@@ -51,7 +51,7 @@ def visit_Subscript(
 def visit_Call(
     state: State,
     node: ast.Call,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
@@ -71,7 +71,7 @@ def visit_Call(
 def visit_Compare(
     state: State,
     node: ast.Compare,
-    parents: list[ast.AST],
+    parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         len(node.ops) == 1

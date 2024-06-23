@@ -48,6 +48,10 @@ def visit_ClassDef(
     ):
         return
 
+    # TODO:
+    # For convenience, index_together can be a single list when dealing with a
+    # single set of fields:
+    # index_together = ["pub_date", "deadline"]
     # Find rewritable index_together declaration
     index_togethers: list[ast.Assign] = []
     for subnode in node.body:

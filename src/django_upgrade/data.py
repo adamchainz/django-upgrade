@@ -117,19 +117,17 @@ def visit(
     settings: Settings,
     filename: str,
 ) -> dict[Offset, list[TokenFunc]]:
-    initial_state = State(
+    state = State(
         settings=settings,
         filename=filename,
         from_imports=defaultdict(set),
     )
-    ast_funcs = get_ast_funcs(initial_state, settings)
+    ast_funcs = get_ast_funcs(state, settings)
 
-    nodes: list[tuple[State, ast.AST, tuple[ast.AST, ...]]] = [
-        (initial_state, tree, ())
-    ]
+    nodes: list[tuple[ast.AST, tuple[ast.AST, ...]]] = [(tree, ())]
     ret = defaultdict(list)
     while nodes:
-        state, node, parents = nodes.pop()
+        node, parents = nodes.pop()
 
         for ast_func in ast_funcs[type(node)]:
             for offset, token_func in ast_func(state, node, parents):
@@ -152,14 +150,13 @@ def visit(
         subparents = parents + (node,)
         for name in reversed(node._fields):
             value = getattr(node, name)
-            next_state = state
 
             if isinstance(value, ast.AST):
-                nodes.append((next_state, value, subparents))
+                nodes.append((value, subparents))
             elif isinstance(value, list):
                 for subvalue in reversed(value):
                     if isinstance(subvalue, ast.AST):
-                        nodes.append((next_state, subvalue, subparents))
+                        nodes.append((subvalue, subparents))
     return ret
 
 

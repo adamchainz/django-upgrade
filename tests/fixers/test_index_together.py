@@ -176,6 +176,26 @@ def test_conditional_indexes():
     )
 
 
+def test_list_single_indexes_present():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = ["bill", "tail"]
+                indexes = []
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
 def test_list_indexes_present():
     check_transformed(
         """\
@@ -204,6 +224,26 @@ def test_tuple_indexes_present():
         class Duck(models.Model):
             class Meta:
                 index_together = [("bill", "tail")]
+                indexes = []
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=("bill", "tail"))]
+        """,
+    )
+
+
+def test_tuple_single_indexes_present():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = ("bill", "tail")
                 indexes = []
         """,
         """\
@@ -375,6 +415,25 @@ def test_indexes_nonempty_multiline_aligned():
     )
 
 
+def test_list_single_indexes_absent():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = ["bill", "tail"]
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
 def test_list_indexes_absent():
     check_transformed(
         """\
@@ -390,6 +449,25 @@ def test_list_indexes_absent():
         class Duck(models.Model):
             class Meta:
                 indexes = [models.Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
+def test_tuple_single_indexes_absent():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = ("bill", "tail")
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=("bill", "tail"))]
         """,
     )
 

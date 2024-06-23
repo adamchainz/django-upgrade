@@ -49,10 +49,6 @@ def visit_ClassDef(
     ):
         return
 
-    # TODO:
-    # For convenience, index_together can be a single list when dealing with a
-    # single set of fields:
-    # index_together = ["pub_date", "deadline"]
     # Find rewritable index_together declaration
     index_togethers: list[ast.Assign] = []
     for subnode in node.body:
@@ -62,13 +58,22 @@ def visit_ClassDef(
             and isinstance(subnode.targets[0], ast.Name)
             and subnode.targets[0].id == "index_together"
             and isinstance(subnode.value, (ast.List, ast.Tuple))
-            and all(
-                isinstance(elt, (ast.List, ast.Tuple))
-                and all(
-                    (isinstance(subelt, ast.Constant) and isinstance(subelt.value, str))
-                    for subelt in elt.elts
+            and (
+                all(
+                    (isinstance(elt, ast.Constant) and isinstance(elt.value, str))
+                    for elt in subnode.value.elts
                 )
-                for elt in subnode.value.elts
+                or all(
+                    isinstance(elt, (ast.List, ast.Tuple))
+                    and all(
+                        (
+                            isinstance(subelt, ast.Constant)
+                            and isinstance(subelt.value, str)
+                        )
+                        for subelt in elt.elts
+                    )
+                    for elt in subnode.value.elts
+                )
             )
         ):
             index_togethers.append(subnode)
@@ -107,7 +112,15 @@ def visit_ClassDef(
 
     src_chunks = []
     assert isinstance(index_together.value, (ast.List, ast.Tuple))  # type checked above
-    for indexnode in index_together.value.elts:
+    # Single index: pretend it was a list-of-lists (or tuple-of-tuples, etc.)
+    if isinstance(index_together.value.elts[0], ast.Constant):
+        iterate: list[ast.List | ast.Tuple] = [
+            type(index_together.value)(elts=index_together.value.elts)
+        ]
+    else:
+        # type checked above
+        iterate = index_together.value.elts  # type: ignore [assignment]
+    for indexnode in iterate:
         index_src = index_ref
         index_src += "(fields="
         if isinstance(indexnode, ast.Tuple):

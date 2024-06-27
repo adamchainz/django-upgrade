@@ -82,6 +82,13 @@ For example:
 ``django-upgrade`` focuses on upgrading your code and not on making it look nice.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
 
+Some of django-upgrade’s fixers make changes to models that need migrations:
+
+* ``index_together``
+* ``null_boolean_field``
+
+Add a `test for pending migrations <https://adamj.eu/tech/2024/06/23/django-test-pending-migrations/>`__ to ensure that you do not miss these.
+
 ``django-upgrade`` does not have any ability to recurse through directories.
 Use the pre-commit integration, globbing, or another technique for applying to many files.
 Some fixers depend on the names of containing directories to activate, so ensure you run django-upgrade with paths relative to the root of your project.
@@ -305,6 +312,23 @@ Requires Python 3.9+ due to changes in ``ast.keyword``.
      from django.test import RequestFactory
     -RequestFactory(HTTP_USER_AGENT="curl")
     +RequestFactory(headers={"user-agent": "curl"})
+
+
+``index_together`` deprecation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``index_together``
+
+Rewrites ``index_together`` declarations into ``indexes`` declarations in model ``Meta`` classes.
+
+.. code-block:: diff
+
+     from django.db import models
+
+     class Duck(models.Model):
+         class Meta:
+    -       index_together = [["bill", "tail"]]
+    +       indexes = [models.Index(fields=["bill", "tail"]]
 
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

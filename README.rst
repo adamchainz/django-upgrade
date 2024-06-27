@@ -328,7 +328,7 @@ Rewrites ``index_together`` declarations into ``indexes`` declarations in model 
      class Duck(models.Model):
          class Meta:
     -       index_together = [["bill", "tail"]]
-    +       indexes = [models.Index(fields=["bill", "tail"]]
+    +       indexes = [models.Index(fields=["bill", "tail"])]
 
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

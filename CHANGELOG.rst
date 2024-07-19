@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.20.0 (2024-07-19)
+-------------------
+
 * Fix the ``admin_register`` fixer to avoid rewriting when there are duplicate ``ModelAdmin`` classes in the file.
 
   `Issue #471 <https://github.com/adamchainz/django-upgrade/issues/471>`__.

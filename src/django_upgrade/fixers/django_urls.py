@@ -90,7 +90,7 @@ def update_django_conf_import(
             tokens,
             i,
             node=node,
-            name_map={name: "" for name in removals},
+            name_map=dict.fromkeys(removals, ""),
         )
         if not re_path_imported:
             joined_names = ", ".join(sorted(added_names))

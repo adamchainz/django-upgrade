@@ -45,7 +45,9 @@ class AdminDetails:
         self.model_names_per_site: dict[str, set[str]] = {}
 
 
-decorable_admins: MutableMapping[State, dict[str, AdminDetails]] = WeakKeyDictionary()
+decorable_admins: MutableMapping[State, dict[str, AdminDetails | None]] = (
+    WeakKeyDictionary()
+)
 # Name of site to set of unregistered model names, or True if potentially all
 # models have been unregistered
 unregistered_site_models: MutableMapping[State, dict[str, set[str] | Literal[True]]] = (
@@ -67,9 +69,14 @@ def visit_ClassDef(
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if _is_django_admin_imported(state) and not uses_full_super_in_init_or_new(node):
-        decorable_admins.setdefault(state, {})[node.name] = AdminDetails(
-            parents[-1], node.lineno
-        )
+        admin_detailses = decorable_admins.setdefault(state, {})
+        if node.name in admin_detailses:
+            # Duplicate name, ignore
+            admin_detailses[node.name] = None
+            return
+        else:
+            admin_detailses[node.name] = AdminDetails(parents[-1], node.lineno)
+
         if not node.decorator_list:
             offset = ast_start_offset(node)
             decorated = False
@@ -125,7 +132,7 @@ def update_class_def(
     tokens: list[Token], i: int, *, name: str, state: State, decorated: bool
 ) -> None:
     admin_details = decorable_admins.get(state, {})[name]
-    if not admin_details.model_names_per_site:
+    if admin_details is None or not admin_details.model_names_per_site:
         return
 
     if decorated:
@@ -221,7 +228,12 @@ def visit_Call(
                 admin_details.model_names_per_site.setdefault(site_name, set()).update(
                     model_names
                 )
-                yield ast_start_offset(node), partial(erase_node, node=parents[-1])
+                yield ast_start_offset(parents[-1]), partial(
+                    remove_register,
+                    name=admin_name,
+                    state=state,
+                    node=parents[-1],
+                )
         elif node.func.attr == "unregister" and (
             (  # admin.site.unregister(...)
                 isinstance(node.func.value, ast.Attribute)
@@ -264,6 +276,16 @@ def visit_Call(
                     state_details[site_name] = unregistered_names
                 elif existing_names is not True:
                     existing_names.update(unregistered_names)
+
+
+def remove_register(
+    tokens: list[Token], i: int, *, name: str, state: State, node: ast.AST
+) -> None:
+    admin_details = decorable_admins.get(state, {})[name]
+    if admin_details is None:
+        return
+
+    erase_node(tokens, i, node=node)
 
 
 site_definitions: MutableMapping[ast.Module, dict[str, int | None]] = (

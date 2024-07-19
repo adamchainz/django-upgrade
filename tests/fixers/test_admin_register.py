@@ -65,6 +65,20 @@ def test_already_using_decorator_registration():
     )
 
 
+def test_register_assigned():
+    check_noop(
+        """\
+        from django.contrib import admin
+        from myapp.models import Author
+
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+
+        value = admin.site.register(Author, AuthorAdmin)
+        """,
+    )
+
+
 def test_py2_style_init_super():
     check_noop(
         """\
@@ -665,6 +679,75 @@ def test_multiple_model_mixed_registration():
         class MyCustomAdmin:
             pass
 
+        """,
+    )
+
+
+def test_duplicate_model_admins_register_one():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(Book, BookAdmin)
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+        """,
+    )
+
+
+def test_duplicate_model_admins_register_two():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(Book, BookAdmin)
+        """,
+    )
+
+
+def test_duplicate_model_admins_with_intermediate():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        class DuckAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(Duck, DuckAdmin)
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(Book, BookAdmin)
+        """,
+        """\
+        from django.contrib import admin
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        @admin.register(Duck)
+        class DuckAdmin(admin.ModelAdmin):
+            pass
+
+
+        class BookAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(Book, BookAdmin)
         """,
     )
 

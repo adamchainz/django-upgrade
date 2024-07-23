@@ -195,7 +195,7 @@ def store_value_src(
     tokens: list[Token],
     i: int,
     *,
-    node: ast.AST,
+    node: ast.expr,
     name: str,
     funcdetails: FunctionDetails,
 ) -> None:

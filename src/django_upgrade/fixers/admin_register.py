@@ -279,7 +279,7 @@ def visit_Call(
 
 
 def remove_register(
-    tokens: list[Token], i: int, *, name: str, state: State, node: ast.AST
+    tokens: list[Token], i: int, *, name: str, state: State, node: ast.Expr
 ) -> None:
     admin_details = decorable_admins.get(state, {})[name]
     if admin_details is None:

@@ -63,7 +63,9 @@ def reverse_consume(
     return i
 
 
-def find_first_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
+def find_first_token(
+    tokens: list[Token], i: int, *, node: ast.expr | ast.keyword | ast.stmt
+) -> int:
     """
     Find the first token corresponding to the given ast node.
     """
@@ -77,7 +79,9 @@ def find_first_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
     return i
 
 
-def find_last_token(tokens: list[Token], i: int, *, node: ast.AST) -> int:
+def find_last_token(
+    tokens: list[Token], i: int, *, node: ast.expr | ast.keyword | ast.stmt
+) -> int:
     """
     Find the last token corresponding to the given ast node.
     """
@@ -327,7 +331,9 @@ def replace(tokens: list[Token], i: int, *, src: str) -> None:
     tokens[i] = tokens[i]._replace(name=CODE, src=src)
 
 
-def erase_node(tokens: list[Token], i: int, *, node: ast.AST) -> None:
+def erase_node(
+    tokens: list[Token], i: int, *, node: ast.expr | ast.keyword | ast.stmt
+) -> None:
     """
     Erase all tokens corresponding to the given ast node.
     """

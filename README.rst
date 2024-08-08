@@ -242,7 +242,24 @@ Django 5.0
 
 `Release Notes <https://docs.djangoproject.com/en/5.0/releases/5.0/>`__
 
-No fixers yet.
+``format_html()`` calls
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``format_html``
+
+Rewrites ``format_html()`` calls without ``args`` or ``kwargs`` but using ``str.format()``.
+Such calls are most likely incorrectly applying formatting without escaping, making them vulnerable to HTML injection.
+Such use cases are why calling ``format_html()`` without any arguments or keyword arguments was deprecated in `Ticket #34609 <https://code.djangoproject.com/ticket/34609>`__.
+
+.. code-block:: diff
+
+     from django.utils.html import format_html
+
+    -format_html("<marquee>{}</marquee>".format(message))
+    +format_html("<marquee>{}</marquee>", message)
+
+    -format_html("<marquee>{name}</marquee>".format(name=name))
+    +format_html("<marquee>{name}</marquee>", name=name)
 
 Django 4.2
 ----------

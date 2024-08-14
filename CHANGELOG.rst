@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add Django 5.0+ fixer to rewrite ``format_html()`` calls without ``args`` or ``kwargs`` probably using ``str.format()`` incorrectly.
+
+  `Issue #477 <https://github.com/adamchainz/django-upgrade/issues/477>`__.
+
 1.20.0 (2024-07-19)
 -------------------
 

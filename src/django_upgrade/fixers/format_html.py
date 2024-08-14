@@ -23,6 +23,7 @@ from django_upgrade.tokens import alone_on_line
 from django_upgrade.tokens import find
 from django_upgrade.tokens import find_last_token
 from django_upgrade.tokens import insert
+from django_upgrade.tokens import replace
 
 fixer = Fixer(
     __name__,
@@ -43,14 +44,26 @@ def visit_Call(
         # Template only
         and len(node.args) == 1
         and len(node.keywords) == 0
-        # str.format()
-        and isinstance((str_format := node.args[0]), ast.Call)
-        and isinstance(str_format.func, ast.Attribute)
-        and isinstance(str_format.func.value, ast.Constant)
-        and isinstance(str_format.func.value.value, str)
-        and str_format.func.attr == "format"
     ):
-        yield ast_start_offset(node), partial(rewrite_str_format, node=str_format)
+        arg = node.args[0]
+
+        # String constant -> mark_safe()
+        if (
+            isinstance(arg, ast.Constant)
+            and isinstance(arg.value, str)
+            and "mark_safe" in state.from_imports["django.utils.safestring"]
+        ):
+            yield ast_start_offset(node), partial(replace, src="mark_safe")
+
+        # str.format() -> push args and kwargs out to format_html
+        elif (
+            isinstance(arg, ast.Call)
+            and isinstance(arg.func, ast.Attribute)
+            and arg.func.attr == "format"
+            and isinstance(arg.func.value, ast.Constant)
+            and isinstance(arg.func.value.value, str)
+        ):
+            yield ast_start_offset(arg), partial(rewrite_str_format, node=arg)
 
 
 def rewrite_str_format(

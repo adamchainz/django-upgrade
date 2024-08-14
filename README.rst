@@ -247,9 +247,9 @@ Django 5.0
 
 **Name:** ``format_html``
 
-Rewrites ``format_html()`` calls without ``args`` or ``kwargs`` but using ``str.format()``.
-Such calls are most likely incorrectly applying formatting without escaping, making them vulnerable to HTML injection.
-Such use cases are why calling ``format_html()`` without any arguments or keyword arguments was deprecated in `Ticket #34609 <https://code.djangoproject.com/ticket/34609>`__.
+Rewrites ``format_html()`` calls without arguments.
+
+If a ``format_html()`` call wraps a ``str.format()`` call, that is removed, with the arguments pushed out to ``format_html()``:
 
 .. code-block:: diff
 
@@ -260,6 +260,23 @@ Such use cases are why calling ``format_html()`` without any arguments or keywor
 
     -format_html("<marquee>{name}</marquee>".format(name=name))
     +format_html("<marquee>{name}</marquee>", name=name)
+
+Such calls are most likely incorrectly applying formatting without escaping, making them vulnerable to HTML injection, the motivation for the deprecation in `Ticket #34609 <https://code.djangoproject.com/ticket/34609>`__.
+
+If a call wraps a string constant, it is changed to call |mark_safe()|__:
+
+.. |mark_safe()| replace:: ``mark_safe()``
+__ https://docs.djangoproject.com/en/stable/ref/utils/#django.utils.safestring.mark_safe
+
+.. code-block:: diff
+
+     from django.utils.html import format_html
+    +from django.utils.safestring import mark_safe
+
+    -format_html("")
+    +mark_safe("")
+
+Such calls probably just meant to call ``mark_safe()`` to begin with.
 
 Django 4.2
 ----------

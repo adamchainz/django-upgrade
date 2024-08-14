@@ -58,7 +58,22 @@ def test_not_format():
     )
 
 
-def test_pos_arg_single():
+def test_mark_safe_already_imported():
+    check_transformed(
+        """\
+        from django.utils.html import format_html
+        from django.utils.safestring import mark_safe
+        format_html("")
+        """,
+        """\
+        from django.utils.html import format_html
+        from django.utils.safestring import mark_safe
+        mark_safe("")
+        """,
+    )
+
+
+def test_str_format_pos_arg_single():
     check_transformed(
         """\
         from django.utils.html import format_html
@@ -71,7 +86,7 @@ def test_pos_arg_single():
     )
 
 
-def test_pos_arg_double():
+def test_str_format_pos_arg_double():
     check_transformed(
         """\
         from django.utils.html import format_html
@@ -84,7 +99,7 @@ def test_pos_arg_double():
     )
 
 
-def test_kwarg_single():
+def test_str_format_kwarg_single():
     check_transformed(
         """\
         from django.utils.html import format_html
@@ -97,7 +112,7 @@ def test_kwarg_single():
     )
 
 
-def test_kwarg_double():
+def test_str_format_kwarg_double():
     check_transformed(
         """\
         from django.utils.html import format_html
@@ -110,7 +125,7 @@ def test_kwarg_double():
     )
 
 
-def test_pos_kwarg_mixed():
+def test_str_format_pos_kwarg_mixed():
     check_transformed(
         """\
         from django.utils.html import format_html
@@ -123,7 +138,7 @@ def test_pos_kwarg_mixed():
     )
 
 
-def test_indented():
+def test_str_format_indented():
     check_transformed(
         """\
         from django.utils.html import format_html
@@ -140,7 +155,7 @@ def test_indented():
     )
 
 
-def test_indented_double():
+def test_str_format_indented_double():
     check_transformed(
         """\
         from django.utils.html import format_html

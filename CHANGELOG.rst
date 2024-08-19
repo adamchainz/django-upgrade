@@ -21,6 +21,10 @@ Changelog
 
   `Issue #477 <https://github.com/adamchainz/django-upgrade/issues/477>`__.
 
+* Add Django 4.0+ fixer to rewrite ``OSMGeoAdmin`` and ``GeoModelAdmin`` classes.
+
+  `PR #484 <https://github.com/adamchainz/django-upgrade/pull/484>`__.
+
 1.20.0 (2024-07-19)
 -------------------
 

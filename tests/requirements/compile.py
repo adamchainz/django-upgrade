@@ -24,3 +24,4 @@ if __name__ == "__main__":
     run([*common_args, "--python", "3.10", "--output-file", "py310.txt"])
     run([*common_args, "--python", "3.11", "--output-file", "py311.txt"])
     run([*common_args, "--python", "3.12", "--output-file", "py312.txt"])
+    run([*common_args, "--python", "3.13", "--output-file", "py313.txt"])

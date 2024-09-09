@@ -36,7 +36,7 @@ Use **pip**:
 
     python -m pip install django-upgrade
 
-Python 3.8 to 3.12 supported.
+Python 3.8 to 3.13 supported.
 
 (Python 3.12+ is required to correctly apply fixes within f-strings.)
 

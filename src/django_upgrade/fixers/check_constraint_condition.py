@@ -6,9 +6,8 @@ https://docs.djangoproject.com/en/5.1/releases/5.1/#id2
 from __future__ import annotations
 
 import ast
-import sys
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 
@@ -23,33 +22,31 @@ fixer = Fixer(
     min_version=(5, 1),
 )
 
-# Requires lineno/utf8_byte_offset on ast.keyword, added in Python 3.9
-if sys.version_info >= (3, 9):
 
-    @fixer.register(ast.Call)
-    def visit_Call(
-        state: State,
-        node: ast.Call,
-        parents: tuple[ast.AST, ...],
-    ) -> Iterable[tuple[Offset, TokenFunc]]:
-        if (
+@fixer.register(ast.Call)
+def visit_Call(
+    state: State,
+    node: ast.Call,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        (
             (
-                (
-                    isinstance(node.func, ast.Name)
-                    and node.func.id == "CheckConstraint"
-                    and "CheckConstraint" in state.from_imports["django.db.models"]
-                )
-                or (
-                    isinstance(node.func, ast.Attribute)
-                    and node.func.attr == "CheckConstraint"
-                    and isinstance(node.func.value, ast.Name)
-                    and node.func.value.id == "models"
-                    and "models" in state.from_imports["django.db"]
-                )
+                isinstance(node.func, ast.Name)
+                and node.func.id == "CheckConstraint"
+                and "CheckConstraint" in state.from_imports["django.db.models"]
             )
-            and (kwarg_names := {k.arg for k in node.keywords})
-            and "check" in kwarg_names
-            and "condition" not in kwarg_names
-        ):
-            check_kwarg = [k for k in node.keywords if k.arg == "check"][0]
-            yield ast_start_offset(check_kwarg), partial(replace, src="condition")
+            or (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr == "CheckConstraint"
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "models"
+                and "models" in state.from_imports["django.db"]
+            )
+        )
+        and (kwarg_names := {k.arg for k in node.keywords})
+        and "check" in kwarg_names
+        and "condition" not in kwarg_names
+    ):
+        check_kwarg = [k for k in node.keywords if k.arg == "check"][0]
+        yield ast_start_offset(check_kwarg), partial(replace, src="condition")

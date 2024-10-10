@@ -17,10 +17,10 @@ from __future__ import annotations
 
 import ast
 from collections import defaultdict
+from collections.abc import Iterable
+from collections.abc import Mapping
 from functools import lru_cache
 from functools import partial
-from typing import Iterable
-from typing import Mapping
 
 from tokenize_rt import Offset
 

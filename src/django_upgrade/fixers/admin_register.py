@@ -6,10 +6,10 @@ https://docs.djangoproject.com/en/stable/releases/1.7/#minor-features
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
+from collections.abc import MutableMapping
 from functools import partial
-from typing import Iterable
 from typing import Literal
-from typing import MutableMapping
 from typing import cast
 from weakref import WeakKeyDictionary
 

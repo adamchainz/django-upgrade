@@ -9,8 +9,8 @@ else:
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 from typing import Literal
 from typing import cast
 

@@ -36,7 +36,7 @@ Use **pip**:
 
     python -m pip install django-upgrade
 
-Python 3.8 to 3.13 supported.
+Python 3.9 to 3.13 supported.
 
 (Python 3.12+ is required to correctly apply fixes within f-strings.)
 
@@ -230,8 +230,6 @@ Django 5.1
 
 Rewrites calls to ``CheckConstraint`` and built-in subclasses from the old ``check`` argument to the new name ``condition``.
 
-Requires Python 3.9+ due to changes in ``ast.keyword``.
-
 .. code-block:: diff
 
    -CheckConstraint(check=Q(amount__gte=0))
@@ -314,8 +312,6 @@ Transforms HTTP headers from the old WSGI kwarg format to use the new ``headers`
 * ``Client`` method like ``self.client.get()``
 * ``Client`` instantiation
 * ``RequestFactory`` instantiation
-
-Requires Python 3.9+ due to changes in ``ast.keyword``.
 
 .. code-block:: diff
 

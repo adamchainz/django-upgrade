@@ -8,8 +8,8 @@ https://docs.djangoproject.com/en/1.10/releases/1.10/#using-user-is-authenticate
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 from tokenize_rt import Token

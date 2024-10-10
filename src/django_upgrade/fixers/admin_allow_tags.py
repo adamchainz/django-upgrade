@@ -7,8 +7,8 @@ https://docs.djangoproject.com/en/2.0/releases/2.0/#features-removed-in-2-0
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 

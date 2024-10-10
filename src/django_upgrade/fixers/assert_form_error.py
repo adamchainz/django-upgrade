@@ -8,9 +8,9 @@ https://docs.djangoproject.com/en/4.1/releases/4.1/#tests
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
 from typing import Any
-from typing import Iterable
 
 from tokenize_rt import UNIMPORTANT_WS
 from tokenize_rt import Offset

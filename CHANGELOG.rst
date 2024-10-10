@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Drop Python 3.8 support.
+
 * Support Python 3.13.
 
 * Avoid accidental removal of comments a removed ``if`` block in the versioned block fixer.

@@ -113,6 +113,34 @@ def test_unittest_bare_skipUnless_failing_comparison():
     )
 
 
+def test_unittest_attr_skipIf_class_level_not_removed():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 2), "Django 4.2+")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+    )
+
+
+def test_unittest_skipUnless_class_level_not_removed():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipUnless(django.VERSION >= (4, 2), "Django 4.2+")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+    )
+
+
 def test_unittest_attr_skipIf_removed():
     check_transformed(
         """\
@@ -168,6 +196,27 @@ def test_unittest_skipIf_mixed():
         """\
         import unittest
         from unittest import skipIf
+        import django
+
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_mixed_skipIf_skipUnless():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        @unittest.skipUnless(django.VERSION >= (4, 1), "Django 4.1+")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        import unittest
         import django
 
         def test_thing(self):
@@ -233,5 +282,96 @@ def test_unittest_bare_skipIf_skipUnless_mixed():
 
         def test_thing(self):
             pass
+        """,
+    )
+
+
+def test_unittest_attr_skipIf_class_level_removed():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+    )
+
+
+def test_unittest_bare_skipIf_class_level_removed():
+    check_transformed(
+        """\
+        from unittest import skipIf
+        import django
+
+        @skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+        """\
+        from unittest import skipIf
+        import django
+
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+    )
+
+
+def test_unittest_skipUnless_class_level_removed():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipUnless(django.VERSION >= (4, 1), "Django 4.1+")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+    )
+
+
+def test_unittest_mixed_decorators_class_level():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        @unittest.skipUnless(django.VERSION >= (4, 1), "Django 4.1+")
+        @unittest.skip("Always skipped")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+
+        @unittest.skip("Always skipped")
+        class TestCase(unittest.TestCase):
+            def test_thing(self):
+                pass
         """,
     )

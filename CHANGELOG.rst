@@ -6,6 +6,26 @@ Changelog
 
   Thanks to Tobias Funke for the report in `Issue #495 <https://github.com/adamchainz/django-upgrade/issues/495>`__.
 
+* Add all-version fixer to remove outdated test skip decorators.
+  For example:
+
+  .. code-block:: diff
+
+     import django
+     from django.test import TestCase
+
+     class ExampleTests(TestCase):
+    -    @unittest.skipIf(django.VERSION < (5, 1), "Django 5.1+")
+         def test_one(self):
+             ...
+
+    -    @unittest.skipUnless(django.VERSION >= (5, 1), "Django 5.1+")
+         def test_two(self):
+             ...
+
+
+  `Issue #364 <https://github.com/adamchainz/django-upgrade/issues/364>`__.
+
 * Drop Python 3.8 support.
 
 * Support Python 3.13.

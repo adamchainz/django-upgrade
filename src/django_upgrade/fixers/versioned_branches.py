@@ -12,12 +12,12 @@ import ast
 from collections.abc import Iterable
 from functools import partial
 from typing import Literal
-from typing import cast
 
 from tokenize_rt import Offset
 from tokenize_rt import Token
 
 from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import is_passing_comparison
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
@@ -37,11 +37,7 @@ def visit_If(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.test, ast.Compare)
-        and isinstance(left := node.test.left, ast.Attribute)
-        and isinstance(left.value, ast.Name)
-        and left.value.id == "django"
-        and left.attr == "VERSION"
-        and (keep_branch := _is_passing_comparison(node.test, state)) is not None
+        and (pass_fail := is_passing_comparison(node.test, state)) is not None
         and (
             # do not handle 'if ... elif ...'
             not node.orelse
@@ -49,38 +45,10 @@ def visit_If(
         )
     ):
         yield ast_start_offset(node), partial(
-            _fix_block, node=node, keep_branch=keep_branch
+            _fix_block,
+            node=node,
+            keep_branch=("first" if pass_fail == "pass" else "second"),
         )
-
-
-def _is_passing_comparison(
-    test: ast.Compare, state: State
-) -> Literal["first", "second", None]:
-    if not (
-        len(test.ops) == 1
-        and isinstance(test.ops[0], (ast.Gt, ast.GtE, ast.Lt, ast.LtE))
-        and len(test.comparators) == 1
-        and isinstance((comparator := test.comparators[0]), ast.Tuple)
-        and len(comparator.elts) == 2
-        and all(isinstance(e, ast.Constant) for e in comparator.elts)
-        and all(isinstance(cast(ast.Constant, e).value, int) for e in comparator.elts)
-    ):
-        return None
-
-    min_version = tuple(cast(ast.Constant, e).value for e in comparator.elts)
-    if isinstance(test.ops[0], ast.Gt):
-        if state.settings.target_version > min_version:
-            return "first"
-    elif isinstance(test.ops[0], ast.GtE):
-        if state.settings.target_version >= min_version:
-            return "first"
-    elif isinstance(test.ops[0], ast.Lt):
-        if state.settings.target_version >= min_version:
-            return "second"
-    else:  # ast.LtE
-        if state.settings.target_version > min_version:
-            return "second"
-    return None
 
 
 def _fix_block(

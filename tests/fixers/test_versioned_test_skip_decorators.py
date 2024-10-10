@@ -10,7 +10,45 @@ check_noop = partial(tools.check_noop, settings=settings)
 check_transformed = partial(tools.check_transformed, settings=settings)
 
 
-def test_unittest_skipIf_kept():
+def test_unittest_skip_left():
+    check_noop(
+        """\
+        import unittest
+
+        @unittest.skip("Always skipped")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_skipIf_too_few_args():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 1))
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_skipIf_too_many_args():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 1), "Django 4.1+", "what is this arg?")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_skipIf_passing_comparison():
     check_noop(
         """\
         import unittest
@@ -23,12 +61,26 @@ def test_unittest_skipIf_kept():
     )
 
 
-def test_unittest_skip_left():
+def test_unittest_skipIf_unknown_comparison():
     check_noop(
         """\
         import unittest
+        import django
 
-        @unittest.skip("Always skipped")
+        @unittest.skipIf(django.VERSION < (4, 1, 1), "Django 4.1.1+")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_skipUnless_failing_comparison():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipUnless(django.VERSION >= (4, 2), "Django 4.2+")
         def test_thing(self):
             pass
         """,

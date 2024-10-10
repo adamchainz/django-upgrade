@@ -270,6 +270,14 @@ For example:
          def test_three(self):
              ...
 
+    -@unittest.skipIf(django.VERSION < (5, 1), "Django 5.1+")
+     class Example2Tests(TestCase):
+         ...
+
+    -@pytest.mark.skipif(django.VERSION < (5, 1), reason="Django 5.1+")
+     class Example3Tests(TestCase):
+         ...
+
 Django 5.1
 ----------
 

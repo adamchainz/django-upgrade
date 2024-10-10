@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.22.0 (2024-10-10)
+-------------------
+
 * Avoid accidental removal of comments a removed ``if`` block in the versioned block fixer.
 
   Thanks to Tobias Funke for the report in `Issue #495 <https://github.com/adamchainz/django-upgrade/issues/495>`__.

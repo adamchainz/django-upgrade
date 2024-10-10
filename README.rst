@@ -232,12 +232,12 @@ Like the above, it requires comparisons of the form:
 
 Supports these test skip decorators:
 
-* |unittest.skipIf|__:
+* |unittest.skipIf|__
 
   .. |unittest.skipIf| replace:: ``@unittest.skipIf``
   __ https://docs.python.org/3/library/unittest.html#unittest.skipIf
 
-* |unittest.skipUnless|__:
+* |unittest.skipUnless|__
 
   .. |unittest.skipUnless| replace:: ``@unittest.skipUnless``
   __ https://docs.python.org/3/library/unittest.html#unittest.skipUnless
@@ -245,6 +245,8 @@ Supports these test skip decorators:
 For example:
 
 .. code-block:: diff
+
+     import unittest
 
      import django
      from django.test import TestCase

@@ -1,3 +1,19 @@
+"""
+Drop test skip decorators for old Django versions like:
+
+import django
+from django.test import TestCase
+
+class ExampleTests(TestCase):
+    @unittest.skipIf(django.VERSION < (5, 1), "Django 5.1+")
+    def test_one(self):
+        ...
+
+    @unittest.skipUnless(django.VERSION >= (5, 1), "Django 5.1+")
+    def test_two(self):
+        ...
+"""
+
 from __future__ import annotations
 
 import ast
@@ -31,10 +47,23 @@ def visit_FunctionDef(
     for decorator in node.decorator_list:
         if (
             isinstance(decorator, ast.Call)
-            and isinstance(decorator.func, ast.Attribute)
-            and isinstance(decorator.func.value, ast.Name)
-            and decorator.func.value.id == "unittest"
-            and decorator.func.attr in ("skipIf", "skipUnless")
+            and (
+                (
+                    isinstance(decorator.func, ast.Attribute)
+                    and isinstance(decorator.func.value, ast.Name)
+                    and decorator.func.value.id == "unittest"
+                    and (unittest_decorator := decorator.func.attr)
+                    in ("skipIf", "skipUnless")
+                )
+                or (
+                    isinstance(decorator.func, ast.Name)
+                    and (
+                        (unittest_decorator := decorator.func.id)
+                        in ("skipIf", "skipUnless")
+                    )
+                    and unittest_decorator in state.from_imports["unittest"]
+                )
+            )
             and len(decorator.args) == 2
             and isinstance(decorator.args[0], ast.Compare)
             and (
@@ -42,8 +71,8 @@ def visit_FunctionDef(
                 is not None
             )
             and (
-                (decorator.func.attr == "skipIf" and pass_fail == "fail")
-                or (decorator.func.attr == "skipUnless" and pass_fail == "pass")
+                (unittest_decorator == "skipIf" and pass_fail == "fail")
+                or (unittest_decorator == "skipUnless" and pass_fail == "pass")
             )
         ):
             yield ast_start_offset(decorator), partial(erase_decorator, node=decorator)

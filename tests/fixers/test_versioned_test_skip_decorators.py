@@ -10,7 +10,7 @@ check_noop = partial(tools.check_noop, settings=settings)
 check_transformed = partial(tools.check_transformed, settings=settings)
 
 
-def test_unittest_skip_left():
+def test_unittest_attr_skip_left():
     check_noop(
         """\
         import unittest
@@ -22,7 +22,7 @@ def test_unittest_skip_left():
     )
 
 
-def test_unittest_skipIf_too_few_args():
+def test_unittest_attr_skipIf_too_few_args():
     check_noop(
         """\
         import unittest
@@ -35,7 +35,7 @@ def test_unittest_skipIf_too_few_args():
     )
 
 
-def test_unittest_skipIf_too_many_args():
+def test_unittest_attr_skipIf_too_many_args():
     check_noop(
         """\
         import unittest
@@ -48,7 +48,7 @@ def test_unittest_skipIf_too_many_args():
     )
 
 
-def test_unittest_skipIf_passing_comparison():
+def test_unittest_attr_skipIf_passing_comparison():
     check_noop(
         """\
         import unittest
@@ -61,7 +61,7 @@ def test_unittest_skipIf_passing_comparison():
     )
 
 
-def test_unittest_skipIf_unknown_comparison():
+def test_unittest_attr_skipIf_unknown_comparison():
     check_noop(
         """\
         import unittest
@@ -74,7 +74,20 @@ def test_unittest_skipIf_unknown_comparison():
     )
 
 
-def test_unittest_skipUnless_failing_comparison():
+def test_unittest_bare_skipIf_passing_comparison():
+    check_noop(
+        """\
+        from unittest import skipIf
+        import django
+
+        @skipIf(django.VERSION < (4, 2), "Django 4.2+")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_attr_skipUnless_failing_comparison():
     check_noop(
         """\
         import unittest
@@ -87,7 +100,20 @@ def test_unittest_skipUnless_failing_comparison():
     )
 
 
-def test_unittest_skipIf_removed():
+def test_unittest_bare_skipUnless_failing_comparison():
+    check_noop(
+        """\
+        from unittest import skipUnless
+        import django
+
+        @skipUnless(django.VERSION >= (4, 2), "Django 4.2+")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_attr_skipIf_removed():
     check_transformed(
         """\
         import unittest
@@ -99,6 +125,49 @@ def test_unittest_skipIf_removed():
         """,
         """\
         import unittest
+        import django
+
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_bare_skipIf_removed():
+    check_transformed(
+        """\
+        from unittest import skipIf
+        import django
+
+        @skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        from unittest import skipIf
+        import django
+
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_skipIf_mixed():
+    check_transformed(
+        """\
+        import unittest
+        from unittest import skipIf
+        import django
+
+        @unittest.skipUnless(django.VERSION >= (4, 1), "Django 4.1+")
+        @skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        import unittest
+        from unittest import skipIf
         import django
 
         def test_thing(self):
@@ -119,6 +188,47 @@ def test_skipUnless_removed():
         """,
         """\
         import unittest
+        import django
+
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_bare_skipUnless_removed():
+    check_transformed(
+        """\
+        from unittest import skipUnless
+        import django
+
+        @skipUnless(django.VERSION >= (4, 1), "Django 4.1+")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        from unittest import skipUnless
+        import django
+
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_bare_skipIf_skipUnless_mixed():
+    check_transformed(
+        """\
+        from unittest import skipIf, skipUnless
+        import django
+
+        @skipUnless(django.VERSION >= (4, 1), "Django 4.1+")
+        @skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        from unittest import skipIf, skipUnless
         import django
 
         def test_thing(self):

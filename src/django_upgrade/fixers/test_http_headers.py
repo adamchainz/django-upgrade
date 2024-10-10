@@ -7,10 +7,9 @@ https://docs.djangoproject.com/en/4.2/releases/4.2/#tests
 from __future__ import annotations
 
 import ast
-import sys
 from bisect import bisect
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 from typing import cast
 
 from tokenize_rt import UNIMPORTANT_WS
@@ -19,7 +18,6 @@ from tokenize_rt import Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.ast import looks_like_test_client_call
-from django_upgrade.compat import str_removeprefix
 from django_upgrade.data import Fixer
 from django_upgrade.data import State
 from django_upgrade.data import TokenFunc
@@ -41,38 +39,36 @@ fixer = Fixer(
 HEADERS_KWARG = "headers"
 HTTP_PREFIX = "HTTP_"
 
-# Requires lineno/utf8_byte_offset on ast.keyword, added in Python 3.9
-if sys.version_info >= (3, 9):
 
-    @fixer.register(ast.Call)
-    def visit_Call(
-        state: State,
-        node: ast.Call,
-        parents: tuple[ast.AST, ...],
-    ) -> Iterable[tuple[Offset, TokenFunc]]:
-        if (
-            isinstance(node.func, ast.Name)
-            and node.func.id in ("Client", "RequestFactory")
-            and node.func.id in state.from_imports["django.test"]
-        ) or looks_like_test_client_call(node, "client"):
-            has_http_kwarg = False
-            headers_keyword = None
-            for keyword in node.keywords:
-                if keyword.arg is None:  # ** unpacking
+@fixer.register(ast.Call)
+def visit_Call(
+    state: State,
+    node: ast.Call,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        isinstance(node.func, ast.Name)
+        and node.func.id in ("Client", "RequestFactory")
+        and node.func.id in state.from_imports["django.test"]
+    ) or looks_like_test_client_call(node, "client"):
+        has_http_kwarg = False
+        headers_keyword = None
+        for keyword in node.keywords:
+            if keyword.arg is None:  # ** unpacking
+                return
+            elif keyword.arg == "headers":
+                if not isinstance(keyword.value, ast.Dict):
                     return
-                elif keyword.arg == "headers":
-                    if not isinstance(keyword.value, ast.Dict):
-                        return
-                    headers_keyword = keyword
-                elif keyword.arg.startswith(HTTP_PREFIX):
-                    has_http_kwarg = True
+                headers_keyword = keyword
+            elif keyword.arg.startswith(HTTP_PREFIX):
+                has_http_kwarg = True
 
-            if has_http_kwarg:
-                yield ast_start_offset(node), partial(
-                    combine_http_headers_kwargs,
-                    node=node,
-                    headers_keyword=headers_keyword,
-                )
+        if has_http_kwarg:
+            yield ast_start_offset(node), partial(
+                combine_http_headers_kwargs,
+                node=node,
+                headers_keyword=headers_keyword,
+            )
 
 
 class Insert:
@@ -165,4 +161,4 @@ def combine_http_headers_kwargs(
 
 
 def transform_header_arg(header: str) -> str:
-    return str_removeprefix(header, HTTP_PREFIX).replace("_", "-").lower()
+    return header.removeprefix(HTTP_PREFIX).replace("_", "-").lower()

@@ -4,14 +4,12 @@ import ast
 import pkgutil
 import re
 from collections import defaultdict
+from collections.abc import Iterable
 from functools import cached_property
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import DefaultDict
-from typing import Iterable
-from typing import List
-from typing import Tuple
 from typing import TypeVar
 
 from tokenize_rt import Offset
@@ -93,9 +91,9 @@ class State:
 
 
 AST_T = TypeVar("AST_T", bound=ast.AST)
-TokenFunc = Callable[[List[Token], int], None]
+TokenFunc = Callable[[list[Token], int], None]
 ASTFunc = Callable[
-    [State, AST_T, Tuple[ast.AST, ...]], Iterable[Tuple[Offset, TokenFunc]]
+    [State, AST_T, tuple[ast.AST, ...]], Iterable[tuple[Offset, TokenFunc]]
 ]
 
 if TYPE_CHECKING:  # pragma: no cover

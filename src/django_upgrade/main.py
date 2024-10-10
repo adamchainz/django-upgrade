@@ -3,10 +3,9 @@ from __future__ import annotations
 import argparse
 import sys
 import tokenize
+from collections.abc import Sequence
 from importlib import metadata
 from typing import Any
-from typing import Sequence
-from typing import Tuple
 from typing import cast
 
 from tokenize_rt import UNIMPORTANT_WS
@@ -78,7 +77,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     target_version: tuple[int, int] = cast(
-        Tuple[int, int],
+        tuple[int, int],
         tuple(int(x) for x in args.target_version.split(".", 1)),
     )
 

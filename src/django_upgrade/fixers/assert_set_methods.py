@@ -7,8 +7,8 @@ https://docs.djangoproject.com/en/4.2/releases/4.2/#miscellaneous
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 

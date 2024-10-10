@@ -6,8 +6,8 @@ https://docs.djangoproject.com/en/2.2/releases/2.2/#features-deprecated-in-2-2
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 from tokenize_rt import Token

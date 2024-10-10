@@ -6,9 +6,8 @@ https://docs.djangoproject.com/en/2.2/releases/2.2/#requests-and-responses
 from __future__ import annotations
 
 import ast
-import sys
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 from tokenize_rt import Token
@@ -102,23 +101,10 @@ def is_request_or_self_request_meta(node: ast.AST) -> bool:
     )
 
 
-if sys.version_info >= (3, 9):
-
-    def extract_constant(node: ast.AST) -> str | None:
-        if isinstance(node, ast.Constant) and isinstance(node.value, str):
-            return node.value
-        return None
-
-else:
-
-    def extract_constant(node: ast.AST) -> str | None:
-        if (
-            isinstance(node, ast.Index)
-            and isinstance(node.value, ast.Constant)
-            and isinstance(node.value.value, str)
-        ):
-            return node.value.value
-        return None
+def extract_constant(node: ast.AST) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    return None
 
 
 def get_header_name(meta_name: str) -> str | None:

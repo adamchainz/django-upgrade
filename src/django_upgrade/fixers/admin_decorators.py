@@ -8,8 +8,8 @@ https://docs.djangoproject.com/en/3.2/ref/contrib/admin/#django.contrib.admin.di
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 from typing import Literal
 
 from tokenize_rt import Offset

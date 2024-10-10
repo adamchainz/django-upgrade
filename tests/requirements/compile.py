@@ -19,7 +19,6 @@ if __name__ == "__main__":
         *sys.argv[1:],
     ]
     run = partial(subprocess.run, check=True)
-    run([*common_args, "--python", "3.8", "--output-file", "py38.txt"])
     run([*common_args, "--python", "3.9", "--output-file", "py39.txt"])
     run([*common_args, "--python", "3.10", "--output-file", "py310.txt"])
     run([*common_args, "--python", "3.11", "--output-file", "py311.txt"])

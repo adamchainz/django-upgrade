@@ -6,8 +6,8 @@ https://docs.djangoproject.com/en/4.0/releases/4.0/#localization
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 

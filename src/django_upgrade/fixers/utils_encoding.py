@@ -6,8 +6,8 @@ https://docs.djangoproject.com/en/3.0/releases/3.0/#django-utils-encoding-force-
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from functools import partial
-from typing import Iterable
 
 from tokenize_rt import Offset
 

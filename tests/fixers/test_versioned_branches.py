@@ -228,3 +228,20 @@ def test_current_version_gt():
         foo()
         """,
     )
+
+def test_comment_old_version_lt():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (3, 2):
+            foo()
+
+        # test comment
+        """,
+        """\
+        import django
+
+        # test comment
+        """,
+    )

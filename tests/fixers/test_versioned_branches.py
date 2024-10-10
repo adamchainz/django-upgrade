@@ -229,6 +229,7 @@ def test_current_version_gt():
         """,
     )
 
+
 def test_comment_old_version_lt():
     check_transformed(
         """\

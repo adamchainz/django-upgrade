@@ -4,6 +4,10 @@ Changelog
 
 * Support Python 3.13.
 
+* Avoid accidental removal of comments a removed ``if`` block in the versioned block fixer.
+
+  Thanks to Tobias Funke for the report in `Issue #495 <https://github.com/adamchainz/django-upgrade/issues/495>`__.
+
 1.21.0 (2024-09-05)
 -------------------
 

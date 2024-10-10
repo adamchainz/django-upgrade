@@ -242,6 +242,11 @@ Supports these test skip decorators:
   .. |unittest.skipUnless| replace:: ``@unittest.skipUnless``
   __ https://docs.python.org/3/library/unittest.html#unittest.skipUnless
 
+* |pytest.mark.skipif|__
+
+  .. |pytest.mark.skipif| replace:: ``@pytest.mark.skipif``
+  __ https://docs.pytest.org/en/stable/how-to/skipping.html#id1
+
 For example:
 
 .. code-block:: diff
@@ -249,6 +254,7 @@ For example:
      import unittest
 
      import django
+     import pytest
      from django.test import TestCase
 
      class ExampleTests(TestCase):
@@ -259,6 +265,18 @@ For example:
     -    @unittest.skipUnless(django.VERSION >= (5, 1), "Django 5.1+")
          def test_two(self):
              ...
+
+    -    @pytest.mark.skipif(django.VERSION < (5, 1), reason="Django 5.1+")
+         def test_three(self):
+             ...
+
+    -@unittest.skipIf(django.VERSION < (5, 1), "Django 5.1+")
+     class Example2Tests(TestCase):
+         ...
+
+    -@pytest.mark.skipif(django.VERSION < (5, 1), reason="Django 5.1+")
+     class Example3Tests(TestCase):
+         ...
 
 Django 5.1
 ----------

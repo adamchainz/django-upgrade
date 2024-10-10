@@ -141,6 +141,73 @@ def test_unittest_skipUnless_class_level_not_removed():
     )
 
 
+def test_pytest_mark_skip():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skip("whatever")
+        def test_thing():
+            pass
+        """,
+    )
+
+
+def test_pytest_mark_skip_class():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skip("whatever")
+        class TestThing:
+            def test_thing():
+                pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_incorrect_args():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 1), "Django 4.1+")
+        def test_thing():
+            pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_passing_comparison():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 2), reason="Django 4.2+")
+        def test_thing():
+            pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_passing_comparison_class():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 2), reason="Django 4.2+")
+        class TestThing:
+            def test_thing():
+                pass
+        """,
+    )
+
+
 def test_unittest_attr_skipIf_removed():
     check_transformed(
         """\
@@ -372,6 +439,48 @@ def test_unittest_mixed_decorators_class_level():
         @unittest.skip("Always skipped")
         class TestCase(unittest.TestCase):
             def test_thing(self):
+                pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_failing_comparison():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 1), reason="Django 4.1+")
+        def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
+
+        def test_thing():
+            pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_failing_comparison_class():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 1), reason="Django 4.1+")
+        class TestThing:
+            def test_thing():
+                pass
+        """,
+        """\
+        import pytest
+        import django
+
+        class TestThing:
+            def test_thing():
                 pass
         """,
     )

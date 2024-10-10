@@ -104,7 +104,7 @@ def _fix_block(
             else_block.dedent(tokens)
             del tokens[if_block.start : else_block.block]
     else:
-        if_block = Block.find(tokens, i)
+        if_block = Block.find(tokens, i, trim_end=True)
         if keep_branch == "first":
             if_block.dedent(tokens)
             del tokens[if_block.start : if_block.block]

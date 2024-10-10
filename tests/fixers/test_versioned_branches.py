@@ -228,3 +228,38 @@ def test_current_version_gt():
         foo()
         """,
     )
+
+
+def test_removed_block_trailing_comment():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (3, 2):
+            foo()
+
+        # test comment
+        """,
+        """\
+        import django
+
+
+        # test comment
+        """,
+    )
+
+
+def test_removed_block_internal_comment():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (3, 2):
+            foo()
+            # test comment
+        """,
+        """\
+        import django
+
+        """,
+    )

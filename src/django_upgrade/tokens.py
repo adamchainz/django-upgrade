@@ -331,11 +331,11 @@ def replace(tokens: list[Token], i: int, *, src: str) -> None:
     tokens[i] = tokens[i]._replace(name=CODE, src=src)
 
 
-def erase_node(
+def find_node(
     tokens: list[Token], i: int, *, node: ast.expr | ast.keyword | ast.stmt
-) -> None:
+) -> tuple[int, int]:
     """
-    Erase all tokens corresponding to the given ast node.
+    Return bounds of tokens corresponding to the given node, minus any indent.
     """
     j = find_last_token(tokens, i, node=node)
     if tokens[j + 1].name == UNIMPORTANT_WS:
@@ -345,6 +345,26 @@ def erase_node(
     if tokens[j + 1].name == LOGICAL_NEWLINE:  # pragma: no branch
         j += 1
     i, _ = extract_indent(tokens, i)
+    return (i, j)
+
+
+def erase_node(
+    tokens: list[Token], i: int, *, node: ast.expr | ast.keyword | ast.stmt
+) -> None:
+    """
+    Erase all tokens corresponding to the given node.
+    """
+    i, j = find_node(tokens, i, node=node)
+    del tokens[i : j + 1]
+
+
+def erase_decorator(tokens: list[Token], i: int, *, node: ast.Call) -> None:
+    """
+    Specialized version of erase_node for removing decorators, since they don't
+    include the @ in their bounds.
+    """
+    i, j = find_node(tokens, i, node=node)
+    i = reverse_find(tokens, i, name=OP, src="@")
     del tokens[i : j + 1]
 
 

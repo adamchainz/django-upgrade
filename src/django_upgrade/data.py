@@ -136,7 +136,10 @@ def visit(
             and node.level == 0
             and (
                 node.module is not None
-                and (node.module.startswith("django.") or node.module == "django")
+                and (
+                    node.module.startswith("django.")
+                    or node.module in ("django", "unittest")
+                )
             )
         ):
             state.from_imports[node.module].update(

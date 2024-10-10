@@ -10,6 +10,10 @@ Changelog
 
   `Issue #364 <https://github.com/adamchainz/django-upgrade/issues/364>`__.
 
+* Add Django 4.0+ fixer to rewrite ``OSMGeoAdmin`` and ``GeoModelAdmin`` classes.
+
+  Thanks to Adolfo Fitoria in `PR #484 <https://github.com/adamchainz/django-upgrade/pull/484>`__.
+
 * Drop Python 3.8 support.
 
 * Support Python 3.13.
@@ -20,10 +24,6 @@ Changelog
 * Add Django 5.0+ fixer to rewrite ``format_html()`` calls without ``args`` or ``kwargs`` probably using ``str.format()`` incorrectly.
 
   `Issue #477 <https://github.com/adamchainz/django-upgrade/issues/477>`__.
-
-* Add Django 4.0+ fixer to rewrite ``OSMGeoAdmin`` and ``GeoModelAdmin`` classes.
-
-  `PR #484 <https://github.com/adamchainz/django-upgrade/pull/484>`__.
 
 1.20.0 (2024-07-19)
 -------------------

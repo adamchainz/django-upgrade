@@ -20,7 +20,7 @@ def test_no_deprecated_alias():
     )
 
 
-def test_one_local_name():
+def test_osm_geo_admin_plain():
     check_transformed(
         """\
         from django.contrib.gis.admin.options import OSMGeoAdmin
@@ -35,6 +35,9 @@ def test_one_local_name():
             pass
         """,
     )
+
+
+def test_geo_model_admin_plain():
     check_transformed(
         """\
         from django.contrib.gis.admin.options import GeoModelAdmin
@@ -51,7 +54,7 @@ def test_one_local_name():
     )
 
 
-def test_with_alias():
+def test_osm_geo_admin_aliased():
     check_transformed(
         """\
         from django.contrib.gis.admin.options import OSMGeoAdmin as GeoAdmin
@@ -67,6 +70,8 @@ def test_with_alias():
         """,
     )
 
+
+def test_geo_model_admin_aliased():
     check_transformed(
         """\
         from django.contrib.gis.admin.options import GeoModelAdmin as GeoAdmin

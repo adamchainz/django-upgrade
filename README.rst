@@ -218,6 +218,46 @@ A single ``else`` block may be present, but ``elif`` is not supported.
 
 See also `pyupgrade’s similar feature <https://github.com/asottile/pyupgrade/#python2-and-old-python3x-blocks>`__ that removes outdated code from checks on the Python version.
 
+Versioned test skip decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``versioned_test_skip_decorators``
+
+Removes outdated test skip decorators that compare to ``django.VERSION``.
+Like the above, it requires comparisons of the form:
+
+.. code-block:: text
+
+    django.VERSION <comparator> (<X>, <Y>)
+
+Supports these test skip decorators:
+
+* |unittest.skipIf|__:
+
+  .. |unittest.skipIf| replace:: ``@unittest.skipIf``
+  __ https://docs.python.org/3/library/unittest.html#unittest.skipIf
+
+* |unittest.skipUnless|__:
+
+  .. |unittest.skipUnless| replace:: ``@unittest.skipUnless``
+  __ https://docs.python.org/3/library/unittest.html#unittest.skipUnless
+
+For example:
+
+.. code-block:: diff
+
+     import django
+     from django.test import TestCase
+
+     class ExampleTests(TestCase):
+    -    @unittest.skipIf(django.VERSION < (5, 1), "Django 5.1+")
+         def test_one(self):
+             ...
+
+    -    @unittest.skipUnless(django.VERSION >= (5, 1), "Django 5.1+")
+         def test_two(self):
+             ...
+
 Django 5.1
 ----------
 

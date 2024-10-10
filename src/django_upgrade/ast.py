@@ -3,8 +3,11 @@ from __future__ import annotations
 import ast
 import warnings
 from typing import Literal
+from typing import cast
 
 from tokenize_rt import Offset
+
+from django_upgrade.data import State
 
 
 def ast_parse(contents_text: str) -> ast.Module:
@@ -50,3 +53,42 @@ def looks_like_test_client_call(
         and isinstance(node.func.value.value, ast.Name)
         and node.func.value.value.id == "self"
     )
+
+
+def is_passing_comparison(
+    test: ast.Compare, state: State
+) -> Literal["pass", "fail", None]:
+    """
+    Return whether the given ast.Compare node compares a version tuple with
+    django.VERSION and would pass or fail for the current target version, or
+    None if no match or cannot determine.
+    """
+    if not (
+        isinstance(left := test.left, ast.Attribute)
+        and isinstance(left.value, ast.Name)
+        and left.value.id == "django"
+        and left.attr == "VERSION"
+        and len(test.ops) == 1
+        and isinstance(test.ops[0], (ast.Gt, ast.GtE, ast.Lt, ast.LtE))
+        and len(test.comparators) == 1
+        and isinstance((comparator := test.comparators[0]), ast.Tuple)
+        and len(comparator.elts) == 2
+        and all(isinstance(e, ast.Constant) for e in comparator.elts)
+        and all(isinstance(cast(ast.Constant, e).value, int) for e in comparator.elts)
+    ):
+        return None
+
+    min_version = tuple(cast(ast.Constant, e).value for e in comparator.elts)
+    if isinstance(test.ops[0], ast.Gt):
+        if state.settings.target_version > min_version:
+            return "pass"
+    elif isinstance(test.ops[0], ast.GtE):
+        if state.settings.target_version >= min_version:
+            return "pass"
+    elif isinstance(test.ops[0], ast.Lt):
+        if state.settings.target_version >= min_version:
+            return "fail"
+    else:  # ast.LtE
+        if state.settings.target_version > min_version:
+            return "fail"
+    return None

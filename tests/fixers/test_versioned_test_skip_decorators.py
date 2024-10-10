@@ -154,6 +154,20 @@ def test_pytest_mark_skip():
     )
 
 
+def test_pytest_mark_skip_class():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skip("whatever")
+        class TestThing:
+            def test_thing():
+                pass
+        """,
+    )
+
+
 def test_pytest_mark_skipif_incorrect_args():
     check_noop(
         """\
@@ -176,6 +190,20 @@ def test_pytest_mark_skipif_passing_comparison():
         @pytest.mark.skipif(django.VERSION < (4, 2), reason="Django 4.2+")
         def test_thing():
             pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_passing_comparison_class():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 2), reason="Django 4.2+")
+        class TestThing:
+            def test_thing():
+                pass
         """,
     )
 
@@ -432,5 +460,27 @@ def test_pytest_mark_skipif_failing_comparison():
 
         def test_thing():
             pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_failing_comparison_class():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 1), reason="Django 4.1+")
+        class TestThing:
+            def test_thing():
+                pass
+        """,
+        """\
+        import pytest
+        import django
+
+        class TestThing:
+            def test_thing():
+                pass
         """,
     )

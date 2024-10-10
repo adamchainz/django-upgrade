@@ -20,6 +20,28 @@ def test_no_deprecated_alias():
     )
 
 
+def test_osm_geo_admin_multiple_inheritance():
+    check_noop(
+        """\
+        from django.contrib.gis.admin.options import OSMGeoAdmin
+
+        class MyModelAdmin(OSMGeoAdmin, other):
+            pass
+        """,
+    )
+
+
+def test_osm_geo_admin_overloaded_attribute():
+    check_noop(
+        """\
+        from django.contrib.gis.admin.options import OSMGeoAdmin
+
+        class MyModelAdmin(OSMGeoAdmin):
+            default_lon = 1
+        """,
+    )
+
+
 def test_osm_geo_admin_plain():
     check_transformed(
         """\

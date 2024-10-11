@@ -22,7 +22,7 @@ from django_upgrade.tokens import DEDENT
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog="django-upgrade")
     parser.add_argument("filenames", nargs="+")
     parser.add_argument(
         "--target-version",

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import re
+import subprocess
 import sys
 from textwrap import dedent
 from unittest import mock
@@ -34,6 +35,16 @@ def test_main_help():
         main(["--help"])
 
     assert excinfo.value.code == 0
+
+
+def test_main_help_subprocess():
+    proc = subprocess.run(
+        [sys.executable, "-m", "django_upgrade", "--help"],
+        check=True,
+        capture_output=True,
+    )
+
+    assert proc.stdout.startswith(b"usage: django-upgrade ")
 
 
 def test_main_version(capsys):

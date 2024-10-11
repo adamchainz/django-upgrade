@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import ast
 import warnings
+from typing import TYPE_CHECKING
 from typing import Literal
 from typing import cast
 
 from tokenize_rt import Offset
 
-from django_upgrade.data import State
+if TYPE_CHECKING:
+    from django_upgrade.data import State
 
 
 def ast_parse(contents_text: str) -> ast.Module:

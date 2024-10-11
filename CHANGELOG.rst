@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Fix circular import error when running django-upgrade.
+
+  Thanks to Michal Čihař for the report in `Issue #503 <https://github.com/adamchainz/django-upgrade/issues/503>`__.
+
 1.22.0 (2024-10-10)
 -------------------
 

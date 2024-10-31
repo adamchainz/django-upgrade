@@ -263,3 +263,69 @@ def test_removed_block_internal_comment():
 
         """,
     )
+
+
+def test_removed_block_internal_comment1():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (3, 2):
+            foo()
+            # test comment 1
+        # test comment 2
+        """,
+        """\
+        import django
+
+        # test comment 2
+        """,
+    )
+
+
+def test_removed_block_internal_comment2():
+    check_transformed(
+        """\
+        import django
+
+        # test comment 0
+        if django.VERSION < (3, 2):
+            foo()
+            # test comment 1
+        # test comment 2
+        foo()
+        """,
+        """\
+        import django
+
+        # test comment 0
+        # test comment 2
+        foo()
+        """,
+    )
+
+
+def test_removed_block_internal_comment3():
+    check_transformed(
+        """\
+        import django
+
+        if True:
+            # test comment 0
+            if django.VERSION < (3, 2):
+                foo()
+                # test comment 1
+            foo()
+        # test comment 2
+        foo()
+        """,
+        """\
+        import django
+
+        if True:
+            # test comment 0
+            foo()
+        # test comment 2
+        foo()
+        """,
+    )

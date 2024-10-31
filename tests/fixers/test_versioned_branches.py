@@ -8,6 +8,7 @@ from tests.fixers import tools
 settings = Settings(target_version=(4, 0))
 check_noop = partial(tools.check_noop, settings=settings)
 check_transformed = partial(tools.check_transformed, settings=settings)
+check_error_on_transformed = partial(tools.check_error_on_transformed, settings=settings)
 
 
 def test_future_version_gt():
@@ -325,6 +326,30 @@ def test_removed_block_internal_comment3():
         if True:
             # test comment 0
             foo()
+        # test comment 2
+        foo()
+        """,
+    )
+
+
+def test_removed_block_internal_comment_with_error():
+    check_error_on_transformed(
+        """\
+        import django
+
+        if True:
+            # test comment 0
+            if django.VERSION < (3, 2):
+                foo()
+                # test comment 1
+        # test comment 2
+        foo()
+        """,
+        """\
+        import django
+
+        if True:
+            # test comment 0
         # test comment 2
         foo()
         """,

@@ -21,3 +21,16 @@ def check_transformed(
     ast.parse(dedented_after)  # check that the target is valid python code
     fixed = apply_fixers(dedented_before, settings=settings, filename=filename)
     assert fixed == dedented_after
+
+
+def check_error_on_transformed(
+    before: str, after: str, settings: Settings, filename: str = "example.py"
+) -> None:
+    dedented_before = dedent(before)
+    dedented_after = dedent(after)
+    error = None
+    try:
+        ast.parse(dedented_after)  # check that the target is valid python code
+    except SyntaxError as ex:
+        error = ex
+    assert error is not None

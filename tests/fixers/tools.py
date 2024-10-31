@@ -26,7 +26,6 @@ def check_transformed(
 def check_error_on_transformed(
     before: str, after: str, settings: Settings, filename: str = "example.py"
 ) -> None:
-    dedented_before = dedent(before)
     dedented_after = dedent(after)
     error = None
     try:

@@ -8,7 +8,9 @@ from tests.fixers import tools
 settings = Settings(target_version=(4, 0))
 check_noop = partial(tools.check_noop, settings=settings)
 check_transformed = partial(tools.check_transformed, settings=settings)
-check_error_on_transformed = partial(tools.check_error_on_transformed, settings=settings)
+check_error_on_transformed = partial(
+    tools.check_error_on_transformed, settings=settings
+)
 
 
 def test_future_version_gt():

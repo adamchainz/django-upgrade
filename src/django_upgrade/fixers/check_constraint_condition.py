@@ -34,14 +34,21 @@ def visit_Call(
             (
                 isinstance(node.func, ast.Name)
                 and node.func.id == "CheckConstraint"
-                and "CheckConstraint" in state.from_imports["django.db.models"]
+                and (
+                    "CheckConstraint" in state.from_imports["django.db.models"]
+                    or "CheckConstraint"
+                    in state.from_imports["django.contrib.gis.db.models"]
+                )
             )
             or (
                 isinstance(node.func, ast.Attribute)
                 and node.func.attr == "CheckConstraint"
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "models"
-                and "models" in state.from_imports["django.db"]
+                and (
+                    "models" in state.from_imports["django.db"]
+                    or "models" in state.from_imports["django.contrib.gis.db"]
+                )
             )
         )
         and (kwarg_names := {k.arg for k in node.keywords})

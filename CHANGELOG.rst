@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Fix ``check_constraint_condition`` fixer to work when ``django.contrib.gis.db.models`` is used to import ``CheckConstraint``.
+
+  `Issue #513 <https://github.com/adamchainz/django-upgrade/issues/513>`__.
+
 1.22.1 (2024-10-11)
 -------------------
 

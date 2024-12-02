@@ -86,6 +86,21 @@ def test_success_name():
     )
 
 
+def test_success_name_gis():
+    check_transformed(
+        """\
+        from django.contrib.gis.db.models import CheckConstraint
+
+        CheckConstraint(check=Q(id=1))
+        """,
+        """\
+        from django.contrib.gis.db.models import CheckConstraint
+
+        CheckConstraint(condition=Q(id=1))
+        """,
+    )
+
+
 def test_success_attr():
     check_transformed(
         """\
@@ -95,6 +110,21 @@ def test_success_attr():
         """,
         """\
         from django.db import models
+
+        models.CheckConstraint(condition=models.Q(id=1))
+        """,
+    )
+
+
+def test_success_attr_gis():
+    check_transformed(
+        """\
+        from django.contrib.gis.db import models
+
+        models.CheckConstraint(check=models.Q(id=1))
+        """,
+        """\
+        from django.contrib.gis.db import models
 
         models.CheckConstraint(condition=models.Q(id=1))
         """,

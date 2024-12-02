@@ -504,6 +504,30 @@ Renames the undocumented ``django.contrib.admin.utils.lookup_needs_distinct`` to
     +if lookup_spawns_duplicates(self.opts, search_spec):
         ...
 
+Deprecated GIS ``ModelAdmin`` classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``gis_admin_deprecations``
+
+Rewrites use of the deprecated classes ``OSMGeoAdmin`` and ``GeoModelAdmin`` to the new ``GISModelAdmin``.
+The classes were deprecated in `Ticket #34609 <https://code.djangoproject.com/ticket/27674>`__.
+
+.. code-block:: diff
+
+    -from django.contrib.gis.admin.options import OSMGeoAdmin
+    +from django.contrib.gis.admin.options import GISModelAdmin
+
+    -class MyAdminClass(OSMGeoAdmin):
+    +class MyAdminClass(GISModelAdmin):
+
+.. code-block:: diff
+
+    -from django.contrib.gis.admin.options import GeoModelAdmin
+    +from django.contrib.gis.admin.options import GISModelAdmin
+
+    -class MyAdminClass(GeoModelAdmin):
+    +class MyAdminClass(GISModelAdmin):
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.22.2 (2024-12-02)
+-------------------
+
 * Make these fixers work when ``django.contrib.gis.db.models`` is used to import objects from ``django.db.models``:
 
   *  ``check_constraint_condition``

@@ -102,9 +102,15 @@ def visit_ClassDef(
     except IndexError:
         indexes = None
 
-    if "models" in state.from_imports["django.db"]:
+    if (
+        "models" in state.from_imports["django.db"]
+        or "models" in state.from_imports["django.contrib.gis.db"]
+    ):
         index_ref = "models.Index"
-    elif "Index" in state.from_imports["django.db.models"]:
+    elif (
+        "Index" in state.from_imports["django.db.models"]
+        or "Index" in state.from_imports["django.contrib.gis.db.models"]
+    ):
         index_ref = "Index"
     else:
         return

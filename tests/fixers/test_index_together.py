@@ -595,3 +595,43 @@ def test_conditional_meta_class():
                     indexes = [models.Index(fields=["bill", "tail"])]
         """,
     )
+
+
+def test_models_imported_gis():
+    check_transformed(
+        """\
+        from django.contrib.gis.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = [["bill", "tail"]]
+                indexes = []
+        """,
+        """\
+        from django.contrib.gis.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=["bill", "tail"])]
+        """,
+    )
+
+
+def test_index_imported_gis():
+    check_transformed(
+        """\
+        from django.contrib.gis.db.models import Index
+
+        class Duck:
+            class Meta:
+                index_together = [["bill", "tail"]]
+                indexes = []
+        """,
+        """\
+        from django.contrib.gis.db.models import Index
+
+        class Duck:
+            class Meta:
+                indexes = [Index(fields=["bill", "tail"])]
+        """,
+    )

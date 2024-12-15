@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Support single-tuple Django version in the versioned block fixer.
+
+  Thanks to Thibaut Decombe in `PR #517 <https://github.com/adamchainz/django-upgrade/pull/517>`__.
+
 1.22.2 (2024-12-02)
 -------------------
 

@@ -8,6 +8,10 @@ Changelog
 
   Thanks to Thibaut Decombe in `PR #517 <https://github.com/adamchainz/django-upgrade/pull/517>`__.
 
+* Fix test decorator fixer to remove all indentation tokens from the decorator line.
+
+  Thanks to Thibaut Decombe in `PR #518 <https://github.com/adamchainz/django-upgrade/pull/518>`__.
+
 1.22.2 (2024-12-02)
 -------------------
 

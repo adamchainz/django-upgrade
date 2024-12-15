@@ -419,6 +419,28 @@ def test_unittest_skipUnless_class_level_removed():
     )
 
 
+def test_unittest_skipUnless_removed_in_class():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        class TestCase(unittest.TestCase):
+            @unittest.skipUnless(django.VERSION >= (4, 1), "--update added in Django 4.2")
+            def test_update(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+
+        class TestCase(unittest.TestCase):
+            def test_update(self):
+                pass
+        """,
+    )
+
+
 def test_unittest_mixed_decorators_class_level():
     check_transformed(
         """\

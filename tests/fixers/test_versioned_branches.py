@@ -10,6 +10,17 @@ check_noop = partial(tools.check_noop, settings=settings)
 check_transformed = partial(tools.check_transformed, settings=settings)
 
 
+def test_empty_tuple():
+    check_noop(
+        """\
+        import django
+
+        if django.VERSION > ():
+            foo()
+        """,
+    )
+
+
 def test_future_version_gt():
     check_noop(
         """\
@@ -261,5 +272,38 @@ def test_removed_block_internal_comment():
         """\
         import django
 
+        """,
+    )
+
+
+def test_old_version_lt_single_tuple():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION < (4,):
+            foo()
+        bar()
+        """,
+        """\
+        import django
+
+        bar()
+        """,
+    )
+
+
+def test_current_version_gte_single_tuple():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION >= (4,):
+            foo()
+        """,
+        """\
+        import django
+
+        foo()
         """,
     )

@@ -99,7 +99,7 @@ For example, |with git ls-files pipe xargs|_:
 
 .. code-block:: sh
 
-    git ls-files -z -- '*.py' | xargs -0 django-upgrade --target-version 5.0
+    git ls-files -z -- '*.py' | xargs -0r django-upgrade --target-version 5.0
 
 …or PowerShell’s |ForEach-Object|__:
 

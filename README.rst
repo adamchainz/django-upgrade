@@ -52,7 +52,7 @@ Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` f
         rev: ""  # replace with latest tag on GitHub
         hooks:
         -   id: django-upgrade
-            args: [--target-version, "5.0"]   # Replace with Django version
+            args: [--target-version, "5.2"]   # Replace with Django version
 
 Then, upgrade your entire project:
 
@@ -77,7 +77,7 @@ For example:
 
 .. code-block:: sh
 
-    django-upgrade --target-version 5.0 example/core/models.py example/settings.py
+    django-upgrade --target-version 5.2 example/core/models.py example/settings.py
 
 ``django-upgrade`` focuses on upgrading your code and not on making it look nice.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
@@ -99,7 +99,7 @@ For example, |with git ls-files pipe xargs|_:
 
 .. code-block:: sh
 
-    git ls-files -z -- '*.py' | xargs -0r django-upgrade --target-version 5.0
+    git ls-files -z -- '*.py' | xargs -0r django-upgrade --target-version 5.2
 
 …or PowerShell’s |ForEach-Object|__:
 
@@ -108,7 +108,7 @@ __ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core
 
 .. code-block:: powershell
 
-    git ls-files -- '*.py' | %{django-upgrade --target-version 5.0 $_}
+    git ls-files -- '*.py' | %{django-upgrade --target-version 5.2 $_}
 
 The full list of fixers is documented below.
 
@@ -141,7 +141,7 @@ For example:
 
 .. code-block:: sh
 
-    django-upgrade --target-version 5.0 --only admin_allow_tags --only admin_decorators example/core/admin.py
+    django-upgrade --target-version 5.2 --only admin_allow_tags --only admin_decorators example/core/admin.py
 
 ``--skip <fixer_name>``
 -----------------------
@@ -153,7 +153,7 @@ For example:
 
 .. code-block:: sh
 
-    django-upgrade --target-version 5.0 --skip admin_register example/core/admin.py
+    django-upgrade --target-version 5.2 --skip admin_register example/core/admin.py
 
 ``--list-fixers``
 -----------------

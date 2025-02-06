@@ -4,6 +4,10 @@ Changelog
 
 * Support Django 5.2 in ``--target-version``.
 
+* Extend versioned block fixer to support comparisons with single-item tuples, like `django.VERSION >= (4,)`.
+
+  Thanks to Thibaut Decombe in `PR #517 <https://github.com/adamchainz/django-upgrade/pull/517>`__.
+
 1.22.2 (2024-12-02)
 -------------------
 

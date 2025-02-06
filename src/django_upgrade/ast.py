@@ -74,7 +74,7 @@ def is_passing_comparison(
         and isinstance(test.ops[0], (ast.Gt, ast.GtE, ast.Lt, ast.LtE))
         and len(test.comparators) == 1
         and isinstance((comparator := test.comparators[0]), ast.Tuple)
-        and len(comparator.elts) == 2
+        and 1 <= len(comparator.elts) <= 2
         and all(isinstance(e, ast.Constant) for e in comparator.elts)
         and all(isinstance(cast(ast.Constant, e).value, int) for e in comparator.elts)
     ):

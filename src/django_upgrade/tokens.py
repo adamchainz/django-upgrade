@@ -365,6 +365,8 @@ def erase_decorator(tokens: list[Token], i: int, *, node: ast.Call) -> None:
     """
     i, j = find_node(tokens, i, node=node)
     i = reverse_find(tokens, i, name=OP, src="@")
+    i = reverse_consume(tokens, i, name=INDENT)
+    i = reverse_consume(tokens, i, name=UNIMPORTANT_WS)
     del tokens[i : j + 1]
 
 

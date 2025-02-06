@@ -426,6 +426,24 @@ def test_path_uuid_converter():
     )
 
 
+def test_path_implicit_string_concatenation():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+
+        url(r'^page/(?P<number>\\d+)/'
+            r'view/$',
+            views.page)
+        """,
+        """\
+        from django.urls import path
+
+        path('page/<int:number>/view/',
+            views.page)
+        """,
+    )
+
+
 def test_complete():
     check_transformed(
         """\

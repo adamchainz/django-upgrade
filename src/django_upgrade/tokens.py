@@ -95,20 +95,6 @@ def find_last_token(
     return i - 1
 
 
-def reverse_find_first_token_at_line(
-    tokens: list[Token],
-    i: int,
-    *,
-    line: int,
-) -> int:
-    """
-    Rewind tokens to find the first token corresponding to the given line number.
-    """
-    while tokens[i].line is None or tokens[i].line >= line:
-        i -= 1
-    return i + 1
-
-
 def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
     """
     If the previous token is an indent, return its position and the
@@ -379,7 +365,8 @@ def erase_decorator(tokens: list[Token], i: int, *, node: ast.Call) -> None:
     """
     i, j = find_node(tokens, i, node=node)
     i = reverse_find(tokens, i, name=OP, src="@")
-    i = reverse_find_first_token_at_line(tokens, i, line=tokens[i].line)
+    i = reverse_consume(tokens, i, name=INDENT)
+    i = reverse_consume(tokens, i, name=UNIMPORTANT_WS)
     del tokens[i : j + 1]
 
 

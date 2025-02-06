@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.23.0 (2025-02-06)
+-------------------
+
 * Support Django 5.2 in ``--target-version``.
 
 * Extend versioned block fixer to support comparisons with single-item tuples, like `django.VERSION >= (4,)`.

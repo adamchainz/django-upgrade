@@ -23,6 +23,7 @@ from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import STRING
 from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find
+from django_upgrade.tokens import find_node
 from django_upgrade.tokens import insert
 from django_upgrade.tokens import replace
 from django_upgrade.tokens import str_repr_matching
@@ -151,11 +152,11 @@ def visit_Call(
             # cannot convert where called with all kwargs as names don't align
             and len(node.args) >= 1
         ):
-            regex_path: str | None = None
+            regex_path: ast.Constant | None = None
             if isinstance(node.args[0], ast.Constant) and isinstance(
                 node.args[0].value, str
             ):
-                regex_path = node.args[0].value
+                regex_path = node.args[0]
 
             include_called = (
                 len(node.args) >= 2
@@ -182,18 +183,21 @@ def fix_url_call(
     tokens: list[Token],
     i: int,
     *,
-    regex_path: str | None,
+    regex_path: ast.Constant | None,
     state: State,
     node_name: str,
     include_called: bool,
 ) -> None:
     new_name = "re_path"
     if regex_path is not None:
-        path = convert_path_syntax(regex_path, include_called)
+        path = convert_path_syntax(regex_path.value, include_called)
         if path is not None:
-            string_idx = find(tokens, i, name=STRING)
-            path = str_repr_matching(path, match_quotes=tokens[string_idx].src)
-            replace(tokens, string_idx, src=path)
+            string_start_idx = find(tokens, i, name=STRING)
+            string_start_idx, string_end_idx = find_node(
+                tokens, string_start_idx, node=regex_path
+            )
+            path = str_repr_matching(path, match_quotes=tokens[string_start_idx].src)
+            tokens[string_start_idx : string_end_idx + 1] = [Token(STRING, path)]
             new_name = "path"
     if new_name != node_name:
         state_added_names.setdefault(state, set()).add(new_name)

@@ -12,6 +12,10 @@ Changelog
 
   Thanks to Thibaut Decombe in `PR #518 <https://github.com/adamchainz/django-upgrade/pull/518>`__.
 
+* Fix ``django_url`` fixer handling of implicitly concatenated strings.
+
+  Thanks to Gunther Waidacher for the report in `Issue #524 <https://github.com/adamchainz/django-upgrade/issues/524>`__.
+
 1.22.2 (2024-12-02)
 -------------------
 

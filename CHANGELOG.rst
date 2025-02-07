@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.23.1 (2025-02-07)
+-------------------
+
 * Fix ``django_url`` fixer bug that failed for indented path strings.
   This bug was introduced in 1.23.0.
 

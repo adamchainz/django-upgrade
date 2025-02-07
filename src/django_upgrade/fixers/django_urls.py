@@ -23,7 +23,7 @@ from django_upgrade.data import TokenFunc
 from django_upgrade.tokens import STRING
 from django_upgrade.tokens import extract_indent
 from django_upgrade.tokens import find
-from django_upgrade.tokens import find_node
+from django_upgrade.tokens import find_last_token
 from django_upgrade.tokens import insert
 from django_upgrade.tokens import replace
 from django_upgrade.tokens import str_repr_matching
@@ -193,9 +193,7 @@ def fix_url_call(
         path = convert_path_syntax(regex_path.value, include_called)
         if path is not None:
             string_start_idx = find(tokens, i, name=STRING)
-            string_start_idx, string_end_idx = find_node(
-                tokens, string_start_idx, node=regex_path
-            )
+            string_end_idx = find_last_token(tokens, string_start_idx, node=regex_path)
             path = str_repr_matching(path, match_quotes=tokens[string_start_idx].src)
             tokens[string_start_idx : string_end_idx + 1] = [Token(STRING, path)]
             new_name = "path"

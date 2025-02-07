@@ -516,6 +516,27 @@ def test_re_path_unanchored_start():
     )
 
 
+def test_re_path_indented():
+    check_transformed(
+        """\
+        from django.urls import re_path
+
+        re_path(
+            r"^about/$",
+            views.about,
+        )
+        """,
+        """\
+        from django.urls import path
+
+        path(
+            "about/",
+            views.about,
+        )
+        """,
+    )
+
+
 def test_re_path_multiple_import():
     check_transformed(
         """\

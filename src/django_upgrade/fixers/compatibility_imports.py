@@ -108,6 +108,7 @@ REPLACEMENTS_EXACT = {
     (2, 0): {
         "django.utils.functional": {"lru_cache": "functools"},
         "django.utils.decorators": {"ContextDecorator": "contextlib"},
+        "django.http.cookie": {"SimpleCookie": "http.cookies"},
     },
     (3, 1): {
         "django.contrib.postgres.forms": {

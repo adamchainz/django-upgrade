@@ -297,6 +297,20 @@ Rewrites calls to PostgreSQL aggregate functions using the old argument name ``o
     -Book.objects.aggregate(ArrayAgg("author", ordering="name"))
     +Book.objects.aggregate(ArrayAgg("author", order_by="name"))
 
+staticfiles ``find()`` ``find_all``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``staticfiles_find_all``
+
+Rewrites calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.
+
+.. code-block:: diff
+
+     from django.contrib.staticfiles import find
+
+    -find("example.css", all=True)
+    +find("example.css", find_all=True)
+
 Django 5.1
 ----------
 

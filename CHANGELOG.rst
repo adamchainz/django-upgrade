@@ -6,6 +6,10 @@ Changelog
 
 * Add Django 5.2+ fixer ``staticfiles_find_all`` to rewrite calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.
 
+* Restore Django 5.0+ fixer ``model_field_choices``, with a restriction to only apply when the enumeration type is defined in the same file.
+
+  Thanks to Thibaut Decombe for initially contributing it in `PR #369 <https://github.com/adamchainz/django-upgrade/pull/369>`__.
+
 * Add Django 2.0+ compatibility import rewrite of `django.http.cookie.SimpleCookie` to `http.cookies.SimpleCookie`.
 
   Thanks to Thibaut Decombe in `PR #537 <https://github.com/adamchainz/django-upgrade/pull/537>`__.

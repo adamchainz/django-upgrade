@@ -333,6 +333,26 @@ Django 5.0
 
 `Release Notes <https://docs.djangoproject.com/en/5.0/releases/5.0/>`__
 
+Model field enumeration type ``.choices``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``model_field_choices``
+
+Drop ``.choices`` for model field ``choices`` parameters, where the value is a class defined in the same file.
+This change is possible because the ``choices`` parameter now accepts enumeration types directly.
+
+.. code-block:: diff
+
+     from django.db import models
+
+     class Suit(models.IntegerChoices):
+         HEARTS = 1
+         ...
+
+     class Card(models.Model):
+    -    suit = models.IntegerField(choices=Suit.choices, default=Suit.DEFAULT)
+    +    suit = models.IntegerField(choices=Suit, default=Suit.DEFAULT)
+
 ``format_html()`` calls
 ~~~~~~~~~~~~~~~~~~~~~~~
 

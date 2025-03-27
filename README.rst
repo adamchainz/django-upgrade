@@ -126,18 +126,18 @@ The version of Django to target, in the format ``<major>.<minor>``.
 django-upgrade enables all of its fixers for versions up to and including the target version.
 See the list of available versions with ``django-upgrade --help``.
 
-Without a ``--target-version`` option, django-upgrade looks for a ``pypyproject.toml`` file in the current directory.
-If found, it attempts to parse your current minimum-supported Django version from |project.dependencies|__, supporting formats like ``django>=5.2``.
+When ``--target-version`` is not specified, django-upgrade attempts to detect the target version from a ``pyproject.toml`` in the current directory.
+If found, it attempts to parse your current minimum-supported Django version from |project.dependencies|__, supporting formats like ``django>=5.2,<6.0``.
 When available, it reports:
+
+.. |project.dependencies| replace:: ``project.dependencies``
+__ https://packaging.python.org/en/latest/specifications/pyproject-toml/#dependencies-optional-dependencies
 
 .. code-block:: sh
 
     $ django-upgrade example.py
     Detected Django version from pyproject.toml: 5.2
     ...
-
-.. |project.dependencies| replace:: ``project.dependencies``
-__ https://packaging.python.org/en/latest/specifications/pyproject-toml/#dependencies-optional-dependencies
 
 If this doesn’t work, ``--target-version`` defaults to 2.2, the oldest supported Django version when django-upgrade was created.
 

@@ -918,8 +918,8 @@ Django 2.0
 
 `Release Notes <https://docs.djangoproject.com/en/2.0/releases/2.0/>`__
 
-URL’s
-~~~~~
+URLs
+~~~~
 
 **Name:** ``django_urls``
 

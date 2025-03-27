@@ -976,27 +976,27 @@ Thus, you should test affected paths after this fixer makes any changes.
 Note that ``[\w-]`` is sometimes used for slugs, but is not converted because it might be incompatible.
 That pattern matches all Unicode word characters, such as “α”, unlike Django's ``slug`` converter, which only matches Latin characters.
 
-``lru_cache``
-~~~~~~~~~~~~~
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
 
 **Name:** ``compatibility_imports``
 
-Rewrites imports of ``lru_cache`` from ``django.utils.functional`` to use ``functools``.
+Rewrites some compatibility imports:
+
+* ``lru_cache`` from ``django.utils.functional`` to use ``functools``.
+* ``ContextDecorator`` from ``django.utils.decorators`` to use ``contextlib``
+* ``SimpleCookie`` from ``django.http.cookie`` to use ``http.cookies``
 
 .. code-block:: diff
 
     -from django.utils.functional import lru_cache
     +from functools import lru_cache
 
-``ContextDecorator``
-~~~~~~~~~~~~~~~~~~~~
-
-Rewrites imports of ``ContextDecorator`` from ``django.utils.decorators`` to use ``contextlib``.
-
-.. code-block:: diff
-
     -from django.utils.decorators import ContextDecorator
     +from contextlib import ContextDecorator
+
+    -from django.http.cookie import SimpleCookie
+    +from http.cookies import SimpleCookie
 
 ``<func>.allow_tags = True``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

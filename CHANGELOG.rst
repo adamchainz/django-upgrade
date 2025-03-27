@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Add Django 2.0+ compatibility import rewrite of `django.http.cookie.SimpleCookie` to `http.cookies.SimpleCookie`.
+
+  Thanks to Thibaut Decombe in `PR #537 <https://github.com/adamchainz/django-upgrade/pull/537>`__.
+
 1.23.1 (2025-02-07)
 -------------------
 

@@ -1,18 +1,3 @@
-"""
-- Replace compatibility imports for
-    - `django.core.exceptions.EmptyResultSet`
-    - `django.core.exceptions.FieldDoesNotExist`
-    - `django.forms.utils.pretty_name`
-    - `django.forms.boundfield.BoundField`
-  See https://docs.djangoproject.com/en/3.1/releases/3.1/#id1
-
-- Replace `JSONField` imports:
-  See https://docs.djangoproject.com/en/3.1/releases/3.1/#features-deprecated-in-3-1
-
-- Replace `django.utils.functional.lru_cache` with `functools.lru_cache`
-  Undocumented change
-"""
-
 from __future__ import annotations
 
 import ast

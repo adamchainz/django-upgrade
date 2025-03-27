@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.24.0 (2025-03-27)
+-------------------
+
 * Parse target Django version from ``pyproject.toml``.
   Now, if you don’t specify a version with ``--target-version``, django-upgrade will try to parse your minimum-supported target Django version from ``project.dependencies`` in ``pyproject.toml``.
   It supports several common formats, like ``django>=5.2,<6.0``.

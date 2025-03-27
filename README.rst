@@ -278,6 +278,25 @@ For example:
      class Example3Tests(TestCase):
          ...
 
+Django 5.2
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/5.2/releases/5.2/>`__
+
+PostgreSQL aggregate ``order_by``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``postgres_aggregate_order_by``
+
+Rewrites calls to PostgreSQL aggregate functions using the old argument name ``ordering`` to the new name ``order_by``.
+
+.. code-block:: diff
+
+     from django.contrib.postgres.aggregates import ArrayAgg
+
+    -Book.objects.aggregate(ArrayAgg("author", ordering="name"))
+    +Book.objects.aggregate(ArrayAgg("author", order_by="name"))
+
 Django 5.1
 ----------
 

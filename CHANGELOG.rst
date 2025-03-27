@@ -4,6 +4,8 @@ Changelog
 
 * Add Django 5.2+ fixer ``postgres_aggregate_order_by`` to rewrite PostgreSQL aggregate functions using the old argument name ``ordering`` to the new name ``order_by``.
 
+* Add Django 5.2+ fixer ``staticfiles_find_all`` to rewrite calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.
+
 * Add Django 2.0+ compatibility import rewrite of `django.http.cookie.SimpleCookie` to `http.cookies.SimpleCookie`.
 
   Thanks to Thibaut Decombe in `PR #537 <https://github.com/adamchainz/django-upgrade/pull/537>`__.

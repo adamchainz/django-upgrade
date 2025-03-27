@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Parse target Django version from ``pyproject.toml``.
+  Now, if you don’t specify a version with ``--target-version``, django-upgrade will try to parse your minimum-supported target Django version from ``project.dependencies`` in ``pyproject.toml``.
+  It supports several common formats, like ``django >= 5.2``.
+
 * Add Django 5.2+ fixer ``postgres_aggregate_order_by`` to rewrite PostgreSQL aggregate functions using the old argument name ``ordering`` to the new name ``order_by``.
 
 * Add Django 5.2+ fixer ``staticfiles_find_all`` to rewrite calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import tokenize
 from collections.abc import Sequence
@@ -20,31 +21,36 @@ from django_upgrade.data import Settings
 from django_upgrade.data import visit
 from django_upgrade.tokens import DEDENT
 
+SUPPORTED_TARGET_VERSIONS = {
+    (1, 7),
+    (1, 8),
+    (1, 9),
+    (1, 10),
+    (1, 11),
+    (2, 0),
+    (2, 1),
+    (2, 2),
+    (3, 0),
+    (3, 1),
+    (3, 2),
+    (4, 0),
+    (4, 1),
+    (4, 2),
+    (5, 0),
+    (5, 1),
+    (5, 2),
+}
+
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="django-upgrade")
     parser.add_argument("filenames", nargs="+")
     parser.add_argument(
         "--target-version",
-        default="2.2",
+        default="auto",
         choices=[
-            "1.7",
-            "1.8",
-            "1.9",
-            "1.10",
-            "1.11",
-            "2.0",
-            "2.1",
-            "2.2",
-            "3.0",
-            "3.1",
-            "3.2",
-            "4.0",
-            "4.1",
-            "4.2",
-            "5.0",
-            "5.1",
-            "5.2",
+            "auto",
+            *[f"{major}.{minor}" for major, minor in SUPPORTED_TARGET_VERSIONS],
         ],
         help="The version of Django to target.",
     )
@@ -77,13 +83,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
-    target_version: tuple[int, int] = cast(
-        tuple[int, int],
-        tuple(int(x) for x in args.target_version.split(".", 1)),
-    )
-
     settings = Settings(
-        target_version=target_version,
+        target_version=get_target_version(args.target_version),
         only_fixers=set(args.only) if args.only else None,
         skip_fixers=set(args.skip) if args.skip else None,
     )
@@ -116,6 +117,78 @@ class ListFixersAction(argparse.Action):
         for name in sorted(FIXERS):
             print(name)
         parser.exit()
+
+
+def get_target_version(string: str) -> tuple[int, int]:
+    default = (2, 2)
+    if string != "auto":
+        return cast(
+            tuple[int, int],
+            tuple(int(x) for x in string.split(".", 1)),
+        )
+
+    if sys.version_info < (3, 11):
+        return default
+
+    import tomllib
+
+    try:
+        with open("pyproject.toml", "rb") as fp:
+            config = tomllib.load(fp)
+    except FileNotFoundError:
+        return default
+
+    deps = config.get("project", {}).get("dependencies", [])
+    for dep in deps:
+        match = re.fullmatch(
+            r"""
+            django
+            \s*
+            (
+                \[[^]]+\]
+                \s*
+            )?
+            (?:==|~=|>=)
+            \s*
+            (
+                (?P<major>[0-9]+)
+                \.
+                (?P<minor>[0-9]+)
+                (
+                    (?:a|b|rc)
+                    [0-9]+
+                |
+                    \.
+                    [0-9]+
+                |
+                )
+            )
+            (
+                \s*,\s*
+                (<|<=)
+                \s*
+                [0-9]+
+                (
+                    \.
+                    [0-9]+
+                    (
+                        \.
+                        [0-9]+
+                    )?
+                )?
+            )?
+            """,
+            dep.lower(),
+            re.VERBOSE,
+        )
+        if match:
+            major = int(match["major"])
+            minor = int(match["minor"])
+            if (major, minor) in SUPPORTED_TARGET_VERSIONS:
+                print(f"Detected Django version from pyproject.toml: {major}.{minor}")
+                return (major, minor)
+
+    return default
 
 
 def fix_file(

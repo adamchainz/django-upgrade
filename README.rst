@@ -52,9 +52,16 @@ Add the following to the ``repos`` section of your ``.pre-commit-config.yaml`` f
         rev: ""  # replace with latest tag on GitHub
         hooks:
         -   id: django-upgrade
-            args: [--target-version, "5.2"]   # Replace with Django version
 
-Then, upgrade your entire project:
+django-upgrade attempts to parse your current Django version from ``pyproject.toml``.
+If this doesn’t work for you, specify your target version with the ``--target-version`` option:
+
+.. code-block:: diff
+
+     -   id: django-upgrade
+    +    args: [--target-version, "5.2"]   # Replace with Django version
+
+Now, upgrade your entire project:
 
 .. code-block:: sh
 
@@ -69,15 +76,12 @@ pre-commit’s ``autoupdate`` command will also let you take advantage of future
 Usage
 =====
 
-``django-upgrade`` is a commandline tool that rewrites files in place.
-Pass your Django version as ``<major>.<minor>`` to the ``--target-version`` flag and a list of files.
-django-upgrade’s fixers will rewrite your code to avoid ``DeprecationWarning``\s and use some new features.
-
+``django-upgrade`` is a commandline tool that rewrites files in place to avoid ``DeprecationWarning``\s and use some new features.
 For example:
 
 .. code-block:: sh
 
-    django-upgrade --target-version 5.2 example/core/models.py example/settings.py
+    django-upgrade example/core/models.py example/settings.py
 
 ``django-upgrade`` focuses on upgrading your code and not on making it look nice.
 Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
@@ -120,9 +124,22 @@ Options
 
 The version of Django to target, in the format ``<major>.<minor>``.
 django-upgrade enables all of its fixers for versions up to and including the target version.
-
-This option defaults to 2.2, the oldest supported version when this project was created.
 See the list of available versions with ``django-upgrade --help``.
+
+Without a ``--target-version`` option, django-upgrade looks for a ``pypyproject.toml`` file in the current directory.
+If found, it attempts to parse your current minimum-supported Django version from |project.dependencies|__, supporting formats like ``django>=5.2``.
+When available, it reports:
+
+.. code-block:: sh
+
+    $ django-upgrade example.py
+    Detected Django version from pyproject.toml: 5.2
+    ...
+
+.. |project.dependencies| replace:: ``project.dependencies``
+__ https://packaging.python.org/en/latest/specifications/pyproject-toml/#dependencies-optional-dependencies
+
+If this doesn’t work, ``--target-version`` defaults to 2.2, the oldest supported Django version when django-upgrade was created.
 
 ``--exit-zero-even-if-changed``
 -------------------------------

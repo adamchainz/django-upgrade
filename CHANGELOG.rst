@@ -9,9 +9,15 @@ Changelog
   Now, if you don’t specify a version with ``--target-version``, django-upgrade will try to parse your minimum-supported target Django version from ``project.dependencies`` in ``pyproject.toml``.
   It supports several common formats, like ``django>=5.2,<6.0``.
 
+  `PR #543 <https://github.com/adamchainz/django-upgrade/pull/543>`__.
+
 * Add Django 5.2+ fixer ``postgres_aggregate_order_by`` to rewrite PostgreSQL aggregate functions using the old argument name ``ordering`` to the new name ``order_by``.
 
+  `Issue #538 <https://github.com/adamchainz/django-upgrade/issues/538>`__.
+
 * Add Django 5.2+ fixer ``staticfiles_find_all`` to rewrite calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.
+
+  `Issue #539 <https://github.com/adamchainz/django-upgrade/issues/539>`__.
 
 * Restore Django 5.0+ fixer ``model_field_choices``, with a restriction to only apply when the enumeration type is defined in the same file.
 

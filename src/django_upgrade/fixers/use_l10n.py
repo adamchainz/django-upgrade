@@ -36,6 +36,12 @@ def visit_Assign(
         and node.targets[0].id == "USE_L10N"
         and isinstance(node.value, ast.Constant)
         and node.value.value is True
-        and isinstance(parents[-1], ast.Module)
+        and (
+            isinstance(parents[-1], ast.Module)
+            or (
+                isinstance(parents[-1], ast.ClassDef)
+                and isinstance(parents[-2], ast.Module)
+            )
+        )
     ):
         yield ast_start_offset(node), partial(erase_node, node=node)

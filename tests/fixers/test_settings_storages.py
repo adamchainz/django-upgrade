@@ -256,3 +256,153 @@ def test_star_import_extended_module_path():
         """,
         filename="settings.py",
     )
+
+
+def test_default_only_class_based():
+    check_transformed(
+        """\
+        class BaseSettings:
+            DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        class BaseSettings:
+            STORAGES = {
+                "default": {
+                    "BACKEND": "example.backend",
+                },
+                "staticfiles": {
+                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                },
+            }
+        """,
+        filename="settings.py",
+    )
+
+
+def test_static_only_class_based():
+    check_transformed(
+        """\
+        class BaseSettings:
+            STATICFILES_STORAGE = "example.other.backend"
+        """,
+        """\
+        class BaseSettings:
+            STORAGES = {
+                "default": {
+                    "BACKEND": "django.core.files.storage.FileSystemStorage",
+                },
+                "staticfiles": {
+                    "BACKEND": "example.other.backend",
+                },
+            }
+        """,
+        filename="settings.py",
+    )
+
+
+def test_both_class_based():
+    check_transformed(
+        """\
+        class BaseSettings:
+            DEFAULT_FILE_STORAGE = "example.backend"
+            STATICFILES_STORAGE = "example.other.backend"
+        """,
+        """\
+        class BaseSettings:
+            STORAGES = {
+                "default": {
+                    "BACKEND": "example.backend",
+                },
+                "staticfiles": {
+                    "BACKEND": "example.other.backend",
+                },
+            }
+        """,
+        filename="settings.py",
+    )
+
+
+def test_retains_quoting_class_based():
+    check_transformed(
+        """\
+        class BaseSettings:
+            DEFAULT_FILE_STORAGE = 'example.backend'
+        """,
+        """\
+        class BaseSettings:
+            STORAGES = {
+                "default": {
+                    "BACKEND": 'example.backend',
+                },
+                "staticfiles": {
+                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                },
+            }
+        """,
+        filename="settings.py",
+    )
+
+
+def test_star_import_not_settings_class_based():
+    check_transformed(
+        """\
+        from example import *
+        class BaseSettings:
+            DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        from example import *
+        class BaseSettings:
+            STORAGES = {
+                "default": {
+                    "BACKEND": "example.backend",
+                },
+                "staticfiles": {
+                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                },
+            }
+        """,
+        filename="settings.py",
+    )
+
+
+def test_star_import_base_settings_class_based():
+    check_transformed(
+        """\
+        from base_settings import *
+        class BaseSettings:
+            DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        from base_settings import *
+        class BaseSettings:
+            STORAGES = {
+                **STORAGES,
+                "default": {
+                    "BACKEND": "example.backend",
+                },
+            }
+        """,
+        filename="settings.py",
+    )
+
+
+def test_star_import_extended_module_path_class_based():
+    check_transformed(
+        """\
+        from example.settings.base import *
+        class BaseSettings:
+            DEFAULT_FILE_STORAGE = "example.backend"
+        """,
+        """\
+        from example.settings.base import *
+        class BaseSettings:
+            STORAGES = {
+                **STORAGES,
+                "default": {
+                    "BACKEND": "example.backend",
+                },
+            }
+        """,
+        filename="settings.py",
+    )

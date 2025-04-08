@@ -405,6 +405,8 @@ Only applies if all old settings are defined as strings, at module level, and a 
 Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
 For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
+Class-based settings files, such as ``django-configurations`` and ``django-classy-settings``, are supported.
+
 .. code-block:: diff
 
     -DEFAULT_FILE_STORAGE = "example.storages.ExtendedFileSystemStorage"

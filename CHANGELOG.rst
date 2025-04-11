@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Add tests to ``settings.PASSWORD_RESET_TIMEOUT`` fixer to support class-based settings.
+
 1.24.0 (2025-03-27)
 -------------------
 

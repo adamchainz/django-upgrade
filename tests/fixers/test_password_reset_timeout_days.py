@@ -72,3 +72,55 @@ def test_success_function_call_multiline():
         """,
         filename="myapp/settings.py",
     )
+
+
+def test_success_class_based():
+    check_transformed(
+        """\
+        class BaseSettings:
+            PASSWORD_RESET_TIMEOUT_DAYS = 4
+        """,
+        """\
+        class BaseSettings:
+            PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
+        """,
+        filename="myapp/settings/base.py",
+    )
+
+
+def test_success_class_based_inherited():
+    check_transformed(
+        """\
+        class BaseSettings:
+            PASSWORD_RESET_TIMEOUT_DAYS = 4
+
+        class DevSettings(BaseSettings):
+            PASSWORD_RESET_TIMEOUT_DAYS = 2
+        """,
+        """\
+        class BaseSettings:
+            PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
+
+        class DevSettings(BaseSettings):
+            PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 2
+        """,
+        filename="myapp/settings/dev.py",
+    )
+
+
+def test_success_class_based_configurations():
+    check_transformed(
+        """\
+        PASSWORD_RESET_TIMEOUT_DAYS = 4
+
+        class Dev(Configurations):
+            PASSWORD_RESET_TIMEOUT_DAYS = 2
+        """,
+        """\
+        PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
+
+        class Dev(Configurations):
+            PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 2
+        """,
+        filename="myapp/settings.py",
+    )

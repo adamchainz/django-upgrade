@@ -49,6 +49,7 @@ class SettingsDetails:
         "value_tokens",
         "rewritten",
         "settings_star_import",
+        "contexts",
     )
 
     def __init__(self) -> None:
@@ -57,6 +58,7 @@ class SettingsDetails:
         self.value_tokens: dict[str, Token] = {}
         self.rewritten: dict[str, bool] = {}
         self.settings_star_import = False
+        self.contexts: dict[str, tuple[ast.AST, ...]] = {}
 
 
 settings_details: MutableMapping[State, SettingsDetails] = WeakKeyDictionary()
@@ -96,7 +98,10 @@ def visit_Assign(
         details = settings_details.setdefault(state, SettingsDetails())
         is_rewritable = (
             name != "STORAGES"
-            and isinstance(parents[-1], ast.Module)
+            and (
+                isinstance(parents[-1], ast.Module)
+                or isinstance(parents[-1], ast.ClassDef)
+            )
             and isinstance(node.value, ast.Constant)
             and isinstance(node.value.value, str)
             and name not in details.nodes
@@ -106,9 +111,11 @@ def visit_Assign(
                 details.all_rewritable = False
             else:
                 details.nodes[name] = node
+                details.contexts[name] = parents
 
-                yield ast_start_offset(node), partial(
-                    replace_storages, details=details, name=name, node=node
+                yield (
+                    ast_start_offset(node),
+                    partial(replace_storages, details=details, name=name, node=node),
                 )
 
 
@@ -128,10 +135,15 @@ def replace_storages(
 
     erase_node(tokens, i, node=node)
     if len(details.rewritten) == len(details.nodes):
+        context = details.contexts[name]
+
+        is_class_based = any(isinstance(parent, ast.ClassDef) for parent in context)
+        indentation = "    " if is_class_based else ""
+
         # We just deleted the first in the file, insert the new setting
-        src_fragments = ["STORAGES = {"]
+        src_fragments = [f"{indentation}STORAGES = {{"]
         if details.settings_star_import:
-            src_fragments.append("    **STORAGES,")
+            src_fragments.append(f"{indentation}    **STORAGES,")
 
         for name in NAME_MAP:
             if name in details.value_tokens:
@@ -139,9 +151,9 @@ def replace_storages(
                 value_token = details.value_tokens[name]
                 src_fragments.extend(
                     [
-                        f'    "{new_name}": {{',
-                        f'        "BACKEND": {value_token.src},',
-                        "    },",
+                        f'{indentation}    "{new_name}": {{',
+                        f'{indentation}        "BACKEND": {value_token.src},',
+                        f"{indentation}    }},",
                     ]
                 )
             elif not details.settings_star_import:
@@ -149,11 +161,11 @@ def replace_storages(
                 initial_value = INITIAL_VALUES[new_name]
                 src_fragments.extend(
                     [
-                        f'    "{new_name}": {{',
-                        f'        "BACKEND": "{initial_value}",',
-                        "    },",
+                        f'{indentation}    "{new_name}": {{',
+                        f'{indentation}        "BACKEND": "{initial_value}",',
+                        f"{indentation}    }},",
                     ]
                 )
 
-        src_fragments.append("}\n")
+        src_fragments.append(f"{indentation}}}\n")
         insert(tokens, i, new_src="\n".join(src_fragments))

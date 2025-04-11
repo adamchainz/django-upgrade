@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Add support for class-based settings files in USE_L10N fixer.
+
 1.24.0 (2025-03-27)
 -------------------
 

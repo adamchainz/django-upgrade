@@ -554,6 +554,8 @@ Removes the deprecated ``USE_L10N`` setting if set to its default value of ``Tru
 Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
 For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
+Class-based settings files, such as ``django-configurations`` and ``django-classy-settings``, are supported.
+
 .. code-block:: diff
 
     -USE_L10N = True

@@ -151,3 +151,83 @@ def test_success_with_merged_settings():
         """,
         filename="myapp/settings.py",
     )
+
+
+def test_success_class_based():
+    check_transformed(
+        """\
+        class BaseSettings:
+            DATABASES = {
+                "default": {
+                    "ENGINE": "django.db.backends.postgresql_psycopg2",
+                    "NAME": "mydatabase",
+                    "USER": "mydatabaseuser",
+                    "PASSWORD": "mypassword",
+                    "HOST": "127.0.0.1",
+                    "PORT": "5432",
+                }
+            }
+        """,
+        """\
+        class BaseSettings:
+            DATABASES = {
+                "default": {
+                    "ENGINE": "django.db.backends.postgresql",
+                    "NAME": "mydatabase",
+                    "USER": "mydatabaseuser",
+                    "PASSWORD": "mypassword",
+                    "HOST": "127.0.0.1",
+                    "PORT": "5432",
+                }
+            }
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_success_class_based_inherited():
+    check_transformed(
+        """\
+        class BaseSettings:
+            DATABASES = {
+                "default": {
+                    "ENGINE": "django.db.backends.postgresql_psycopg2",
+                    "NAME": "mydatabase",
+                    "USER": "mydatabaseuser",
+                    "PASSWORD": "mypassword",
+                    "HOST": "127.0.0.1",
+                    "PORT": "5432",
+                }
+            }
+
+        class DevSettings(BaseSettings):
+            DATABASES = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": "mydatabase",
+                }
+            }
+        """,
+        """\
+        class BaseSettings:
+            DATABASES = {
+                "default": {
+                    "ENGINE": "django.db.backends.postgresql",
+                    "NAME": "mydatabase",
+                    "USER": "mydatabaseuser",
+                    "PASSWORD": "mypassword",
+                    "HOST": "127.0.0.1",
+                    "PORT": "5432",
+                }
+            }
+
+        class DevSettings(BaseSettings):
+            DATABASES = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": "mydatabase",
+                }
+            }
+        """,
+        filename="myapp/settings.py",
+    )

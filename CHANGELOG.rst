@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Add tests to ``DATABASES`` fixer for ``postgresql_psycopg2`` to support class-based settings.
+
 1.24.0 (2025-03-27)
 -------------------
 

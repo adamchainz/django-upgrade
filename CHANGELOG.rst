@@ -80,6 +80,10 @@ Changelog
 
   `Issue #364 <https://github.com/adamchainz/django-upgrade/issues/364>`__.
 
+* Add Django 4.0+ fixer to rewrite ``OSMGeoAdmin`` and ``GeoModelAdmin`` classes.
+
+  Thanks to Adolfo Fitoria in `PR #484 <https://github.com/adamchainz/django-upgrade/pull/484>`__.
+
 * Drop Python 3.8 support.
 
 * Support Python 3.13.

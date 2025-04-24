@@ -7,4 +7,7 @@ django-upgrade documentation
    :maxdepth: 1
    :caption: Contents:
 
+   installation
+   usage
+   options
    changelog

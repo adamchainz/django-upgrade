@@ -20,7 +20,7 @@ django-upgrade
 
 ----
 
-.. figure:: https://raw.githubusercontent.com/adamchainz/django-upgrade/logo/logo.svg
+.. figure:: https://raw.githubusercontent.com/adamchainz/django-upgrade/main/logo.svg
   :alt: django-upgrade logo
   :align: center
 

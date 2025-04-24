@@ -6,20 +6,20 @@ Changelog
 -------------------
 
 * Parse target Django version from ``pyproject.toml``.
-  Now, if you don’t specify a version with ``--target-version``, django-upgrade will try to parse your minimum-supported target Django version from ``project.dependencies`` in ``pyproject.toml``.
+  Now, if you don’t specify a version with :option:`--target-version`, django-upgrade will try to parse your minimum-supported target Django version from ``project.dependencies`` in ``pyproject.toml``.
   It supports several common formats, like ``django>=5.2,<6.0``.
 
   `PR #543 <https://github.com/adamchainz/django-upgrade/pull/543>`__.
 
-* Add Django 5.2+ fixer ``postgres_aggregate_order_by`` to rewrite PostgreSQL aggregate functions using the old argument name ``ordering`` to the new name ``order_by``.
+* Add Django 5.2+ fixer :ref:`postgres_aggregate_order_by <postgres_aggregate_order_by>` to rewrite PostgreSQL aggregate functions using the old argument name ``ordering`` to the new name ``order_by``.
 
   `Issue #538 <https://github.com/adamchainz/django-upgrade/issues/538>`__.
 
-* Add Django 5.2+ fixer ``staticfiles_find_all`` to rewrite calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.
+* Add Django 5.2+ fixer :ref:`staticfiles_find_all <staticfiles_find_all>` to rewrite calls to the staticfiles ``find()`` function using the old argument name ``all`` to the new name ``find_all``.
 
   `Issue #539 <https://github.com/adamchainz/django-upgrade/issues/539>`__.
 
-* Restore Django 5.0+ fixer ``model_field_choices``, with a restriction to only apply when the enumeration type is defined in the same file.
+* Restore Django 5.0+ fixer :ref:`model_field_choices <model_field_choices>`, with a restriction to only apply when the enumeration type is defined in the same file.
 
   Thanks to Thibaut Decombe for initially contributing it in `PR #369 <https://github.com/adamchainz/django-upgrade/pull/369>`__.
 
@@ -30,7 +30,7 @@ Changelog
 1.23.1 (2025-02-07)
 -------------------
 
-* Fix ``django_url`` fixer bug that failed for indented path strings.
+* Fix :ref:`django_urls <django_urls>` fixer bug that failed for indented path strings.
   This bug was introduced in 1.23.0.
 
   Thanks to Michal Čihař for the report in `Issue #528 <https://github.com/adamchainz/django-upgrade/issues/528>`__.
@@ -38,17 +38,17 @@ Changelog
 1.23.0 (2025-02-06)
 -------------------
 
-* Support Django 5.2 in ``--target-version``.
+* Support Django 5.2 in :option:`--target-version`.
 
 * Extend versioned block fixer to support comparisons with single-item tuples, like `django.VERSION >= (4,)`.
 
   Thanks to Thibaut Decombe in `PR #517 <https://github.com/adamchainz/django-upgrade/pull/517>`__.
 
-* Fix test decorator fixer to remove all indentation tokens from the decorator line.
+* Fix :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixer to remove all indentation tokens from the decorator line.
 
   Thanks to Thibaut Decombe in `PR #518 <https://github.com/adamchainz/django-upgrade/pull/518>`__.
 
-* Fix ``django_url`` fixer handling of implicitly concatenated strings.
+* Fix :ref:`django_urls <django_urls>` fixer handling of implicitly concatenated strings.
 
   Thanks to Gunther Waidacher for the report in `Issue #524 <https://github.com/adamchainz/django-upgrade/issues/524>`__.
 
@@ -57,8 +57,8 @@ Changelog
 
 * Make these fixers work when ``django.contrib.gis.db.models`` is used to import objects from ``django.db.models``:
 
-  *  ``check_constraint_condition``
-  *  ``index_together``
+  *  :ref:`check_constraint_condition <check_constraint_condition>`
+  *  :ref:`index_together <index_together>`
 
   `Issue #513 <https://github.com/adamchainz/django-upgrade/issues/513>`__.
 

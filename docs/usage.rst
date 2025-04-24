@@ -2,20 +2,20 @@
 Usage
 =====
 
-``django-upgrade`` is a commandline tool that rewrites files in place to avoid ``DeprecationWarning``\s and use some new features.
-For example:
+``django-upgrade`` is a commandline tool that rewrites files to autoatically pugrade your code to fix ``DeprecationWarning``\s from Django and use some new features.
+Target files like:
 
 .. code-block:: sh
 
     django-upgrade example/core/models.py example/settings.py
 
 ``django-upgrade`` focuses on upgrading your code and not on making it look nice.
-Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__.
+Run django-upgrade before formatters like `Black <https://black.readthedocs.io/en/stable/>`__ or `Ruff <https://docs.astral.sh/ruff/formatter/>`__.
 
 Some of django-upgrade’s fixers make changes to models that need migrations:
 
-* ``index_together``
-* ``null_boolean_field``
+* :ref:`index_together <index_together>`
+* :ref:`null_boolean_field <null_boolean_field>`
 
 Add a `test for pending migrations <https://adamj.eu/tech/2024/06/23/django-test-pending-migrations/>`__ to ensure that you do not miss these.
 
@@ -29,7 +29,7 @@ For example, |with git ls-files pipe xargs|_:
 
 .. code-block:: sh
 
-    git ls-files -z -- '*.py' | xargs -0r django-upgrade --target-version 5.2
+    git ls-files -z -- '*.py' | xargs -0r django-upgrade
 
 …or PowerShell’s |ForEach-Object|__:
 
@@ -38,4 +38,4 @@ __ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core
 
 .. code-block:: powershell
 
-    git ls-files -- '*.py' | %{django-upgrade --target-version 5.2 $_}
+    git ls-files -- '*.py' | %{django-upgrade $_}

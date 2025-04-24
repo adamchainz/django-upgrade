@@ -2,7 +2,7 @@
 Usage
 =====
 
-``django-upgrade`` is a commandline tool that rewrites files to autoatically pugrade your code to fix ``DeprecationWarning``\s from Django and use some new features.
+``django-upgrade`` is a commandline tool that rewrites files to automatically upgrade your code to fix ``DeprecationWarning``\s from Django and use some new features.
 Target files like:
 
 .. code-block:: sh

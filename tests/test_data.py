@@ -255,7 +255,7 @@ def test_looks_like_test_file_false(filename: str) -> None:
 
 
 def test_all_fixers_are_documented() -> None:
-    readme = (Path(__name__).parent.parent / "README.rst").read_text()
+    readme = (Path(__name__).parent.parent / "docs/fixers.rst").read_text()
     docs = {m[1] for m in re.finditer(r"\*\*Name:\*\* ``(.+)``", readme, re.MULTILINE)}
 
     names = set(FIXERS)

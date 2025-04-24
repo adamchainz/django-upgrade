@@ -18,6 +18,12 @@ django-upgrade
    :target: https://github.com/pre-commit/pre-commit
    :alt: pre-commit
 
+
+.. figure:: https://raw.githubusercontent.com/adamchainz/django-upgrade/logo/logo.svg
+  :alt: django-upgrade logo
+
+..
+
 Automatically upgrade your Django project code.
 
 ----

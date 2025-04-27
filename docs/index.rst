@@ -10,8 +10,11 @@ I (Adam Johnson) wrote django-upgrade whilst working on the book!
 
 ----
 
-Welcome to the documentation for django-upgrade.
-If you’re new, start with :doc:`installation`!
+django-upgrade is a tool that automatically upgrades your Django project code.
+It changes code to avoid deprecation warnings and migrates some patterns to newer Django idioms.
+Use it to ease upgrading Django and ensure your code uses the latest features.
+
+To get started, see :doc:`installation` and :doc:`usage`.
 
 .. toctree::
    :maxdepth: 1

@@ -12,23 +12,20 @@ from collections.abc import Iterable
 from functools import partial
 from typing import cast
 
-from tokenize_rt import UNIMPORTANT_WS
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import UNIMPORTANT_WS, Offset, Token
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import looks_like_test_client_call
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import COMMENT
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import PHYSICAL_NEWLINE
-from django_upgrade.tokens import consume
-from django_upgrade.tokens import find
-from django_upgrade.tokens import find_first_token
-from django_upgrade.tokens import find_last_token
-from django_upgrade.tokens import insert
+from django_upgrade.ast import ast_start_offset, looks_like_test_client_call
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import (
+    COMMENT,
+    OP,
+    PHYSICAL_NEWLINE,
+    consume,
+    find,
+    find_first_token,
+    find_last_token,
+    insert,
+)
 
 fixer = Fixer(
     __name__,
@@ -64,10 +61,13 @@ def visit_Call(
                 has_http_kwarg = True
 
         if has_http_kwarg:
-            yield ast_start_offset(node), partial(
-                combine_http_headers_kwargs,
-                node=node,
-                headers_keyword=headers_keyword,
+            yield (
+                ast_start_offset(node),
+                partial(
+                    combine_http_headers_kwargs,
+                    node=node,
+                    headers_keyword=headers_keyword,
+                ),
             )
 
 

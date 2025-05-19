@@ -11,13 +11,9 @@ from functools import partial
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import is_rewritable_import_from
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import find_and_replace_name
-from django_upgrade.tokens import update_import_names
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import find_and_replace_name, update_import_names
 
 fixer = Fixer(
     __name__,
@@ -46,8 +42,9 @@ def visit_ImportFrom(
         and is_rewritable_import_from(node)
         and any(alias.name in NAME_MAP for alias in node.names)
     ):
-        yield ast_start_offset(node), partial(
-            update_import_names, node=node, name_map=NAME_MAP
+        yield (
+            ast_start_offset(node),
+            partial(update_import_names, node=node, name_map=NAME_MAP),
         )
 
 
@@ -60,6 +57,7 @@ def visit_Name(
     if (name := node.id) in NAME_MAP and any(
         name in state.from_imports[m] for m in MODULES
     ):
-        yield ast_start_offset(node), partial(
-            find_and_replace_name, name=name, new=NAME_MAP[name]
+        yield (
+            ast_start_offset(node),
+            partial(find_and_replace_name, name=name, new=NAME_MAP[name]),
         )

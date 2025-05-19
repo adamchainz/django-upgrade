@@ -9,20 +9,18 @@ import ast
 from collections.abc import Iterable
 from functools import partial
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import is_rewritable_import_from
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import CODE
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import find
-from django_upgrade.tokens import find_and_replace_name
-from django_upgrade.tokens import parse_call_args
-from django_upgrade.tokens import update_import_names
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import (
+    CODE,
+    OP,
+    find,
+    find_and_replace_name,
+    parse_call_args,
+    update_import_names,
+)
 
 fixer = Fixer(
     __name__,
@@ -38,10 +36,13 @@ def visit_ImportFrom(
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if is_rewritable_import_from(node) and node.module == "django.db.models":
-        yield ast_start_offset(node), partial(
-            update_import_names,
-            node=node,
-            name_map={"NullBooleanField": "BooleanField"},
+        yield (
+            ast_start_offset(node),
+            partial(
+                update_import_names,
+                node=node,
+                name_map={"NullBooleanField": "BooleanField"},
+            ),
         )
 
 

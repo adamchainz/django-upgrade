@@ -10,23 +10,21 @@ import ast
 from collections.abc import Iterable
 from functools import partial
 
-from tokenize_rt import UNIMPORTANT_WS
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import UNIMPORTANT_WS, Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import DEDENT
-from django_upgrade.tokens import INDENT
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import PHYSICAL_NEWLINE
-from django_upgrade.tokens import erase_node
-from django_upgrade.tokens import extract_indent
-from django_upgrade.tokens import find_last_token
-from django_upgrade.tokens import insert
-from django_upgrade.tokens import str_repr_matching
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import (
+    DEDENT,
+    INDENT,
+    OP,
+    PHYSICAL_NEWLINE,
+    erase_node,
+    extract_indent,
+    find_last_token,
+    insert,
+    str_repr_matching,
+)
 
 fixer = Fixer(
     __name__,
@@ -155,15 +153,19 @@ def visit_ClassDef(
 
     index_src = ", ".join(src_chunks)
 
-    yield ast_start_offset(index_together), partial(
-        remove_index_together_and_maybe_add_indexes,
-        index_together=index_together,
-        add_indexes=(indexes is None),
-        index_src=index_src,
+    yield (
+        ast_start_offset(index_together),
+        partial(
+            remove_index_together_and_maybe_add_indexes,
+            index_together=index_together,
+            add_indexes=(indexes is None),
+            index_src=index_src,
+        ),
     )
     if indexes is not None:
-        yield ast_start_offset(indexes), partial(
-            extend_indexes, indexes=indexes, index_src=index_src
+        yield (
+            ast_start_offset(indexes),
+            partial(extend_indexes, indexes=indexes, index_src=index_src),
         )
 
 

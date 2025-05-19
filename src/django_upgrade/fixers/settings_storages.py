@@ -6,22 +6,15 @@ https://docs.djangoproject.com/en/4.2/releases/4.2/#custom-file-storages
 from __future__ import annotations
 
 import ast
-from collections.abc import Iterable
-from collections.abc import MutableMapping
+from collections.abc import Iterable, MutableMapping
 from functools import partial
 from weakref import WeakKeyDictionary
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import STRING
-from django_upgrade.tokens import erase_node
-from django_upgrade.tokens import find
-from django_upgrade.tokens import insert
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import STRING, erase_node, find, insert
 
 fixer = Fixer(
     __name__,
@@ -107,8 +100,9 @@ def visit_Assign(
             else:
                 details.nodes[name] = node
 
-                yield ast_start_offset(node), partial(
-                    replace_storages, details=details, name=name, node=node
+                yield (
+                    ast_start_offset(node),
+                    partial(replace_storages, details=details, name=name, node=node),
                 )
 
 

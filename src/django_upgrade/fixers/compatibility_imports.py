@@ -2,18 +2,13 @@ from __future__ import annotations
 
 import ast
 from collections import defaultdict
-from collections.abc import Iterable
-from collections.abc import Mapping
-from functools import lru_cache
-from functools import partial
+from collections.abc import Iterable, Mapping
+from functools import cache, partial
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import is_rewritable_import_from
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import update_import_modules
 
 fixer = Fixer(
@@ -125,7 +120,7 @@ REPLACEMENTS_EXCEPT_MIGRATIONS = {
 }
 
 
-@lru_cache(maxsize=None)
+@cache
 def _get_replacements(
     version: tuple[int, int], looks_like_migrations_file: bool
 ) -> Mapping[str, dict[str, str]]:
@@ -164,8 +159,11 @@ def visit_ImportFrom(
     if node.module in replacements and any(
         alias.name in replacements[node.module] for alias in node.names
     ):
-        yield ast_start_offset(node), partial(
-            update_import_modules,
-            node=node,
-            module_rewrites=replacements[node.module],
+        yield (
+            ast_start_offset(node),
+            partial(
+                update_import_modules,
+                node=node,
+                module_rewrites=replacements[node.module],
+            ),
         )

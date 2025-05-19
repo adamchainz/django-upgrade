@@ -9,20 +9,14 @@ import ast
 from collections import defaultdict
 from collections.abc import Iterable
 from functools import partial
-from typing import DefaultDict
 from typing import cast
 from weakref import WeakKeyDictionary
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import find_last_token
-from django_upgrade.tokens import reverse_find
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import OP, find_last_token, reverse_find
 
 fixer = Fixer(
     __name__,
@@ -41,7 +35,7 @@ def defined_enumeration_types(module: ast.Module, up_to_line: int) -> set[str]:
     """
     if module not in module_defined_enumeration_types:
         enum_dict = {}
-        from_imports: DefaultDict[str, set[str]] = defaultdict(set)
+        from_imports: defaultdict[str, set[str]] = defaultdict(set)
         for node in module.body:
             if (
                 isinstance(node, ast.ImportFrom)
@@ -76,7 +70,7 @@ DJANGO_CHOICES_TYPES = {
 
 
 def _is_django_choices_type(
-    from_imports: DefaultDict[str, set[str]], node: ast.expr
+    from_imports: defaultdict[str, set[str]], node: ast.expr
 ) -> bool:
     """Check if an AST node refers to a Django enumeration type base class."""
     return (

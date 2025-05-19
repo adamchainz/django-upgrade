@@ -8,13 +8,10 @@ from textwrap import dedent
 from unittest import mock
 
 import pytest
-from tokenize_rt import UNIMPORTANT_WS
-from tokenize_rt import src_to_tokens
+from tokenize_rt import UNIMPORTANT_WS, src_to_tokens
 
 from django_upgrade import __main__  # noqa: F401
-from django_upgrade.main import fixup_dedent_tokens
-from django_upgrade.main import get_target_version
-from django_upgrade.main import main
+from django_upgrade.main import fixup_dedent_tokens, get_target_version, main
 from django_upgrade.tokens import DEDENT
 from tests.compat import chdir
 

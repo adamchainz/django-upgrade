@@ -9,16 +9,11 @@ import ast
 from collections.abc import Iterable
 from functools import partial
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import CODE
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import find
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import CODE, OP, find
 
 fixer = Fixer(
     __name__,
@@ -53,9 +48,12 @@ def visit_Call(
         and len(node.args) == 0
         and not any(k.arg == "length" for k in node.keywords)
     ):
-        yield ast_start_offset(node), partial(
-            add_length_argument,
-            has_kwargs=(len(node.keywords) > 0),
+        yield (
+            ast_start_offset(node),
+            partial(
+                add_length_argument,
+                has_kwargs=(len(node.keywords) > 0),
+            ),
         )
 
 

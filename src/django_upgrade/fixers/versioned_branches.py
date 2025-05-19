@@ -13,14 +13,10 @@ from collections.abc import Iterable
 from functools import partial
 from typing import Literal
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import is_passing_comparison
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
+from django_upgrade.ast import ast_start_offset, is_passing_comparison
+from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import Block
 
 fixer = Fixer(
@@ -40,14 +36,16 @@ def visit_If(
         and (pass_fail := is_passing_comparison(node.test, state)) is not None
         and (
             # do not handle 'if ... elif ...'
-            not node.orelse
-            or not isinstance(node.orelse[0], ast.If)
+            not node.orelse or not isinstance(node.orelse[0], ast.If)
         )
     ):
-        yield ast_start_offset(node), partial(
-            _fix_block,
-            node=node,
-            keep_branch=("first" if pass_fail == "pass" else "second"),
+        yield (
+            ast_start_offset(node),
+            partial(
+                _fix_block,
+                node=node,
+                keep_branch=("first" if pass_fail == "pass" else "second"),
+            ),
         )
 
 

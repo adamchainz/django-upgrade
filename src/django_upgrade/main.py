@@ -6,19 +6,18 @@ import sys
 import tokenize
 from collections.abc import Sequence
 from importlib import metadata
-from typing import Any
-from typing import cast
+from typing import Any, cast
 
-from tokenize_rt import UNIMPORTANT_WS
-from tokenize_rt import Token
-from tokenize_rt import reversed_enumerate
-from tokenize_rt import src_to_tokens
-from tokenize_rt import tokens_to_src
+from tokenize_rt import (
+    UNIMPORTANT_WS,
+    Token,
+    reversed_enumerate,
+    src_to_tokens,
+    tokens_to_src,
+)
 
 from django_upgrade.ast import ast_parse
-from django_upgrade.data import FIXERS
-from django_upgrade.data import Settings
-from django_upgrade.data import visit
+from django_upgrade.data import FIXERS, Settings, visit
 from django_upgrade.tokens import DEDENT
 
 SUPPORTED_TARGET_VERSIONS = {

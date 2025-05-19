@@ -12,23 +12,19 @@ from collections.abc import Iterable
 from functools import partial
 from typing import Any
 
-from tokenize_rt import UNIMPORTANT_WS
-from tokenize_rt import Offset
-from tokenize_rt import Token
-from tokenize_rt import tokens_to_src
+from tokenize_rt import UNIMPORTANT_WS, Offset, Token, tokens_to_src
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import looks_like_test_client_call
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import PHYSICAL_NEWLINE
-from django_upgrade.tokens import consume
-from django_upgrade.tokens import find_first_token
-from django_upgrade.tokens import find_last_token
-from django_upgrade.tokens import replace
-from django_upgrade.tokens import reverse_consume
+from django_upgrade.ast import ast_start_offset, looks_like_test_client_call
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import (
+    OP,
+    PHYSICAL_NEWLINE,
+    consume,
+    find_first_token,
+    find_last_token,
+    replace,
+    reverse_consume,
+)
 
 fixer = Fixer(
     __name__,
@@ -66,10 +62,13 @@ def visit_Call(
             or is_response_from_client(parents, node, first_arg.id)
         )
     ):
-        yield ast_start_offset(first_arg), partial(
-            rewrite_args,
-            response_arg=first_arg,
-            form_arg=second_arg,
+        yield (
+            ast_start_offset(first_arg),
+            partial(
+                rewrite_args,
+                response_arg=first_arg,
+                form_arg=second_arg,
+            ),
         )
 
         if func_name == "assertFormError":

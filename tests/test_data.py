@@ -6,9 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from django_upgrade.data import FIXERS
-from django_upgrade.data import Settings
-from django_upgrade.data import State
+from django_upgrade.data import FIXERS, Settings, State
 
 settings = Settings(target_version=(4, 0))
 

@@ -6,14 +6,9 @@ import re
 from collections import defaultdict
 from collections.abc import Iterable
 from functools import cached_property
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Callable
-from typing import DefaultDict
-from typing import TypeVar
+from typing import TYPE_CHECKING, Any, Callable, TypeVar
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
+from tokenize_rt import Offset, Token
 
 from django_upgrade import fixers
 
@@ -55,7 +50,7 @@ class State:
         self,
         settings: Settings,
         filename: str,
-        from_imports: DefaultDict[str, set[str]],
+        from_imports: defaultdict[str, set[str]],
     ) -> None:
         self.settings = settings
         self.filename = filename

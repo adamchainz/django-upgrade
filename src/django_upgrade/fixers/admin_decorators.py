@@ -12,20 +12,18 @@ from collections.abc import Iterable
 from functools import partial
 from typing import Literal
 
-from tokenize_rt import Offset
-from tokenize_rt import Token
-from tokenize_rt import tokens_to_src
+from tokenize_rt import Offset, Token, tokens_to_src
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import OP
-from django_upgrade.tokens import erase_node
-from django_upgrade.tokens import extract_indent
-from django_upgrade.tokens import find_last_token
-from django_upgrade.tokens import insert
-from django_upgrade.tokens import reverse_find
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import (
+    OP,
+    erase_node,
+    extract_indent,
+    find_last_token,
+    insert,
+    reverse_find,
+)
 
 fixer = Fixer(
     __name__,
@@ -155,16 +153,22 @@ def visit_Module_or_ClassDef(
             else:
                 offset = ast_start_offset(funcdetails.node)
                 decorated = False
-            yield offset, partial(
-                decorate_function, funcdetails=funcdetails, decorated=decorated
+            yield (
+                offset,
+                partial(
+                    decorate_function, funcdetails=funcdetails, decorated=decorated
+                ),
             )
             for name, assignnode in funcdetails.assignments.items():
                 yield ast_start_offset(assignnode), partial(erase_node, node=assignnode)
-                yield ast_start_offset(assignnode.value), partial(
-                    store_value_src,
-                    node=assignnode.value,
-                    name=name,
-                    funcdetails=funcdetails,
+                yield (
+                    ast_start_offset(assignnode.value),
+                    partial(
+                        store_value_src,
+                        node=assignnode.value,
+                        name=name,
+                        funcdetails=funcdetails,
+                    ),
                 )
 
 

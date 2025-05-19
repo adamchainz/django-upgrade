@@ -6,20 +6,15 @@ https://docs.djangoproject.com/en/4.1/releases/4.1/#id2
 from __future__ import annotations
 
 import ast
-from collections.abc import Iterable
-from collections.abc import MutableMapping
+from collections.abc import Iterable, MutableMapping
 from functools import partial
 from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset
-from django_upgrade.ast import is_rewritable_import_from
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
-from django_upgrade.tokens import replace
-from django_upgrade.tokens import update_import_names
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import replace, update_import_names
 
 fixer = Fixer(
     __name__,
@@ -129,10 +124,13 @@ def maybe_rewrite_import(
         return
 
     assert details.old_utc_import is not None
-    yield ast_start_offset(details.old_utc_import), partial(
-        update_import_names,
-        node=details.old_utc_import,
-        name_map={"utc": ""},
+    yield (
+        ast_start_offset(details.old_utc_import),
+        partial(
+            update_import_names,
+            node=details.old_utc_import,
+            name_map={"utc": ""},
+        ),
     )
 
     details.rewrite_scheduled = True

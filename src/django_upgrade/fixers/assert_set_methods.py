@@ -13,9 +13,7 @@ from functools import partial
 from tokenize_rt import Offset
 
 from django_upgrade.ast import ast_start_offset
-from django_upgrade.data import Fixer
-from django_upgrade.data import State
-from django_upgrade.data import TokenFunc
+from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import find_and_replace_name
 
 fixer = Fixer(
@@ -43,6 +41,7 @@ def visit_Call(
         and isinstance(func.value, ast.Name)
         and func.value.id == "self"
     ):
-        yield ast_start_offset(func), partial(
-            find_and_replace_name, name=name, new=NAMES[name]
+        yield (
+            ast_start_offset(func),
+            partial(find_and_replace_name, name=name, new=NAMES[name]),
         )

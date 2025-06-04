@@ -58,6 +58,11 @@ test = [
   "tokenize-rt",
 ]
 
+docs = [
+  "furo>=2024.8.6",
+  "sphinx>=7.4.7",
+]
+
 [tool.ruff]
 lint.select = [
   # flake8-bugbear

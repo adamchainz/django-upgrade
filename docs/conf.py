@@ -17,7 +17,10 @@ sys.path.insert(0, str(here / ".." / "src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "django-upgrade"
+with (here / ".." / "pyproject.toml").open("rb") as fp:
+    pyproject_toml_data = tomllib.load(fp)
+
+project = pyproject_toml_data["project"]["name"]
 copyright = "2021 Adam Johnson"
 author = "Adam Johnson"
 
@@ -25,15 +28,7 @@ author = "Adam Johnson"
 # for |version| and |release|, also used in various other places throughout
 # the built documents.
 
-
-def _get_version() -> str:
-    with (here / ".." / "pyproject.toml").open("rb") as fp:
-        data = tomllib.load(fp)
-    version: str = data["project"]["version"]
-    return version
-
-
-version = _get_version()
+version = pyproject_toml_data["project"]["version"]
 release = version
 
 # -- General configuration ---------------------------------------------------

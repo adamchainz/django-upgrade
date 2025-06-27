@@ -256,7 +256,7 @@ requires-dist = [{ name = "tokenize-rt", specifier = ">=4.1" }]
 docs = [
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "sphinx", specifier = ">=7.4.7" },
-    { name = "sphinx-build-compatibility", git = "https://github.com/readthedocs/sphinx-build-compatibility" },
+    { name = "sphinx-build-compatibility", git = "https://github.com/readthedocs/sphinx-build-compatibility?rev=4f304bd4562cdc96316f4fec82b264ca379d23e0" },
     { name = "sphinx-copybutton", specifier = ">=0.5.2" },
 ]
 test = [
@@ -634,7 +634,7 @@ wheels = [
 [[package]]
 name = "sphinx-build-compatibility"
 version = "0.0.1"
-source = { git = "https://github.com/readthedocs/sphinx-build-compatibility#58aabc5f207c6c2421f23d3578adc0b14af57047" }
+source = { git = "https://github.com/readthedocs/sphinx-build-compatibility?rev=4f304bd4562cdc96316f4fec82b264ca379d23e0#4f304bd4562cdc96316f4fec82b264ca379d23e0" }
 dependencies = [
     { name = "requests" },
     { name = "sphinx", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },

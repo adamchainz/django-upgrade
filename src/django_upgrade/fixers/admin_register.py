@@ -268,7 +268,7 @@ def visit_Call(
             if unregistered_names is True:
                 state_details[site_name] = True
             else:
-                existing_names = state_details.get(site_name, None)
+                existing_names = state_details.get(site_name)
                 if existing_names is None:
                     state_details[site_name] = unregistered_names
                 elif existing_names is not True:
@@ -314,4 +314,4 @@ def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
                 lines[name] = node.lineno
 
         site_definitions[module] = lines
-    return lines.get(site_name, None)
+    return lines.get(site_name)

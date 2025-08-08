@@ -61,3 +61,7 @@ For example:
 .. code-block:: sh
 
     django-upgrade --list-fixers
+
+.. option:: --check
+
+Show files that would be changed, but don’t modify them.

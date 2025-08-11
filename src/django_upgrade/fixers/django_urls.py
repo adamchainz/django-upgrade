@@ -196,7 +196,9 @@ def fix_url_call(
 ) -> None:
     new_name = "re_path"
     if regex_path is not None:
-        path = convert_path_syntax(regex_path.value, include_called)
+        regex_value = regex_path.value
+        assert isinstance(regex_value, str)
+        path = convert_path_syntax(regex_value, include_called)
         if path is not None:
             string_start_idx = find(tokens, i, name=STRING)
             string_end_idx = find_last_token(tokens, string_start_idx, node=regex_path)

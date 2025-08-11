@@ -73,6 +73,7 @@ def visit_Compare(
         and len(node.comparators) == 1
         and is_request_or_self_request_meta(node.comparators[0])
         and isinstance(node.left, ast.Constant)
+        and isinstance(node.left.value, str)
         and (header_name := get_header_name(node.left.value)) is not None
     ):
         yield (

@@ -42,6 +42,14 @@ def test_delete():
     )
 
 
+def test_in_not_string():
+    check_noop(
+        """\
+        123 in request.META
+        """,
+    )
+
+
 def test_in_not_header():
     check_noop(
         """\

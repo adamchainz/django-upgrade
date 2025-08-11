@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* Fix the ``request_headers`` fixer for non-string ``in`` comparisons like ``1 in request.META`` (unlikely in real code).
+
 1.25.0 (2025-05-13)
 -------------------
 

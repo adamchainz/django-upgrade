@@ -90,6 +90,34 @@ def test_main_file(tmp_path, capsys):
     assert path.read_text() == "from django.core.paginator import Paginator\n"
 
 
+def test_main_check(tmp_path, capsys):
+    initial_contents = "from django.core.paginator import QuerySetPaginator\n"
+    path = tmp_path / "example.py"
+    path.write_text(initial_contents)
+
+    result = main(["--check", str(path)])
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == f"Would rewrite {path}\n"
+    # Contents should be unchanged:
+    assert path.read_text() == initial_contents
+
+
+def test_main_check_stdin(capsys):
+    contents = b"from django.core.paginator import QuerySetPaginator\n"
+    stdin = io.TextIOWrapper(io.BytesIO(contents), "UTF-8")
+
+    with mock.patch.object(sys, "stdin", stdin):
+        result = main(["--check", "-"])
+
+    assert result == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == "Would rewrite stdin\n"
+
+
 def test_main_exit_zero_even_if_changed(tmp_path, capsys):
     path = tmp_path / "example.py"
     path.write_text("from django.core.paginator import QuerySetPaginator\n")
@@ -380,22 +408,3 @@ def test_main_list_fixers_filename(tmp_path, capsys):
     assert excinfo.value.code == 0
     # No change
     assert path.read_text() == source
-
-
-def test_main_check_only(tmp_path, capsys):
-    """
-    Main should not modify files when using --check.
-    """
-
-    initial_contents = "from django.core.paginator import QuerySetPaginator\n"
-    path = tmp_path / "example.py"
-    path.write_text(initial_contents)
-
-    result = main(["--check", str(path)])
-
-    assert result == 1
-    out, err = capsys.readouterr()
-    assert out == ""
-    assert err == f"Would rewrite {path}\n"
-    # Contents should be unchanged:
-    assert path.read_text() == initial_contents

@@ -23,6 +23,11 @@ __ https://packaging.python.org/en/latest/specifications/pyproject-toml/#depende
 
 If this doesn’t work, ``--target-version`` defaults to 2.2, the oldest supported Django version when django-upgrade was created.
 
+.. option:: --check
+
+Avoid writing any changed files back.
+Instead, exit with a non-zero status code if any files would have been modified, and zero otherwise.
+
 .. option:: --exit-zero-even-if-changed
 
 Exit with a zero return code even if files have changed.
@@ -61,7 +66,3 @@ For example:
 .. code-block:: sh
 
     django-upgrade --list-fixers
-
-.. option:: --check
-
-Show files that would be changed, but don’t modify them.

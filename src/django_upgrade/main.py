@@ -56,6 +56,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="The version of Django to target.",
     )
     parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Only output files to change, do not change files.",
+    )
+    parser.add_argument(
         "--exit-zero-even-if-changed",
         action="store_true",
         help="Exit with a zero return code even if files have changed.",
@@ -81,11 +86,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--list-fixers", nargs=0, action=ListFixersAction, help="List all fixer names."
     )
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="Only output files to change, do not change files.",
-    )
 
     args = parser.parse_args(argv)
 
@@ -101,7 +101,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             filename,
             settings,
             exit_zero_even_if_changed=args.exit_zero_even_if_changed,
-            write_to_file=not args.check,
+            check=args.check,
         )
 
     return ret
@@ -205,7 +205,7 @@ def fix_file(
     filename: str,
     settings: Settings,
     exit_zero_even_if_changed: bool,
-    write_to_file: bool,
+    check: bool,
 ) -> int:
     if filename == "-":
         contents_bytes = sys.stdin.buffer.read()
@@ -221,19 +221,26 @@ def fix_file(
 
     contents_text = apply_fixers(contents_text, settings, filename)
 
-    if filename == "-":
-        print(contents_text, end="")
-    elif contents_text != contents_text_orig:
-        if write_to_file:
-            print(f"Rewriting {filename}", file=sys.stderr)
-            with open(filename, "w", encoding="UTF-8", newline="") as f:
-                f.write(contents_text)
+    returncode = 0
+    if contents_text != contents_text_orig:
+        if check:
+            display_name = "stdin" if filename == "-" else filename
+            print(f"Would rewrite {display_name}", file=sys.stderr)
+            returncode = 1
         else:
-            print(f"Would rewrite {filename}", file=sys.stderr)
+            if filename == "-":
+                print(contents_text, end="")
+            else:
+                print(f"Rewriting {filename}", file=sys.stderr)
+                with open(filename, "w", encoding="UTF-8", newline="") as f:
+                    f.write(contents_text)
+                if not exit_zero_even_if_changed:
+                    returncode = 1
+    else:
+        if filename == "-" and not check:
+            print(contents_text, end="")
 
-    if exit_zero_even_if_changed or filename == "-":
-        return 0
-    return contents_text != contents_text_orig
+    return returncode
 
 
 def apply_fixers(contents_text: str, settings: Settings, filename: str) -> str:

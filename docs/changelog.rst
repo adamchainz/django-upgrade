@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.26.0 (2025-08-26)
+-------------------
+
 * Add ``--check`` option that only reports which files would be changed.
 
   Thanks to berzi in `PR #581 <https://github.com/adamchainz/django-upgrade/pull/581>`__.

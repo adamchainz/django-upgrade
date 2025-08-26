@@ -4,6 +4,12 @@ Changelog
 
 * Fix the ``request_headers`` fixer for non-string ``in`` comparisons like ``1 in request.META`` (unlikely in real code).
 
+  `PR #579 <https://github.com/adamchainz/django-upgrade/pull/579>`__.
+
+* Improve stdin handling: exit with code 0 even when changes were made for stdin, and print all other output to stderr.
+
+  `PR #583 <https://github.com/adamchainz/django-upgrade/pull/583>`__.
+
 1.25.0 (2025-05-13)
 -------------------
 

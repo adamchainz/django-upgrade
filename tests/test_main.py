@@ -74,8 +74,8 @@ def test_main_non_utf8_bytes(tmp_path, capsys):
 
     assert result == 1
     out, err = capsys.readouterr()
-    assert out == f"{path} is non-utf-8 (not supported)\n"
-    assert err == ""
+    assert out == ""
+    assert err == f"{path} is non-utf-8 (not supported)\n"
 
 
 def test_main_file(tmp_path, capsys):
@@ -121,7 +121,7 @@ def test_main_stdin_with_changes(capsys):
     with mock.patch.object(sys, "stdin", stdin):
         result = main(["-"])
 
-    assert result == 1
+    assert result == 0
     out, err = capsys.readouterr()
     assert out == "from django.core.paginator import Paginator\n"
     assert err == ""
@@ -178,11 +178,11 @@ dependencies = [
         assert get_target_version("auto") == expected
 
     out, err = capsys.readouterr()
+    assert out == ""
     assert (
-        out
+        err
         == f"Detected Django version from pyproject.toml: {expected[0]}.{expected[1]}\n"
     )
-    assert err == ""
 
 
 @pytest.mark.skipif(sys.version_info < (3, 11), reason="Python 3.11+")

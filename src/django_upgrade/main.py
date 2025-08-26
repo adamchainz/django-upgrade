@@ -184,7 +184,10 @@ def get_target_version(string: str) -> tuple[int, int]:
             major = int(match["major"])
             minor = int(match["minor"])
             if (major, minor) in SUPPORTED_TARGET_VERSIONS:
-                print(f"Detected Django version from pyproject.toml: {major}.{minor}")
+                print(
+                    f"Detected Django version from pyproject.toml: {major}.{minor}",
+                    file=sys.stderr,
+                )
                 return (major, minor)
 
     return default
@@ -204,7 +207,7 @@ def fix_file(
     try:
         contents_text_orig = contents_text = contents_bytes.decode()
     except UnicodeDecodeError:
-        print(f"{filename} is non-utf-8 (not supported)")
+        print(f"{filename} is non-utf-8 (not supported)", file=sys.stderr)
         return 1
 
     contents_text = apply_fixers(contents_text, settings, filename)
@@ -216,7 +219,7 @@ def fix_file(
         with open(filename, "w", encoding="UTF-8", newline="") as f:
             f.write(contents_text)
 
-    if exit_zero_even_if_changed:
+    if exit_zero_even_if_changed or filename == "-":
         return 0
     return contents_text != contents_text_orig
 

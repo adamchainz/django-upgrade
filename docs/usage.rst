@@ -39,3 +39,5 @@ __ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core
 .. code-block:: powershell
 
     git ls-files -- '*.py' | %{django-upgrade $_}
+
+The filename ``-`` makes django-upgrade read from standard input and write the updated contents to standard output.

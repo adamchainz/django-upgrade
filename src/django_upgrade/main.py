@@ -43,7 +43,9 @@ SUPPORTED_TARGET_VERSIONS = {
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="django-upgrade")
-    parser.add_argument("filenames", nargs="+")
+    parser.add_argument(
+        "filenames", nargs="+", help="Filenames to fix, or '-' for stdin."
+    )
     parser.add_argument(
         "--target-version",
         default="auto",

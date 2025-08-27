@@ -232,6 +232,8 @@ def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
         prefix, rest = remaining.split("(?P<", 1)
         group, remaining = rest.split(")", 1)
         group_name, group_regex = group.split(">", 1)
+        if not group_name.isidentifier():
+            return None
         try:
             converter = REGEX_TO_CONVERTER[group_regex]
         except KeyError:
@@ -242,10 +244,10 @@ def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
 
     path += remaining
 
-    dashless_path = path.replace("-", "")
-    if re.escape(dashless_path) != dashless_path:
+    path = re.sub(r"\\\.", ".", path)  # unescape literal dots
+
+    if not re.fullmatch(r"[a-zA-Z0-9_\-./<>:]*", path):
         # path still contains regex special characters
-        # dashes are ignored as they only have meaning in regexes within []
         return None
 
     return path

@@ -553,6 +553,21 @@ def test_re_path_multiple_import():
     )
 
 
+def test_re_path_dot():
+    check_transformed(
+        """\
+        from django.urls import re_path
+
+        re_path(r"^about\\.html$", views.about_json)
+        """,
+        """\
+        from django.urls import path
+
+        path("about.html", views.about_json)
+        """,
+    )
+
+
 def test_re_path_int_converter_1():
     check_transformed(
         """\
@@ -640,6 +655,21 @@ def test_re_path_uuid_converter():
         from django.urls import path
 
         path('uuid/<uuid:uuid>/', by_uuid)
+        """,
+    )
+
+
+def test_re_path_group_name_not_identifier():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+
+        url(r'^page/(?P<a-what>[0-9]+)/$', views.page)
+        """,
+        """\
+        from django.urls import re_path
+
+        re_path(r'^page/(?P<a-what>[0-9]+)/$', views.page)
         """,
     )
 

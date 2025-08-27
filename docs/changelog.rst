@@ -2,6 +2,19 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Improve :ref:`the django_urls fixer <django_urls>` slightly:
+
+  * Regular expression URLs with a ``.`` are now converted to ``path()`` syntax.
+
+    Thanks to Iteron-dev for the report in `Issue #567 <https://github.com/adamchainz/django-upgrade/issues/567>`__.
+
+  * Invalid group names are no longer converted to ``path()`` syntax.
+
+  `PR #584 <https://github.com/adamchainz/django-upgrade/pull/584>`__.
+
 1.26.0 (2025-08-26)
 -------------------
 

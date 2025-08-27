@@ -5,6 +5,12 @@ Changelog
 Unreleased
 ----------
 
+* Support Django 6.0 as a target version.
+
+* Add Django 6.0+ fixer :ref:`settings_forms_urlfield_assume_https <settings_forms_urlfield_assume_https>` to remove the transitional setting ``FORMS_URLFIELD_ASSUME_HTTPS``.
+
+  `PR #585 <https://github.com/adamchainz/django-upgrade/pull/585>`__.
+
 * Improve :ref:`the django_urls fixer <django_urls>` slightly:
 
   * Regular expression URLs with a ``.`` are now converted to ``path()`` syntax.

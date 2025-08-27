@@ -102,6 +102,27 @@ For example:
      class Example3Tests(TestCase):
          ...
 
+Django 6.0
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/dev/releases/6.0/>`__
+
+.. _settings_forms_urlfield_assume_https:
+
+``FORMS_URLFIELD_ASSUME_HTTPS`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``settings_forms_urlfield_assume_https``
+
+Removes the transitional setting ``FORMS_URLFIELD_ASSUME_HTTPS`` from settings files, as it no longer has any effect.
+
+Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+.. code-block:: diff
+
+    -FORMS_URLFIELD_ASSUME_HTTPS = True
+
 Django 5.2
 ----------
 

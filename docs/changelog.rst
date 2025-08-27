@@ -11,6 +11,10 @@ Unreleased
 
   `PR #585 <https://github.com/adamchainz/django-upgrade/pull/585>`__.
 
+* Add Django 6.0+ compatibility import rewrite of ``StringAgg`` from ``django.contrib.postgres.aggregates`` to ``django.db.models``.
+
+  `PR #586 <https://github.com/adamchainz/django-upgrade/pull/586>`__.
+
 * Improve :ref:`the django_urls fixer <django_urls>` slightly:
 
   * Regular expression URLs with a ``.`` are now converted to ``path()`` syntax.

@@ -123,6 +123,20 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
     -FORMS_URLFIELD_ASSUME_HTTPS = True
 
+Compatibility imports
+~~~~~~~~~~~~~~~~~~~~~
+
+Rewrites some compatibility imports:
+
+* ``StringAgg` from ``django.contrib.postgres.aggregates`` to use ``django.db.models``.
+
+  (This aggregate was `expanded to all database backends <https://docs.djangoproject.com/en/dev/releases/6.0/#models>`__ in Django 6.0.)
+
+.. code-block:: diff
+
+    -from django.contrib.postgres.aggregates import StringAgg
+    +from django.db.models import StringAgg
+
 Django 5.2
 ----------
 

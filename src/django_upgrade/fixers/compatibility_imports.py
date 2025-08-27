@@ -103,6 +103,14 @@ REPLACEMENTS_EXACT = {
             "TRANSLATOR_COMMENT_MARK": "django.utils.translation.template"
         }
     },
+    (6, 0): {
+        "django.contrib.postgres.aggregates": {
+            "StringAgg": "django.db.models",
+        },
+        "django.contrib.postgres.aggregates.general": {
+            "StringAgg": "django.db.models",
+        },
+    },
 }
 REPLACEMENTS_EXCEPT_MIGRATIONS = {
     (3, 1): {

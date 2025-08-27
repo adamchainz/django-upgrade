@@ -38,6 +38,7 @@ SUPPORTED_TARGET_VERSIONS = {
     (5, 0),
     (5, 1),
     (5, 2),
+    (6, 0),
 }
 
 

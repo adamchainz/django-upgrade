@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+1.27.0 (2025-08-27)
+-------------------
 
 * Support Django 6.0 as a target version.
 

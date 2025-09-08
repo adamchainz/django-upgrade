@@ -5,7 +5,7 @@ Installation
 Requirements
 ------------
 
-Python 3.9 to 3.13 supported.
+Python 3.9 to 3.14 supported.
 
 (Python 3.12+ is required to correctly apply fixes within f-strings.)
 

@@ -252,6 +252,41 @@ def test_looks_like_test_file_false(filename: str) -> None:
     assert not make_state(filename).looks_like_test_file
 
 
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "apps.py",
+        "myapp/apps.py",
+        "myapp\\apps.py",
+    ),
+)
+def test_looks_like_apps_file_true(filename: str) -> None:
+    assert make_state(filename).looks_like_apps_file
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "app.py",
+        "blog/app/article.py",
+        "blog\\app\\article.py",
+        "myapp\\apps\\file.py",
+        "myapp/blog/apps/article.py",
+        "myapp\\blog\\apps\\article.py",
+        "myapp/custom_apps.py",
+        "myapp\\custom_apps.py",
+        "myapp/custom_apps/file.py",
+        "myapp\\custom_apps\\file.py",
+        "myapp/apps_custom.py",
+        "myapp\\apps_custom.py",
+        "myapp/apps_custom/file.py",
+        "myapp\\apps_custom\\file.py",
+    ),
+)
+def test_looks_like_apps_file_false(filename: str) -> None:
+    assert not make_state(filename).looks_like_apps_file
+
+
 def test_all_fixers_are_documented() -> None:
     readme = (Path(__name__).parent.parent / "docs/fixers.rst").read_text()
     docs = {m[1] for m in re.finditer(r"\*\*Name:\*\* ``(.+)``", readme, re.MULTILINE)}

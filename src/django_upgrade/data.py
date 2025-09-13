@@ -34,6 +34,7 @@ class Settings:
         }
 
 
+apps_re = re.compile(r"(^|[\\/])apps\.py$")
 admin_re = re.compile(r"(\b|_)admin(\b|_)")
 commands_re = re.compile(r"(^|[\\/])management[\\/]commands[\\/]")
 dunder_init_re = re.compile(r"(^|[\\/])__init__\.py$")
@@ -55,6 +56,10 @@ class State:
         self.settings = settings
         self.filename = filename
         self.from_imports = from_imports
+
+    @cached_property
+    def looks_like_apps_file(self) -> bool:
+        return apps_re.search(self.filename) is not None
 
     @cached_property
     def looks_like_admin_file(self) -> bool:

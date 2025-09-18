@@ -128,7 +128,7 @@ Compatibility imports
 
 Rewrites some compatibility imports:
 
-* ``StringAgg` from ``django.contrib.postgres.aggregates`` to use ``django.db.models``.
+* ``StringAgg`` from ``django.contrib.postgres.aggregates`` to use ``django.db.models``.
 
   (This aggregate was `expanded to all database backends <https://docs.djangoproject.com/en/dev/releases/6.0/#models>`__ in Django 6.0.)
 

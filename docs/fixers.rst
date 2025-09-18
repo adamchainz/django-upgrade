@@ -137,6 +137,33 @@ Rewrites some compatibility imports:
     -from django.contrib.postgres.aggregates import StringAgg
     +from django.db.models import StringAgg
 
+.. _default_auto_field:
+
+``DEFAULT_AUTO_FIELD`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``default_auto_field``
+
+Removes the deprecated ``DEFAULT_AUTO_FIELD`` setting if set to its default value of ``django.db.models.BigAutoField``.
+
+.. code-block:: diff
+
+    -DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+    class Settings:
+      -DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+Removes the deprecated ``default_auto_field`` attribute of appconfig classes if set to its default value of ``django.db.models.BigAutoField``.
+
+.. code-block:: diff
+
+    from django.apps import AppConfig
+
+    class DefaultConfig(AppConfig):
+        name = 'default'
+        verbose_name = 'default'
+        -default_auto_field = 'django.db.models.BigAutoField'
+
 Django 5.2
 ----------
 

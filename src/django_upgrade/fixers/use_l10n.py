@@ -38,6 +38,7 @@ def visit_Assign(
             isinstance(parents[-1], ast.Module)
             or (
                 isinstance(parents[-1], ast.ClassDef)
+                and len(parents[-1].body) > 1
                 and isinstance(parents[-2], ast.Module)
             )
         )

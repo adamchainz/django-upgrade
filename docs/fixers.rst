@@ -144,12 +144,13 @@ __ https://docs.djangoproject.com/en/6.0/releases/6.0/#default-auto-field-settin
 .. _stringagg:
 
 ``StringAgg`` aggregate move
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Name:** ``stringagg``
 
 Rewrites imports of ``StringAgg`` from ``django.contrib.postgres.aggregates`` to the new all-database version in ``django.db.models``, per `this change <https://docs.djangoproject.com/en/dev/releases/6.0/#models:~:text=The%20new%20StringAgg%20aggregate>`__.
-Updates any calls that passed ``delimiter`` as a string literal to wrap it in ``Value()``, if ``django.db.models`` is already imported or imported from.
+Updates any calls that passed ``delimiter`` as a string literal to wrap it in ``Value()``.
+These changes only apply if all ``StringAgg`` calls can be updated.
 
 .. code-block:: diff
 

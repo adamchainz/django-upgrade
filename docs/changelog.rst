@@ -14,6 +14,11 @@ Unreleased
 
   Thanks to q0w in `PR #591 <https://github.com/adamchainz/django-upgrade/pull/591>`__.
 
+* Add Django 6.0+ fixer :ref:`stringagg <stringagg>` to rewrite ``StringAgg`` imports from ``django.contrib.postgres.aggregates`` to ``django.db.models``.
+  This fixer replaces the compatibility import rewrite added in 1.27.0, and now correctly wraps the ``delimiter`` argument in ``Value()`` when it is a string literal.
+
+  `PR #596 <https://github.com/adamchainz/django-upgrade/pull/596>`__.
+
 1.28.0 (2025-09-09)
 -------------------
 

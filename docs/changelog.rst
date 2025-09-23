@@ -7,7 +7,7 @@ Unreleased
 
 * Add Django 6.0 fixer :ref:`default_auto_field <default_auto_field>` to remove deprecated default_auto_field setting if set to `django.db.models.BigAutoField`.
 
-  `PR #591 <https://github.com/adamchainz/django-upgrade/pull/591>`__.
+  Thanks to q0w in `PR #591 <https://github.com/adamchainz/django-upgrade/pull/591>`__.
 
 1.28.0 (2025-09-09)
 -------------------

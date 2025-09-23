@@ -21,6 +21,7 @@ from django_upgrade.tokens import OP, find_last_token, reverse_find
 fixer = Fixer(
     __name__,
     min_version=(5, 0),
+    condition=lambda state: state.looks_like_models_file,
 )
 
 # Cache defined enumeration types by module
@@ -101,29 +102,25 @@ def visit_Call(
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        state.looks_like_models_file
+        (
+            isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+            and node.func.attr.endswith("Field")
+        )
+        or (isinstance(node.func, ast.Name) and node.func.id.endswith("Field"))
+    ) and any(
+        kw.arg == "choices"
+        and isinstance(kw.value, ast.Attribute)
+        and (target_node := kw.value).attr == "choices"
+        and isinstance(target_node.value, ast.Name)
         and (
-            (
-                isinstance(node.func, ast.Attribute)
-                and isinstance(node.func.value, ast.Name)
-                and node.func.attr.endswith("Field")
+            target_node.value.id
+            in defined_enumeration_types(
+                cast(ast.Module, parents[0]),
+                node.lineno,
             )
-            or (isinstance(node.func, ast.Name) and node.func.id.endswith("Field"))
         )
-        and any(
-            kw.arg == "choices"
-            and isinstance(kw.value, ast.Attribute)
-            and (target_node := kw.value).attr == "choices"
-            and isinstance(target_node.value, ast.Name)
-            and (
-                target_node.value.id
-                in defined_enumeration_types(
-                    cast(ast.Module, parents[0]),
-                    node.lineno,
-                )
-            )
-            for kw in node.keywords
-        )
+        for kw in node.keywords
     ):
         yield ast_start_offset(target_node), partial(remove_choices, node=target_node)
 

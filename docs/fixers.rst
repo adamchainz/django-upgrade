@@ -105,7 +105,44 @@ For example:
 Django 6.0
 ----------
 
-`Release Notes <https://docs.djangoproject.com/en/dev/releases/6.0/>`__
+`Release Notes <https://docs.djangoproject.com/en/6.0/releases/6.0/>`__
+
+.. _default_auto_field:
+
+Default auto field
+~~~~~~~~~~~~~~~~~~
+
+**Name:** ``default_auto_field``
+
+Per |DEFAULT_AUTO_FIELD setting now defaults to BigAutoField|__, this fixer removes two now-redundant ways to specify the default auto field class, if they are set to the new default value of ``django.db.models.BigAutoField``.
+
+.. |DEFAULT_AUTO_FIELD setting now defaults to BigAutoField| replace:: ``DEFAULT_AUTO_FIELD`` setting now defaults to BigAutoField
+__ https://docs.djangoproject.com/en/6.0/releases/6.0/#default-auto-field-setting-now-defaults-to-bigautofield
+
+1. The ``DEFAULT_AUTO_FIELD`` setting in settings files:
+
+   .. code-block:: diff
+
+      -DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+       class Settings:
+      -    DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+   Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
+   For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+2. The ``default_auto_field`` attribute of ``AppConfig`` classes:
+
+   .. code-block:: diff
+
+       from django.apps import AppConfig
+
+       class GelatoConfig(AppConfig):
+           name = 'gelato'
+           verbose_name = 'Gelato'
+      -    default_auto_field = 'django.db.models.BigAutoField'
+
+   ``AppConfig`` classes are only rewritten within ``apps.py`` files.
 
 .. _settings_forms_urlfield_assume_https:
 
@@ -136,33 +173,6 @@ Rewrites some compatibility imports:
 
     -from django.contrib.postgres.aggregates import StringAgg
     +from django.db.models import StringAgg
-
-.. _default_auto_field:
-
-``DEFAULT_AUTO_FIELD`` setting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Name:** ``default_auto_field``
-
-Removes the deprecated ``DEFAULT_AUTO_FIELD`` setting if set to its default value of ``django.db.models.BigAutoField``.
-
-.. code-block:: diff
-
-    -DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-    class Settings:
-      -DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-Removes the deprecated ``default_auto_field`` attribute of appconfig classes if set to its default value of ``django.db.models.BigAutoField``.
-
-.. code-block:: diff
-
-    from django.apps import AppConfig
-
-    class DefaultConfig(AppConfig):
-        name = 'default'
-        verbose_name = 'default'
-        -default_auto_field = 'django.db.models.BigAutoField'
 
 Django 5.2
 ----------

@@ -35,7 +35,6 @@ def test_only_postgres_import_no_calls():
 
 
 def test_unsafe_delimiter_variable():
-    # Should not transform because delimiter uses variable
     check_noop(
         """\
         from django.contrib.postgres.aggregates import StringAgg
@@ -47,7 +46,6 @@ def test_unsafe_delimiter_variable():
 
 
 def test_unsafe_delimiter_expression():
-    # Should not transform because delimiter uses expression
     check_noop(
         """\
         from django.contrib.postgres.aggregates import StringAgg
@@ -57,8 +55,27 @@ def test_unsafe_delimiter_expression():
     )
 
 
+def test_zero_arguments():
+    check_noop(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+
+        StringAgg()
+        """,
+    )
+
+
+def test_one_argument():
+    check_noop(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+
+        StringAgg("name")
+        """,
+    )
+
+
 def test_mixed_safe_and_unsafe_delimiters():
-    # Should not transform because one call has unsafe delimiter
     check_noop(
         """\
         from django.contrib.postgres.aggregates import StringAgg
@@ -69,24 +86,7 @@ def test_mixed_safe_and_unsafe_delimiters():
     )
 
 
-def test_safe_no_delimiter():
-    # Should transform when StringAgg has no delimiter
-    check_transformed(
-        """\
-        from django.contrib.postgres.aggregates import StringAgg
-
-        StringAgg("name")
-        """,
-        """\
-        from django.db.models import StringAgg
-
-        StringAgg("name")
-        """,
-    )
-
-
-def test_safe_string_literal_delimiter():
-    # Should transform when all delimiters are string literals
+def test_success():
     check_transformed(
         """\
         from django.contrib.postgres.aggregates import StringAgg
@@ -101,8 +101,41 @@ def test_safe_string_literal_delimiter():
     )
 
 
+def test_success_models_imported():
+    check_transformed(
+        """\
+        from django.db.models import Model
+        from django.contrib.postgres.aggregates import StringAgg
+
+        StringAgg("name", delimiter=", ")
+        """,
+        """\
+        from django.db.models import Model
+        from django.db.models import StringAgg, Value
+
+        StringAgg("name", delimiter=Value(", "))
+        """,
+    )
+
+
+def test_success_models_value_imported():
+    check_transformed(
+        """\
+        from django.db.models import Model, Value
+        from django.contrib.postgres.aggregates import StringAgg
+
+        StringAgg("name", delimiter=", ")
+        """,
+        """\
+        from django.db.models import Model, Value
+        from django.db.models import StringAgg
+
+        StringAgg("name", delimiter=Value(", "))
+        """,
+    )
+
+
 def test_safe_value_wrapped_delimiter():
-    # Should transform when delimiter is already wrapped in Value
     check_transformed(
         """\
         from django.contrib.postgres.aggregates import StringAgg
@@ -119,7 +152,6 @@ def test_safe_value_wrapped_delimiter():
 
 
 def test_multiple_safe_calls_mixed_delimiters():
-    # Should transform when all calls have safe delimiters (mix of string literals and Value)
     check_transformed(
         """\
         from django.contrib.postgres.aggregates import StringAgg
@@ -140,7 +172,6 @@ def test_multiple_safe_calls_mixed_delimiters():
 
 
 def test_general_import():
-    # Should transform imports from .general submodule
     check_transformed(
         """\
         from django.contrib.postgres.aggregates.general import StringAgg
@@ -156,7 +187,6 @@ def test_general_import():
 
 
 def test_multiple_imports_with_stringagg():
-    # Should transform only StringAgg import, keeping others
     check_transformed(
         """\
         from django.contrib.postgres.aggregates import ArrayAgg, StringAgg, JSONBAgg
@@ -173,7 +203,6 @@ def test_multiple_imports_with_stringagg():
 
 
 def test_existing_db_models_import():
-    # Should add to existing django.db.models import
     check_transformed(
         """\
         from django.db.models import Model
@@ -222,7 +251,6 @@ def test_attr_import_aggregates():
 
 
 def test_attr_import_unsafe_delimiter():
-    # Should not transform attribute-style call with unsafe delimiter
     check_noop(
         """\
         from django.contrib.postgres import aggregates
@@ -301,7 +329,6 @@ def test_stringagg_with_alias():
 
 
 def test_existing_value_import():
-    # Should not duplicate Value import
     check_transformed(
         """\
         from django.contrib.postgres.aggregates import StringAgg

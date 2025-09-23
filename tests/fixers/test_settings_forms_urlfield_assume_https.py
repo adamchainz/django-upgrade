@@ -103,60 +103,93 @@ def test_success_with_other_lines():
     )
 
 
-def test_success_with_class_based_settings():
-    check_transformed(
+def test_class_not_settings_file():
+    check_noop(
         """\
-        class BaseSettings:
-            SETTINGS_1 = True
+        class Settings:
+            ADMINS = []
             FORMS_URLFIELD_ASSUME_HTTPS = True
-            SETTINGS_2 = True
         """,
-        """\
-        class BaseSettings:
-            SETTINGS_1 = True
-            SETTINGS_2 = True
-        """,
-        filename="myapp/settings/base.py",
     )
 
 
-def test_success_with_class_based_settings_inherited():
-    check_transformed(
+def test_class_false():
+    check_noop(
         """\
-        class BaseSettings:
-            SETTINGS_1 = True
-            FORMS_URLFIELD_ASSUME_HTTPS = True
-
-        class ProdSettings(BaseSettings):
-            SETTINGS_2 = True
-            FORMS_URLFIELD_ASSUME_HTTPS = True
+        class Settings:
+            ADMINS = []
+            FORMS_URLFIELD_ASSUME_HTTPS = False
         """,
-        """\
-        class BaseSettings:
-            SETTINGS_1 = True
-
-        class ProdSettings(BaseSettings):
-            SETTINGS_2 = True
-        """,
-        filename="myapp/settings/base.py",
+        filename="myapp/settings.py",
     )
 
 
-def test_success_with_class_based_configurations():
+def test_class_dynamic():
+    check_noop(
+        """\
+        import os
+        class Settings:
+            ADMINS = []
+            FORMS_URLFIELD_ASSUME_HTTPS = os.environ["FORMS_URLFIELD_ASSUME_HTTPS"]
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_ignore_conditional():
+    check_noop(
+        """\
+        class Settings:
+            ADMINS = []
+            if something:
+                FORMS_URLFIELD_ASSUME_HTTPS = True
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_only_assignment():
+    check_noop(
+        """\
+        class Settings:
+            FORMS_URLFIELD_ASSUME_HTTPS = True
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_success():
     check_transformed(
         """\
-        DEBUG = False
-        FORMS_URLFIELD_ASSUME_HTTPS = True
-
-        class Dev(Configuration):
-            DEBUG = True
+        class Settings:
+            ADMINS = []
             FORMS_URLFIELD_ASSUME_HTTPS = True
         """,
         """\
-        DEBUG = False
+        class Settings:
+            ADMINS = []
+        """,
+        filename="myapp/settings.py",
+    )
 
-        class Dev(Configuration):
-            DEBUG = True
+
+def test_class_success_with_inheritance():
+    check_transformed(
+        """\
+        class BaseSettings:
+            ADMINS = []
+            FORMS_URLFIELD_ASSUME_HTTPS = True
+
+        class ProdSettings(BaseSettings):
+            ADMINS = []
+            FORMS_URLFIELD_ASSUME_HTTPS = True
+        """,
+        """\
+        class BaseSettings:
+            ADMINS = []
+
+        class ProdSettings(BaseSettings):
+            ADMINS = []
         """,
         filename="myapp/settings/base.py",
     )

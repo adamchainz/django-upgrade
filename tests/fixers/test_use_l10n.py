@@ -103,60 +103,95 @@ def test_success_with_other_lines():
     )
 
 
-def test_success_with_class_based_settings():
+def test_class_not_settings_file():
+    check_noop(
+        """\
+        class Settings:
+            ADMINS = []
+            USE_L10N = True
+        """,
+    )
+
+
+def test_class_false():
+    check_noop(
+        """\
+        class Settings:
+            ADMINS = []
+            USE_L10N = False
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_dynamic():
+    check_noop(
+        """\
+        import os
+        class Settings:
+            ADMINS = []
+            USE_L10N = os.environ["USE_L10N"]
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_only_assignment():
+    check_noop(
+        """\
+        class Settings:
+            USE_L10N = True
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_ignore_conditional():
+    check_noop(
+        """\
+        class Settings:
+            ADMINS = []
+            if something:
+                USE_L10N = True
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_class_success():
     check_transformed(
         """\
-        class BaseSettings:
-            SETTINGS_1 = True
+        class Settings:
+            ADMINS = []
             USE_L10N = True
-            SETTINGS_2 = True
+            MANAGERS = []
         """,
         """\
-        class BaseSettings:
-            SETTINGS_1 = True
-            SETTINGS_2 = True
+        class Settings:
+            ADMINS = []
+            MANAGERS = []
         """,
         filename="myapp/settings/base.py",
     )
 
 
-def test_success_with_class_based_settings_inherited():
+def test_class_success_inheritance():
     check_transformed(
         """\
         class BaseSettings:
-            SETTINGS_1 = True
+            ADMINS = []
             USE_L10N = True
 
         class ProdSettings(BaseSettings):
-            SETTINGS_2 = True
+            ADMINS = []
             USE_L10N = True
         """,
         """\
         class BaseSettings:
-            SETTINGS_1 = True
+            ADMINS = []
 
         class ProdSettings(BaseSettings):
-            SETTINGS_2 = True
-        """,
-        filename="myapp/settings/base.py",
-    )
-
-
-def test_success_with_class_based_configurations():
-    check_transformed(
-        """\
-        DEBUG = False
-        USE_L10N = True
-
-        class Dev(Configuration):
-            DEBUG = True
-            USE_L10N = True
-        """,
-        """\
-        DEBUG = False
-
-        class Dev(Configuration):
-            DEBUG = True
+            ADMINS = []
         """,
         filename="myapp/settings/base.py",
     )

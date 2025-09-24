@@ -12,6 +12,7 @@ check_transformed = partial(tools.check_transformed, settings=settings)
 
 # NOOP tests first
 
+
 def test_unmatched_import():
     check_noop(
         """\
@@ -85,6 +86,7 @@ def test_different_attribute_name():
 
 
 # Transformation tests - one per email function
+
 
 def test_send_mail_excess_positional():
     # 5th argument (fail_silently) should be converted to keyword
@@ -185,13 +187,14 @@ def test_mixed_excess_and_keyword_args():
 
 # Test various indentation patterns
 
+
 def test_multiline_with_excess_args():
     check_transformed(
         """\
         from django.core.mail import send_mail
         send_mail(
             "Subject",
-            "Message", 
+            "Message",
             "from@example.com",
             ["to@example.com"],
             True
@@ -201,7 +204,7 @@ def test_multiline_with_excess_args():
         from django.core.mail import send_mail
         send_mail(
             "Subject",
-            "Message", 
+            "Message",
             "from@example.com",
             ["to@example.com"],
             fail_silently=True

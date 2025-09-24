@@ -49,29 +49,36 @@ def visit_Call(
     node: ast.Call,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    func_name = None
-    
-    # Check for direct import: from django.core.mail import send_mail
+    # Check for direct import or module import and get function config
     if (
-        isinstance(node.func, ast.Name)
-        and node.func.id in EMAIL_FUNCTION_CONFIG
-        and node.func.id in state.from_imports[MODULE]
+        (
+            isinstance(node.func, ast.Name)
+            and (func_name := node.func.id) in EMAIL_FUNCTION_CONFIG
+            and func_name in state.from_imports[MODULE]
+        )
+        or (
+            isinstance(node.func, ast.Attribute)
+            and (func_name := node.func.attr) in EMAIL_FUNCTION_CONFIG
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "mail"
+            and "mail" in state.from_imports["django.core"]
+        )
     ):
-        func_name = node.func.id
-    # Check for module import: from django.core import mail; mail.send_mail(...)
-    elif (
-        isinstance(node.func, ast.Attribute)
-        and node.func.attr in EMAIL_FUNCTION_CONFIG
-        and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "mail"
-        and "mail" in state.from_imports["django.core"]
-    ):
-        func_name = node.func.attr
-    
-    if func_name is not None:
         config = EMAIL_FUNCTION_CONFIG[func_name]
         num_positional_args = len(node.args)
         max_allowed_positional = config["max_positional"]
+        
+        # Guard against having more args than we know about
+        if num_positional_args > max_allowed_positional + len(config["keyword_params"]):
+            return
+        
+        # Guard against existing keyword-only arguments already being keywords
+        # Only check for keyword-only parameters that would be converted from positional
+        existing_kwarg_names = {kw.arg for kw in node.keywords}
+        excess_positional_count = num_positional_args - max_allowed_positional
+        excess_param_names = config["keyword_params"][:excess_positional_count]
+        if any(param in existing_kwarg_names for param in excess_param_names):
+            return
         
         # Only transform if there are more positional args than allowed
         if num_positional_args > max_allowed_positional:

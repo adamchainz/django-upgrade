@@ -179,10 +179,10 @@ Converts excess positional arguments to keyword arguments for Django email funct
 
 This fixer only converts positional arguments beyond the allowed count:
 
-* ``send_mail()`` - converts 5th argument and beyond to keywords (``fail_silently``, ``auth_user``, etc.)
-* ``send_mass_mail()`` - converts 2nd argument and beyond to keywords (``fail_silently``, ``auth_user``, etc.)
-* ``mail_admins()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, etc.)
-* ``mail_managers()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, etc.)
+* ``send_mail()`` - converts 5th argument and beyond to keywords (``fail_silently``, ``auth_user``, ``auth_password``, ``connection``, ``html_message``)
+* ``send_mass_mail()`` - converts 2nd argument and beyond to keywords (``fail_silently``, ``auth_user``, ``auth_password``, ``connection``)
+* ``mail_admins()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, ``html_message``)
+* ``mail_managers()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, ``html_message``)
 
 The first few arguments of each function can still be passed positionally and are not converted.
 

@@ -160,6 +160,30 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
     -FORMS_URLFIELD_ASSUME_HTTPS = True
 
+Email APIs
+~~~~~~~~~~
+
+**Name:** ``email_apis``
+
+Converts positional arguments to keyword arguments for Django email functions, as their positional arguments were deprecated.
+
+.. code-block:: diff
+
+     from django.core.mail import send_mail, mail_admins
+
+    -send_mail("Subject", "Message", "from@example.com", ["to@example.com"])
+    +send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
+
+    -mail_admins("Admin Subject", "Admin Message")
+    +mail_admins(subject="Admin Subject", message="Admin Message")
+
+This fixer handles the following functions:
+
+* ``send_mail(subject, message, from_email, recipient_list, ...)``
+* ``send_mass_mail(datatuple, ...)``
+* ``mail_admins(subject, message, ...)``
+* ``mail_managers(subject, message, ...)``
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

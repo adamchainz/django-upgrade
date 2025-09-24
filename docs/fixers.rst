@@ -184,8 +184,6 @@ This fixer only converts positional arguments beyond the allowed count:
 * ``mail_admins()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, ``html_message``)
 * ``mail_managers()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, ``html_message``)
 
-The first few arguments of each function can still be passed positionally and are not converted.
-
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

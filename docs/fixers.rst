@@ -165,24 +165,26 @@ Email APIs
 
 **Name:** ``email_apis``
 
-Converts positional arguments to keyword arguments for Django email functions, as their positional arguments were deprecated.
+Converts excess positional arguments to keyword arguments for Django email functions, as some positional arguments were deprecated in Django 6.0.
 
 .. code-block:: diff
 
      from django.core.mail import send_mail, mail_admins
 
-    -send_mail("Subject", "Message", "from@example.com", ["to@example.com"])
-    +send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
+    -send_mail("Subject", "Message", "from@example.com", ["to@example.com"], True)
+    +send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=True)
 
-    -mail_admins("Admin Subject", "Admin Message")
-    +mail_admins(subject="Admin Subject", message="Admin Message")
+    -mail_admins("Admin Subject", "Admin Message", False)
+    +mail_admins("Admin Subject", "Admin Message", fail_silently=False)
 
-This fixer handles the following functions:
+This fixer only converts positional arguments beyond the allowed count:
 
-* ``send_mail(subject, message, from_email, recipient_list, ...)``
-* ``send_mass_mail(datatuple, ...)``
-* ``mail_admins(subject, message, ...)``
-* ``mail_managers(subject, message, ...)``
+* ``send_mail()`` - converts 5th argument and beyond to keywords (``fail_silently``, ``auth_user``, etc.)
+* ``send_mass_mail()`` - converts 2nd argument and beyond to keywords (``fail_silently``, ``auth_user``, etc.)
+* ``mail_admins()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, etc.)
+* ``mail_managers()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, etc.)
+
+The first few arguments of each function can still be passed positionally and are not converted.
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~

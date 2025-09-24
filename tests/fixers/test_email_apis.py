@@ -14,216 +14,151 @@ def test_unmatched_import():
     check_noop(
         """\
         from example import send_mail
-        send_mail("Subject", "Message", "from@example.com", ["to@example.com"])
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], True)
         """,
     )
 
 
-def test_no_positional_arguments():
+def test_no_excess_positional_arguments():
+    # These should NOT be transformed - all args are within allowed positional count
     check_noop(
         """\
-        from django.core.mail import send_mail
-        send_mail(
-            subject="Subject", 
-            message="Message", 
-            from_email="from@example.com",
-            recipient_list=["to@example.com"]
-        )
-        """,
-    )
-
-
-def test_send_mail_direct_import():
-    check_transformed(
-        """\
-        from django.core.mail import send_mail
+        from django.core.mail import send_mail, mail_admins, send_mass_mail, mail_managers
         send_mail("Subject", "Message", "from@example.com", ["to@example.com"])
-        """,
-        """\
-        from django.core.mail import send_mail
-        send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
-        """,
-    )
-
-
-def test_send_mail_module_import():
-    check_transformed(
-        """\
-        from django.core import mail
-        mail.send_mail("Subject", "Message", "from@example.com", ["to@example.com"])
-        """,
-        """\
-        from django.core import mail
-        mail.send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
-        """,
-    )
-
-
-def test_send_mail_partial_args():
-    check_transformed(
-        """\
-        from django.core.mail import send_mail
-        send_mail("Subject", "Message")
-        """,
-        """\
-        from django.core.mail import send_mail
-        send_mail(subject="Subject", message="Message")
-        """,
-    )
-
-
-def test_send_mail_with_existing_kwargs():
-    check_transformed(
-        """\
-        from django.core.mail import send_mail
-        send_mail(
-            "Subject", 
-            "Message", 
-            "from@example.com", 
-            ["to@example.com"],
-            fail_silently=True
-        )
-        """,
-        """\
-        from django.core.mail import send_mail
-        send_mail(
-            subject="Subject", 
-            message="Message", 
-            from_email="from@example.com", 
-            recipient_list=["to@example.com"],
-            fail_silently=True
-        )
-        """,
-    )
-
-
-def test_send_mass_mail():
-    check_transformed(
-        """\
-        from django.core.mail import send_mass_mail
-        send_mass_mail([
-            ("Subject1", "Message1", "from@example.com", ["to1@example.com"]),
-            ("Subject2", "Message2", "from@example.com", ["to2@example.com"]),
-        ])
-        """,
-        """\
-        from django.core.mail import send_mass_mail
-        send_mass_mail(datatuple=[
-            ("Subject1", "Message1", "from@example.com", ["to1@example.com"]),
-            ("Subject2", "Message2", "from@example.com", ["to2@example.com"]),
-        ])
-        """,
-    )
-
-
-def test_mail_admins():
-    check_transformed(
-        """\
-        from django.core.mail import mail_admins
         mail_admins("Subject", "Message")
-        """,
-        """\
-        from django.core.mail import mail_admins
-        mail_admins(subject="Subject", message="Message")
-        """,
-    )
-
-
-def test_mail_managers():
-    check_transformed(
-        """\
-        from django.core.mail import mail_managers
+        send_mass_mail([("S", "M", "F", ["T"])])
         mail_managers("Subject", "Message")
         """,
+    )
+
+
+def test_send_mail_excess_positional():
+    # 5th argument (fail_silently) should be converted to keyword
+    check_transformed(
+        """\
+        from django.core.mail import send_mail
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], True)
+        """,
+        """\
+        from django.core.mail import send_mail
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=True)
+        """,
+    )
+
+
+def test_send_mail_multiple_excess_args():
+    # 5th, 6th, 7th arguments should be converted to keywords
+    check_transformed(
+        """\
+        from django.core.mail import send_mail
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], False, "user", "pass")
+        """,
+        """\
+        from django.core.mail import send_mail
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=False, auth_user="user", auth_password="pass")
+        """,
+    )
+
+
+def test_send_mass_mail_excess_positional():
+    # 2nd argument (fail_silently) should be converted to keyword
+    check_transformed(
+        """\
+        from django.core.mail import send_mass_mail
+        send_mass_mail([("S1", "M1", "F", ["T1"]), ("S2", "M2", "F", ["T2"])], True)
+        """,
+        """\
+        from django.core.mail import send_mass_mail
+        send_mass_mail([("S1", "M1", "F", ["T1"]), ("S2", "M2", "F", ["T2"])], fail_silently=True)
+        """,
+    )
+
+
+def test_mail_admins_excess_positional():
+    # 3rd argument (fail_silently) should be converted to keyword
+    check_transformed(
+        """\
+        from django.core.mail import mail_admins
+        mail_admins("Admin Subject", "Admin Message", False)
+        """,
+        """\
+        from django.core.mail import mail_admins
+        mail_admins("Admin Subject", "Admin Message", fail_silently=False)
+        """,
+    )
+
+
+def test_mail_managers_excess_positional():
+    # 3rd argument (fail_silently) should be converted to keyword
+    check_transformed(
         """\
         from django.core.mail import mail_managers
-        mail_managers(subject="Subject", message="Message")
+        mail_managers("Manager Subject", "Manager Message", True)
+        """,
+        """\
+        from django.core.mail import mail_managers
+        mail_managers("Manager Subject", "Manager Message", fail_silently=True)
         """,
     )
 
 
-def test_mail_admins_with_kwargs():
+def test_module_import_excess_args():
     check_transformed(
         """\
-        from django.core.mail import mail_admins
-        mail_admins("Subject", "Message", fail_silently=False)
+        from django.core import mail
+        mail.send_mail("Subject", "Message", "from@example.com", ["to@example.com"], True)
         """,
         """\
-        from django.core.mail import mail_admins
-        mail_admins(subject="Subject", message="Message", fail_silently=False)
+        from django.core import mail
+        mail.send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=True)
         """,
     )
 
 
-def test_multiple_functions():
-    check_transformed(
-        """\
-        from django.core.mail import send_mail, mail_admins
-        send_mail("Subject", "Message", "from@example.com", ["to@example.com"])
-        mail_admins("Admin Subject", "Admin Message")
-        """,
-        """\
-        from django.core.mail import send_mail, mail_admins
-        send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
-        mail_admins(subject="Admin Subject", message="Admin Message")
-        """,
-    )
-
-
-def test_mixed_positional_and_keyword_args():
+def test_mixed_excess_and_keyword_args():
+    # 5th positional arg should become keyword, existing keywords preserved
     check_transformed(
         """\
         from django.core.mail import send_mail
-        send_mail("Subject", "Message", from_email="from@example.com", recipient_list=["to@example.com"])
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], False, connection=None)
         """,
         """\
         from django.core.mail import send_mail
-        send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=False, connection=None)
         """,
     )
 
 
-def test_only_some_positional_args():
-    check_transformed(
-        """\
-        from django.core.mail import send_mail
-        send_mail("Subject", "Message", "from@example.com")
-        """,
-        """\
-        from django.core.mail import send_mail
-        send_mail(subject="Subject", message="Message", from_email="from@example.com")
-        """,
-    )
-
-
-def test_multiline_with_whitespace():
+def test_multiline_with_excess_args():
     check_transformed(
         """\
         from django.core.mail import send_mail
         send_mail(
             "Subject",
-            "Message",
+            "Message", 
             "from@example.com",
-            ["to@example.com"]
+            ["to@example.com"],
+            True
         )
         """,
         """\
         from django.core.mail import send_mail
         send_mail(
-            subject="Subject",
-            message="Message",
-            from_email="from@example.com",
-            recipient_list=["to@example.com"]
+            "Subject",
+            "Message", 
+            "from@example.com",
+            ["to@example.com"],
+            fail_silently=True
         )
         """,
     )
 
 
-def test_already_has_keyword_args():
-    # Should not transform if already has keyword arguments for positional params
+def test_already_using_keywords():
+    # Should not transform if already using keyword arguments
     check_noop(
         """\
         from django.core.mail import send_mail
-        send_mail(subject="Subject", message="Message", from_email="from@example.com", recipient_list=["to@example.com"])
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=True)
         """,
     )

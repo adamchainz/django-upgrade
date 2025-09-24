@@ -22,12 +22,24 @@ fixer = Fixer(
 
 MODULE = "django.core.mail"
 
-# Map function names to their positional parameter names
-EMAIL_FUNCTION_ARGS = {
-    "send_mail": ["subject", "message", "from_email", "recipient_list"],
-    "send_mass_mail": ["datatuple"],
-    "mail_admins": ["subject", "message"],
-    "mail_managers": ["subject", "message"],
+# Map function names to their allowed positional parameters count and keyword-only parameter names
+EMAIL_FUNCTION_CONFIG = {
+    "send_mail": {
+        "max_positional": 4,  # subject, message, from_email, recipient_list
+        "keyword_params": ["fail_silently", "auth_user", "auth_password", "connection", "html_message"]
+    },
+    "send_mass_mail": {
+        "max_positional": 1,  # datatuple
+        "keyword_params": ["fail_silently", "auth_user", "auth_password", "connection"]
+    },
+    "mail_admins": {
+        "max_positional": 2,  # subject, message
+        "keyword_params": ["fail_silently", "connection", "html_message"]
+    },
+    "mail_managers": {
+        "max_positional": 2,  # subject, message
+        "keyword_params": ["fail_silently", "connection", "html_message"]
+    },
 }
 
 
@@ -42,62 +54,67 @@ def visit_Call(
     # Check for direct import: from django.core.mail import send_mail
     if (
         isinstance(node.func, ast.Name)
-        and node.func.id in EMAIL_FUNCTION_ARGS
+        and node.func.id in EMAIL_FUNCTION_CONFIG
         and node.func.id in state.from_imports[MODULE]
     ):
         func_name = node.func.id
     # Check for module import: from django.core import mail; mail.send_mail(...)
     elif (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr in EMAIL_FUNCTION_ARGS
+        and node.func.attr in EMAIL_FUNCTION_CONFIG
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "mail"
         and "mail" in state.from_imports["django.core"]
     ):
         func_name = node.func.attr
     
-    if (
-        func_name is not None
-        and len(node.args) > 0  # Has positional arguments
-        and len(node.args) <= len(EMAIL_FUNCTION_ARGS[func_name])  # Not more than expected
-    ):
-        yield (
-            ast_start_offset(node),
-            partial(
-                convert_positional_to_keyword,
-                func_name=func_name,
-                num_pos_args=len(node.args),
-                num_keywords=len(node.keywords),
-            ),
-        )
+    if func_name is not None:
+        config = EMAIL_FUNCTION_CONFIG[func_name]
+        num_positional_args = len(node.args)
+        max_allowed_positional = config["max_positional"]
+        
+        # Only transform if there are more positional args than allowed
+        if num_positional_args > max_allowed_positional:
+            yield (
+                ast_start_offset(node),
+                partial(
+                    convert_excess_positional_to_keyword,
+                    func_name=func_name,
+                    num_pos_args=num_positional_args,
+                    max_allowed_positional=max_allowed_positional,
+                ),
+            )
 
 
-def convert_positional_to_keyword(
+def convert_excess_positional_to_keyword(
     tokens: list[Token], 
     i: int, 
     *, 
     func_name: str, 
     num_pos_args: int,
-    num_keywords: int,
+    max_allowed_positional: int,
 ) -> None:
     """
-    Convert positional arguments to keyword arguments for email functions.
+    Convert excess positional arguments to keyword arguments for email functions.
+    Only converts arguments beyond the allowed positional count.
     """
     # Find the opening parenthesis
     open_idx = find(tokens, i, name=OP, src="(")
     func_args, close_idx = parse_call_args(tokens, open_idx)
     
-    # Get the parameter names for this function
-    param_names = EMAIL_FUNCTION_ARGS[func_name]
+    # Get the configuration for this function
+    config = EMAIL_FUNCTION_CONFIG[func_name]
+    keyword_params = config["keyword_params"]
     
-    # Convert each positional argument to keyword argument, in reverse order
+    # Convert excess positional arguments to keyword arguments, in reverse order
     # to avoid messing up indices as we insert tokens
-    for pos_idx in reversed(range(num_pos_args)):
-        if pos_idx >= len(param_names):
+    for pos_idx in reversed(range(max_allowed_positional, num_pos_args)):
+        keyword_param_idx = pos_idx - max_allowed_positional
+        if keyword_param_idx >= len(keyword_params):
             continue
             
         arg_start, arg_end = func_args[pos_idx]
-        param_name = param_names[pos_idx]
+        param_name = keyword_params[keyword_param_idx]
         
         # Find the first non-whitespace token in the argument range
         actual_arg_start = arg_start

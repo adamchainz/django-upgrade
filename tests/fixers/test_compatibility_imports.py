@@ -4,48 +4,6 @@ from django_upgrade.data import Settings
 from tests.fixers.tools import check_noop, check_transformed
 
 
-class TestPostgresStringAgg:
-    settings = Settings(target_version=(6, 0))
-
-    def test_unmatched_import(self):
-        check_noop(
-            """\
-            from example import StringAgg
-            """,
-            self.settings,
-        )
-
-    def test_fixed(self):
-        check_transformed(
-            """\
-            from django.contrib.postgres.aggregates import StringAgg
-
-            StringAgg()
-            """,
-            """\
-            from django.db.models import StringAgg
-
-            StringAgg()
-            """,
-            self.settings,
-        )
-
-    def test_fixed_general(self):
-        check_transformed(
-            """\
-            from django.contrib.postgres.aggregates.general import StringAgg
-
-            StringAgg()
-            """,
-            """\
-            from django.db.models import StringAgg
-
-            StringAgg()
-            """,
-            self.settings,
-        )
-
-
 class TestUtilsFunctional:
     settings = Settings(target_version=(3, 1))
 

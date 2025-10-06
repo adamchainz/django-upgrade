@@ -141,6 +141,28 @@ __ https://docs.djangoproject.com/en/6.0/releases/6.0/#default-auto-field-settin
 
    ``AppConfig`` classes are only rewritten within ``apps.py`` files.
 
+.. _stringagg:
+
+``StringAgg`` aggregate move
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``stringagg``
+
+Rewrites imports of ``StringAgg`` from ``django.contrib.postgres.aggregates`` to the new all-database version in ``django.db.models``, per `this change <https://docs.djangoproject.com/en/dev/releases/6.0/#models:~:text=The%20new%20StringAgg%20aggregate>`__.
+Updates any calls that passed ``delimiter`` as a string literal to wrap it in ``Value()``.
+This fixer only makes changes if all ``StringAgg`` calls can be updated, and if there is an existing import of ``Value`` matching one of:
+
+* ``from django.db import models``
+* ``from django.db.models import Value``
+
+.. code-block:: diff
+
+    -from django.contrib.postgres.aggregates import StringAgg
+    +from django.db.models import StringAgg, Value
+
+    -StringAgg("name", delimiter=", ")
+    +StringAgg("name", delimiter=Value(", "))
+
 .. _settings_forms_urlfield_assume_https:
 
 ``FORMS_URLFIELD_ASSUME_HTTPS`` setting
@@ -193,20 +215,6 @@ __ https://docs.djangoproject.com/en/6.0/releases/6.0/#positional-arguments-in-d
     -    ["bcc@example.com"],
     +    bcc=["bcc@example.com"],
       )
-
-Compatibility imports
-~~~~~~~~~~~~~~~~~~~~~
-
-Rewrites some compatibility imports:
-
-* ``StringAgg`` from ``django.contrib.postgres.aggregates`` to use ``django.db.models``.
-
-  (This aggregate was `expanded to all database backends <https://docs.djangoproject.com/en/dev/releases/6.0/#models>`__ in Django 6.0.)
-
-.. code-block:: diff
-
-    -from django.contrib.postgres.aggregates import StringAgg
-    +from django.db.models import StringAgg
 
 Django 5.2
 ----------

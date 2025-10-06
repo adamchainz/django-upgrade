@@ -5,6 +5,10 @@ Changelog
 Unreleased
 ----------
 
+* Add Django 6.0+ fixer :ref:`mail_api_kwargs <mail_api_kwargs>` to rewrite positional arguments to keyword arguments for some ``django.core.mail`` APIs.
+
+  `PR #600 <https://github.com/adamchainz/django-upgrade/pull/600>`__.
+
 * Add Django 6.0+ fixer :ref:`default_auto_field <default_auto_field>` to remove now-redundant auto field specifications.
   The fixer removes the ``DEFAULT_AUTO_FIELD`` setting and ``AppConfig.default_auto_field`` attribute when they are set to the new default of ``django.db.models.BigAutoField``.
 

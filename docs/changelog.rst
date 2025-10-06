@@ -19,6 +19,10 @@ Unreleased
 
   `PR #596 <https://github.com/adamchainz/django-upgrade/pull/596>`__.
 
+* Add Django 6.0+ fixer :ref:`settings_admins_managers <settings_admins_managers>` to rewrite the ``ADMINS`` and ``MANAGERS`` settings to drop the previously-unused name parts of the tuples.
+
+  `PR #601 <https://github.com/adamchainz/django-upgrade/pull/601>`__.
+
 1.28.0 (2025-09-09)
 -------------------
 

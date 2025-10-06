@@ -216,6 +216,23 @@ __ https://docs.djangoproject.com/en/6.0/releases/6.0/#positional-arguments-in-d
     +    bcc=["bcc@example.com"],
       )
 
+.. _settings_admins_managers:
+
+``ADMINS`` and ``MANAGERS`` settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``settings_admins_managers``
+
+Rewrites the ``ADMINS`` and ``MANAGERS`` settings from lists of 2-tuples to lists of strings, per `this change <https://docs.djangoproject.com/en/6.0/releases/6.0/#positional-arguments-in-django-core-mail-apis:~:text=Setting%20ADMINS%20or%20MANAGERS>`__.
+
+.. code-block:: diff
+
+    -ADMINS = [("Ad min", "admin@example.com")]
+    -ADMINS = ["admin@example.com"]
+
+Note: Django never used the name part of the tuple, so this fixer removes it, to preserve behaviour.
+To actually set a name, include it in the email address like ``'"Ad min" <admin@example.com>'``.
+
 Django 5.2
 ----------
 

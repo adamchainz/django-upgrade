@@ -160,25 +160,42 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
     -FORMS_URLFIELD_ASSUME_HTTPS = True
 
+.. _mail_api_kwargs:
+
 Mail API keyword arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Name:** ``mail_api_kwargs``
 
-Per |Positional arguments in django.core.mail APIs|__, converts deprecated positional arguments (``fail_silently`` and later) to keyword arguments for the affected email functions (``get_connection()``, ``mail_admins()``, ``mail_managers()``, ``send_mail()``, ``send_mass_mail()``).
+Per |positional arguments in django.core.mail APIs|__, converts deprecated positional arguments (``fail_silently`` and later) to keyword arguments for the affected email APIs:
 
 .. |Positional arguments in django.core.mail APIs| replace:: Positional arguments in ``django.core.mail`` APIs
 __ https://docs.djangoproject.com/en/6.0/releases/6.0/#positional-arguments-in-django-core-mail-apis
 
+* Functions: ``get_connection()``, ``mail_admins()``, ``mail_managers()``, ``send_mail()``, and ``send_mass_mail()``
+* Classes: ``EmailMessage`` and ``EmailMultiAlternatives``
+
 .. code-block:: diff
 
-     from django.core.mail import send_mail, mail_admins
+     from django.core.mail import send_mail, EmailMessage
 
-    -send_mail("Subject", "Message", "from@example.com", ["to@example.com"], True)
-    +send_mail("Subject", "Message", "from@example.com", ["to@example.com"], fail_silently=True)
+     send_mail(
+         "Subject",
+         "Message",
+         "from@example.com",
+         ["to@example.com"],
+    -    True,
+    +    fail_silently=True,
+     )
 
-    -mail_admins("Admin Subject", "Admin Message", False)
-    +mail_admins("Admin Subject", "Admin Message", fail_silently=False)
+     EmailMessage(
+         "Subject",
+         "Body",
+         "from@example.com",
+         ["to@example.com"],
+    -    ["bcc@example.com"],
+    +    bcc=["bcc@example.com"],
+      )
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~

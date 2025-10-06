@@ -52,7 +52,34 @@ API_CONFIGS = {
     "send_mass_mail": APIConfig(
         1, ["fail_silently", "auth_user", "auth_password", "connection"], False
     ),
+    "EmailMessage": APIConfig(
+        4,
+        [
+            "bcc",
+            "connection",
+            "attachments",
+            "headers",
+            "cc",
+            "reply_to",
+        ],
+        False,
+    ),
+    "EmailMultiAlternatives": APIConfig(
+        4,
+        [
+            "bcc",
+            "connection",
+            "attachments",
+            "headers",
+            "alternatives",
+            "cc",
+            "reply_to",
+        ],
+        False,
+    ),
 }
+
+MESSAGE_MODULE_NAMES = {"EmailMessage", "EmailMultiAlternatives"}
 
 
 @fixer.register(ast.Call)
@@ -64,14 +91,31 @@ def visit_Call(
     # Check for direct import or module import and get function config
     if (
         isinstance(node.func, ast.Name)
-        and (func_name := node.func.id) in API_CONFIGS
-        and func_name in state.from_imports["django.core.mail"]
+        and (
+            (
+                (func_name := node.func.id) in API_CONFIGS
+                and func_name in state.from_imports["django.core.mail"]
+            )
+            or (
+                func_name in MESSAGE_MODULE_NAMES
+                and func_name in state.from_imports["django.core.mail.message"]
+            )
+        )
     ) or (
         isinstance(node.func, ast.Attribute)
         and (func_name := node.func.attr) in API_CONFIGS
         and isinstance(node.func.value, ast.Name)
-        and node.func.value.id == "mail"
-        and "mail" in state.from_imports["django.core"]
+        and (
+            (
+                node.func.value.id == "mail"
+                and "mail" in state.from_imports["django.core"]
+            )
+            or (
+                func_name in MESSAGE_MODULE_NAMES
+                and node.func.value.id == "message"
+                and "message" in state.from_imports["django.core.mail"]
+            )
+        )
     ):
         api_config = API_CONFIGS[func_name]
         num_posargs = len(node.args)

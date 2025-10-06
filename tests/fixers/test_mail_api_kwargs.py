@@ -438,3 +438,250 @@ def test_send_mass_mail_module_import():
         mail.send_mass_mail([("Subject", "Message", "from@example.com", ["to@example.com"])], fail_silently=True)
         """,
     )
+
+
+def test_email_message_1():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_message_2():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn)
+        """,
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn)
+        """,
+    )
+
+
+def test_email_message_3():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment])
+        """,
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment])
+        """,
+    )
+
+
+def test_email_message_4():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"})
+        """,
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"})
+        """,
+    )
+
+
+def test_email_message_5():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"}, ["cc@example.com"])
+        """,
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"}, cc=["cc@example.com"])
+        """,
+    )
+
+
+def test_email_message_6():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"}, ["cc@example.com"], ["reply@example.com"])
+        """,
+        """\
+        from django.core.mail import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"}, cc=["cc@example.com"], reply_to=["reply@example.com"])
+        """,
+    )
+
+
+def test_email_message_module_import():
+    check_transformed(
+        """\
+        from django.core import mail
+        mail.EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core import mail
+        mail.EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_message_message_module_from_import():
+    check_transformed(
+        """\
+        from django.core.mail.message import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core.mail.message import EmailMessage
+        EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_message_message_module_import():
+    check_transformed(
+        """\
+        from django.core.mail import message
+        message.EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core.mail import message
+        message.EmailMessage("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_multi_alternatives_1():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_multi_alternatives_2():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn)
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn)
+        """,
+    )
+
+
+def test_email_multi_alternatives_3():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment])
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment])
+        """,
+    )
+
+
+def test_email_multi_alternatives_4():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"})
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"})
+        """,
+    )
+
+
+def test_email_multi_alternatives_5():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"}, [alternative])
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"}, alternatives=[alternative])
+        """,
+    )
+
+
+def test_email_multi_alternatives_6():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"}, [alternative], ["cc@example.com"])
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"}, alternatives=[alternative], cc=["cc@example.com"])
+        """,
+    )
+
+
+def test_email_multi_alternatives_7():
+    check_transformed(
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"], conn, [attachment], {"x-bonus": "prize"}, [alternative], ["cc@example.com"], ["reply@example.com"])
+        """,
+        """\
+        from django.core.mail import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"], connection=conn, attachments=[attachment], headers={"x-bonus": "prize"}, alternatives=[alternative], cc=["cc@example.com"], reply_to=["reply@example.com"])
+        """,
+    )
+
+
+def test_email_multi_alternatives_module_import():
+    check_transformed(
+        """\
+        from django.core import mail
+        mail.EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core import mail
+        mail.EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_multi_alternatives_message_module_from_import():
+    check_transformed(
+        """\
+        from django.core.mail.message import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core.mail.message import EmailMultiAlternatives
+        EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )
+
+
+def test_email_multi_alternatives_message_module_import():
+    check_transformed(
+        """\
+        from django.core.mail import message
+        message.EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], ["bcc@example.com"])
+        """,
+        """\
+        from django.core.mail import message
+        message.EmailMultiAlternatives("Subject", "Message", "from@example.com", ["to@example.com"], bcc=["bcc@example.com"])
+        """,
+    )

@@ -150,7 +150,10 @@ __ https://docs.djangoproject.com/en/6.0/releases/6.0/#default-auto-field-settin
 
 Rewrites imports of ``StringAgg`` from ``django.contrib.postgres.aggregates`` to the new all-database version in ``django.db.models``, per `this change <https://docs.djangoproject.com/en/dev/releases/6.0/#models:~:text=The%20new%20StringAgg%20aggregate>`__.
 Updates any calls that passed ``delimiter`` as a string literal to wrap it in ``Value()``.
-These changes only apply if all ``StringAgg`` calls can be updated.
+This fixer only makes changes if all ``StringAgg`` calls can be updated, and if there is an existing import of ``Value`` matching one of:
+
+* ``from django.db import models``
+* ``from django.db.models import Value``
 
 .. code-block:: diff
 

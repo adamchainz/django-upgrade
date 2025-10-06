@@ -53,28 +53,6 @@ def visit_ImportFrom(
         )
 
 
-# @fixer.register(ast.ImportFrom)
-# def visit_ImportFrom(
-#     state: State,
-#     node: ast.ImportFrom,
-#     parents: tuple[ast.AST, ...],
-# ) -> Iterable[tuple[Offset, TokenFunc]]:
-#     if (
-#         (
-#             node.module == "django.contrib.postgres.aggregates"
-#             or node.module == "django.contrib.postgres.aggregates.general"
-#         )
-#         and is_rewritable_import_from(node)
-#         and any(
-#             alias.name == "StringAgg" and alias.asname is None for alias in node.names
-#         )
-#     ):
-#         module = parents[0]
-#         module_stringagg_calls_all_fixable.setdefault(module, None)
-#         # schedule a token rewriter that only does stuff if we only found safe calls
-#         # ...
-
-
 @fixer.register(ast.Call)
 def visit_Call(
     state: State,

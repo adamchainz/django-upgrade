@@ -257,6 +257,23 @@ def test_with_other_arguments():
     )
 
 
+def test_after_other_arguments():
+    check_transformed(
+        """\
+        from django.db import models
+        from django.contrib.postgres.aggregates import StringAgg
+
+        StringAgg("name", distinct=True, delimiter=", ")
+        """,
+        """\
+        from django.db import models
+        from django.db.models import StringAgg
+
+        StringAgg("name", distinct=True, delimiter=models.Value(", "))
+        """,
+    )
+
+
 def test_multiline_call():
     check_transformed(
         """\

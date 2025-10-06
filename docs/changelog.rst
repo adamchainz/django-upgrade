@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+1.29.0 (2025-10-06)
+-------------------
 
 * Add Django 6.0+ fixer :ref:`mail_api_kwargs <mail_api_kwargs>` to rewrite positional arguments to keyword arguments for some ``django.core.mail`` APIs.
 

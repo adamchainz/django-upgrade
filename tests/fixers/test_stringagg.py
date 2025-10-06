@@ -80,21 +80,34 @@ def test_mixed_safe_and_unsafe_delimiters():
         """\
         from django.contrib.postgres.aggregates import StringAgg
 
-        StringAgg("name", delimiter=", ")
-        StringAgg("title", delimiter=some_var)
+        StringAgg("name", ", ")
+        StringAgg("title", some_var)
         """,
     )
 
 
-def test_success():
+def test_just_import():
     check_transformed(
         """\
         from django.contrib.postgres.aggregates import StringAgg
-
-        StringAgg("name", delimiter=", ")
         """,
         """\
-        from django.db.models import StringAgg, Value
+        from django.db.models import StringAgg
+        """,
+    )
+
+
+def test_existing_delimiter():
+    check_transformed(
+        """\
+        from django.db.models import Value
+        from django.contrib.postgres.aggregates import StringAgg
+
+        StringAgg("name", delimiter=Value(", "))
+        """,
+        """\
+        from django.db.models import Value
+        from django.db.models import StringAgg
 
         StringAgg("name", delimiter=Value(", "))
         """,
@@ -278,14 +291,16 @@ def test_single_quoted_string():
 def test_with_other_arguments():
     check_transformed(
         """\
+        from django.db import models
         from django.contrib.postgres.aggregates import StringAgg
 
-        StringAgg("name", delimiter=", ", distinct=True, ordering=["id"])
+        StringAgg("name", delimiter=", ", distinct=True, order_by=["id"])
         """,
         """\
-        from django.db.models import StringAgg, Value
+        from django.db import models
+        from django.db.models import StringAgg
 
-        StringAgg("name", delimiter=Value(", "), distinct=True, ordering=["id"])
+        StringAgg("name", delimiter=models.Value(", "), distinct=True, order_by=["id"])
         """,
     )
 

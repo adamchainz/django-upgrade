@@ -160,12 +160,15 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
     -FORMS_URLFIELD_ASSUME_HTTPS = True
 
-Email APIs
-~~~~~~~~~~
+Mail API keyword arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Name:** ``email_apis``
+**Name:** ``mail_api_kwargs``
 
-Converts excess positional arguments to keyword arguments for Django email functions, as some positional arguments were deprecated in Django 6.0.
+Per |Positional arguments in django.core.mail APIs|__, converts deprecated positional arguments (``fail_silently`` and later) to keyword arguments for the affected email functions (``get_connection()``, ``send_mail()``, ``send_mass_mail()``, ``mail_admins()``, ``mail_managers()``).
+
+.. |Positional arguments in django.core.mail APIs| replace:: Positional arguments in ``django.core.mail`` APIs
+__ https://docs.djangoproject.com/en/6.0/releases/6.0/#positional-arguments-in-django-core-mail-apis
 
 .. code-block:: diff
 
@@ -176,13 +179,6 @@ Converts excess positional arguments to keyword arguments for Django email funct
 
     -mail_admins("Admin Subject", "Admin Message", False)
     +mail_admins("Admin Subject", "Admin Message", fail_silently=False)
-
-This fixer only converts positional arguments beyond the allowed count:
-
-* ``send_mail()`` - converts 5th argument and beyond to keywords (``fail_silently``, ``auth_user``, ``auth_password``, ``connection``, ``html_message``)
-* ``send_mass_mail()`` - converts 2nd argument and beyond to keywords (``fail_silently``, ``auth_user``, ``auth_password``, ``connection``)
-* ``mail_admins()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, ``html_message``)
-* ``mail_managers()`` - converts 3rd argument and beyond to keywords (``fail_silently``, ``connection``, ``html_message``)
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~

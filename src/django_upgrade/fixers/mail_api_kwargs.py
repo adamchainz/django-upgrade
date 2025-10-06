@@ -20,32 +20,38 @@ fixer = Fixer(
     min_version=(6, 0),
 )
 
-MODULE = "django.core.mail"
 
-# Map function names to their allowed positional parameters count and keyword-only parameter names
-EMAIL_FUNCTION_CONFIG = {
-    "send_mail": {
-        "max_positional": 4,  # subject, message, from_email, recipient_list
-        "keyword_params": [
+class APIConfig:
+    __slots__ = ("new_posargs", "new_kwargs", "extra_kwargs")
+
+    def __init__(
+        self, new_posargs: int, new_kwargs: list[str], extra_kwargs: bool
+    ) -> None:
+        self.new_posargs = new_posargs
+        self.new_kwargs = new_kwargs
+        self.extra_kwargs = extra_kwargs
+
+
+API_CONFIGS = {
+    "get_connection": APIConfig(1, ["fail_silently"], True),
+    "mail_admins": APIConfig(2, ["fail_silently", "connection", "html_message"], False),
+    "mail_managers": APIConfig(
+        2, ["fail_silently", "connection", "html_message"], False
+    ),
+    "send_mail": APIConfig(
+        4,
+        [
             "fail_silently",
             "auth_user",
             "auth_password",
             "connection",
             "html_message",
         ],
-    },
-    "send_mass_mail": {
-        "max_positional": 1,  # datatuple
-        "keyword_params": ["fail_silently", "auth_user", "auth_password", "connection"],
-    },
-    "mail_admins": {
-        "max_positional": 2,  # subject, message
-        "keyword_params": ["fail_silently", "connection", "html_message"],
-    },
-    "mail_managers": {
-        "max_positional": 2,  # subject, message
-        "keyword_params": ["fail_silently", "connection", "html_message"],
-    },
+        False,
+    ),
+    "send_mass_mail": APIConfig(
+        1, ["fail_silently", "auth_user", "auth_password", "connection"], False
+    ),
 }
 
 
@@ -58,81 +64,67 @@ def visit_Call(
     # Check for direct import or module import and get function config
     if (
         isinstance(node.func, ast.Name)
-        and (func_name := node.func.id) in EMAIL_FUNCTION_CONFIG
-        and func_name in state.from_imports[MODULE]
+        and (func_name := node.func.id) in API_CONFIGS
+        and func_name in state.from_imports["django.core.mail"]
     ) or (
         isinstance(node.func, ast.Attribute)
-        and (func_name := node.func.attr) in EMAIL_FUNCTION_CONFIG
+        and (func_name := node.func.attr) in API_CONFIGS
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "mail"
         and "mail" in state.from_imports["django.core"]
     ):
-        config = EMAIL_FUNCTION_CONFIG[func_name]
-        num_positional_args = len(node.args)
-        max_allowed_positional = config["max_positional"]
+        api_config = API_CONFIGS[func_name]
+        num_posargs = len(node.args)
+        convertible_posargs = num_posargs - api_config.new_posargs
 
-        # Guard against having more args than we know about
-        if num_positional_args > max_allowed_positional + len(config["keyword_params"]):
+        if convertible_posargs <= 0 or convertible_posargs > len(api_config.new_kwargs):
             return
 
-        # Guard against existing keyword-only arguments already being keywords
-        # Only check for keyword-only parameters that would be converted from positional
-        existing_kwarg_names = {kw.arg for kw in node.keywords}
-        excess_positional_count = num_positional_args - max_allowed_positional
-        excess_param_names = config["keyword_params"][:excess_positional_count]
-        if any(param in existing_kwarg_names for param in excess_param_names):
+        convertible_kwargs = api_config.new_kwargs[:convertible_posargs]
+
+        existing_kwargs = {kw.arg for kw in node.keywords}
+        if any(kw in existing_kwargs for kw in convertible_kwargs):
             return
 
-        # Only transform if there are more positional args than allowed
-        if num_positional_args > max_allowed_positional:
-            yield (
-                ast_start_offset(node),
-                partial(
-                    convert_excess_positional_to_keyword,
-                    func_name=func_name,
-                    num_pos_args=num_positional_args,
-                    max_allowed_positional=max_allowed_positional,
-                ),
-            )
+        if not api_config.extra_kwargs:
+            unknown_kwargs = existing_kwargs - set(api_config.new_kwargs)
+            if unknown_kwargs:
+                return
+
+        yield (
+            ast_start_offset(node),
+            partial(
+                migrate_api_args,
+                api_config=api_config,
+                num_posargs=num_posargs,
+                convertible_posargs=convertible_posargs,
+            ),
+        )
 
 
-def convert_excess_positional_to_keyword(
+def migrate_api_args(
     tokens: list[Token],
     i: int,
     *,
-    func_name: str,
-    num_pos_args: int,
-    max_allowed_positional: int,
+    api_config: APIConfig,
+    num_posargs: int,
+    convertible_posargs: int,
 ) -> None:
     """
     Convert excess positional arguments to keyword arguments for email functions.
     Only converts arguments beyond the allowed positional count.
     """
-    # Find the opening parenthesis
     open_idx = find(tokens, i, name=OP, src="(")
-    func_args, close_idx = parse_call_args(tokens, open_idx)
+    func_args, _close_idx = parse_call_args(tokens, open_idx)
 
-    # Get the configuration for this function
-    config = EMAIL_FUNCTION_CONFIG[func_name]
-    keyword_params = config["keyword_params"]
+    for argindex in range(num_posargs - 1, num_posargs - convertible_posargs - 1, -1):
+        kwarg = api_config.new_kwargs[argindex - api_config.new_posargs]
+        arg_start, arg_end = func_args[argindex]
 
-    # Convert excess positional arguments to keyword arguments, in reverse order
-    # to avoid messing up indices as we insert tokens
-    for pos_idx in reversed(range(max_allowed_positional, num_pos_args)):
-        keyword_param_idx = pos_idx - max_allowed_positional
-        if keyword_param_idx >= len(keyword_params):
-            continue
-
-        arg_start, arg_end = func_args[pos_idx]
-        param_name = keyword_params[keyword_param_idx]
-
-        # Find the first non-whitespace token in the argument range
         actual_arg_start = arg_start
         while actual_arg_start < arg_end and tokens[actual_arg_start].name in (
             "UNIMPORTANT_WS",
             "NL",
         ):
             actual_arg_start += 1
-
-        # Insert the parameter name before the actual argument
-        tokens.insert(actual_arg_start, Token(name=CODE, src=f"{param_name}="))
+        tokens.insert(actual_arg_start, Token(name=CODE, src=f"{kwarg}="))

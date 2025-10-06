@@ -125,9 +125,6 @@ __ https://docs.djangoproject.com/en/6.0/releases/6.0/#default-auto-field-settin
 
       -DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-       class Settings:
-      -    DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
    Settings files are heuristically detected as modules with the whole word “settings” somewhere in their path.
    For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 

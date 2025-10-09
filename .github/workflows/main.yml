@@ -13,9 +13,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  uv-lock-check:
+    name: "UV Lockfile Sync Validation 🔒"
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Check uv.lock sync status
+        run: uv lock --locked
+
   tests:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
+    needs: uv-lock-check
 
     strategy:
       matrix:

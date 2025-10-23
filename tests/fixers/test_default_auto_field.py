@@ -140,129 +140,16 @@ def test_setting_class_multiline():
     )
 
 
-def test_app_config_no_assignment():
+def test_app_config_untouched():
+    # Previously, this fixer would transform AppConfig definitions, but that
+    # turned out to be unsafe.
     check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class DefaultConfig(AppConfig):
-            name = "default"
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_not_in_classdef():
-    check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class DefaultConfig(AppConfig):
-            name = "default"
-        default_auto_field = "django.db.models.BigAutoField"
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_not_apps_file():
-    check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class DefaultConfig(AppConfig):
-            name = "default"
-            default_auto_field = "django.db.models.BigAutoField"
-        """,
-    )
-
-
-def test_app_config_not_big_auto_field():
-    check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            name = "pineapple"
-            default_auto_field = "django.db.models.AutoField"
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_not_str():
-    check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            name = "pineapple"
-            default_auto_field = 123
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_not_constant():
-    check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            name = "pineapple"
-            default_auto_field = pick_auto_field()
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_only_assignment():
-    check_noop(
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            default_auto_field = "django.db.models.BigAutoField"
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_success():
-    check_transformed(
         """\
         from django.apps import AppConfig
 
         class PineappleConfig(AppConfig):
             name = "pineapple"
             default_auto_field = "django.db.models.BigAutoField"
-        """,
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            name = "pineapple"
-        """,
-        filename="myapp/apps.py",
-    )
-
-
-def test_app_config_multiline():
-    check_transformed(
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            name = "pineapple"
-            default_auto_field = (
-                "django.db.models.BigAutoField"
-            )
-        """,
-        """\
-        from django.apps import AppConfig
-
-        class PineappleConfig(AppConfig):
-            name = "pineapple"
         """,
         filename="myapp/apps.py",
     )

@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* Remove the ``AppConfig`` rewriting behaviour of :ref:`default_auto_field <default_auto_field>`.
+  It was unsafe for projects setting ``DEFAULT_AUTO_FIELD`` to a field other than ``BigAutoField``, triggering regressive migrations for primary keys in affected apps.
+
+  `PR #606 <https://github.com/adamchainz/django-upgrade/pull/606>`__.
+
 1.29.0 (2025-10-06)
 -------------------
 

@@ -58,10 +58,6 @@ class State:
         self.from_imports = from_imports
 
     @cached_property
-    def looks_like_apps_file(self) -> bool:
-        return apps_re.search(self.filename) is not None
-
-    @cached_property
     def looks_like_admin_file(self) -> bool:
         return admin_re.search(self.filename) is not None
 

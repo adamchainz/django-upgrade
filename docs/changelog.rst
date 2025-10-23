@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.29.1 (2025-10-23)
+-------------------
+
 * Remove the ``AppConfig`` rewriting behaviour of :ref:`default_auto_field <default_auto_field>`.
   It was unsafe for projects setting ``DEFAULT_AUTO_FIELD`` to a field other than ``BigAutoField``, triggering regressive migrations for primary keys in affected apps.
 

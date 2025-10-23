@@ -6,7 +6,7 @@ requires = [
 
 [project]
 name = "django-upgrade"
-version = "1.29.0"
+version = "1.29.1"
 description = "Automatically upgrade your Django project code."
 readme = "README.rst"
 keywords = [

@@ -31,10 +31,6 @@ fixer = Fixer(
     min_version=(2, 0),
 )
 
-# Compiled regex patterns for performance
-PATH_ALLOWED_CHARS_RE = re.compile(r"[a-zA-Z0-9_\-./<>:]*")
-LITERAL_DOT_RE = re.compile(r"\\\.")
-
 
 @fixer.register(ast.ImportFrom)
 def visit_ImportFrom(
@@ -248,9 +244,9 @@ def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
 
     path += remaining
 
-    path = LITERAL_DOT_RE.sub(".", path)  # unescape literal dots
+    path = re.sub(r"\\\.", ".", path)  # unescape literal dots
 
-    if not PATH_ALLOWED_CHARS_RE.fullmatch(path):
+    if not re.fullmatch(r"[a-zA-Z0-9_\-./<>:]*", path):
         # path still contains regex special characters
         return None
 

@@ -17,15 +17,6 @@ OP = "OP"
 PHYSICAL_NEWLINE = "NL"
 STRING = "STRING"
 
-# Frequently used token name sets
-NL_NEWLINE = frozenset({"NL", "NEWLINE"})
-INDENT_TYPES = frozenset({"INDENT", UNIMPORTANT_WS})
-DEDENT_NL_NEWLINE = frozenset({"DEDENT", "NL", "NEWLINE"})
-NEWLINE_ENDMARKER = frozenset({"NEWLINE", "ENDMARKER"})
-
-# Compiled regex patterns for performance
-QUOTE_RE = re.compile(r'[\'"]')
-
 # Basic functions
 
 
@@ -106,7 +97,7 @@ def extract_indent(tokens: list[Token], i: int) -> tuple[int, str]:
     If the previous token is an indent, return its position and the
     indentation string. Otherwise return the current position and "".
     """
-    if i > 0 and tokens[i - 1].name in INDENT_TYPES:
+    if i > 0 and tokens[i - 1].name in (INDENT, UNIMPORTANT_WS):
         i -= 1
         indent = tokens[i].src
     else:
@@ -207,8 +198,8 @@ class Block:  # pragma: no cover
         block_indent: int | None = None
         for i in range(self.block, self.end):
             if (
-                tokens[i - 1].name in NL_NEWLINE
-                and tokens[i].name in INDENT_TYPES
+                tokens[i - 1].name in ("NL", "NEWLINE")
+                and tokens[i].name in ("INDENT", UNIMPORTANT_WS)
                 and
                 # comments can have arbitrary indentation so ignore them
                 tokens[i + 1].name != "COMMENT"
@@ -228,7 +219,10 @@ class Block:  # pragma: no cover
         initial_indent = self._initial_indent(tokens)
         diff = self._minimum_indent(tokens) - initial_indent
         for i in range(self.block, self.end):
-            if tokens[i - 1].name in DEDENT_NL_NEWLINE and tokens[i].name in INDENT_TYPES:
+            if tokens[i - 1].name in ("DEDENT", "NL", "NEWLINE") and tokens[i].name in (
+                "INDENT",
+                UNIMPORTANT_WS,
+            ):
                 # make sure we preserve *at least* the initial indent
                 s = tokens[i].src
                 s = s[:initial_indent] + s[initial_indent + diff :]
@@ -248,13 +242,13 @@ class Block:  # pragma: no cover
         while tokens[i].name in NON_CODING_TOKENS | {"DEDENT", "NEWLINE"}:
             # if we find an indented comment inside our block, keep it
             if (
-                tokens[i].name in NL_NEWLINE
+                tokens[i].name in {"NL", "NEWLINE"}
                 and tokens[i + 1].name == UNIMPORTANT_WS
                 and len(tokens[i + 1].src) > self._initial_indent(tokens)
             ):
                 break
             # otherwise we've found another line to remove
-            elif tokens[i].name in NL_NEWLINE:
+            elif tokens[i].name in {"NL", "NEWLINE"}:
                 last_token = i
             i -= 1
         return self.__class__(
@@ -272,7 +266,7 @@ class Block:  # pragma: no cover
         i: int,
         trim_end: bool = False,
     ) -> Block:
-        if i > 0 and tokens[i - 1].name in INDENT_TYPES:
+        if i > 0 and tokens[i - 1].name in {"INDENT", UNIMPORTANT_WS}:
             i -= 1
         start = i
         colon = find_block_start(tokens, i)
@@ -302,7 +296,7 @@ class Block:  # pragma: no cover
 
 
 def find_end(tokens: list[Token], i: int) -> int:  # pragma: no cover
-    while tokens[i].name not in NEWLINE_ENDMARKER:
+    while tokens[i].name not in {"NEWLINE", "ENDMARKER"}:
         i += 1
 
     # depending on the version of python, some will not emit
@@ -417,7 +411,7 @@ def str_repr_matching(text: str, *, match_quotes: str) -> str:
     literal represent in match_quotes uses double quotes.
     """
     result = repr(text)
-    first_quote = QUOTE_RE.search(match_quotes)
+    first_quote = re.search(r'[\'"]', match_quotes)
     assert first_quote is not None
     if first_quote[0] == '"' and result[0] != '"':
         result = result.translate(str_repr_single_to_double)

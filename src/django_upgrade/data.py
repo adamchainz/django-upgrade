@@ -43,8 +43,6 @@ settings_re = re.compile(r"(\b|_)settings(\b|_)")
 test_re = re.compile(r"(\b|_)tests?(\b|_)")
 models_re = re.compile(r"(^|[\\/])models([\\/]|\.py)")
 
-DJANGO_MODULES_TO_TRACK = frozenset({"django", "unittest"})
-
 
 class State:
     __slots__ = ("settings", "filename", "from_imports", "__weakref__", "__dict__")
@@ -136,7 +134,7 @@ def visit(
                 node.module is not None
                 and (
                     node.module.startswith("django.")
-                    or node.module in DJANGO_MODULES_TO_TRACK
+                    or node.module in ("django", "unittest")
                 )
             )
         ):

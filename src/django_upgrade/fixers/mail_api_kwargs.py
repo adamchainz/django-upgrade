@@ -79,7 +79,7 @@ API_CONFIGS = {
     ),
 }
 
-MESSAGE_MODULE_NAMES = {"EmailMessage", "EmailMultiAlternatives"}
+MESSAGE_MODULE_NAMES = frozenset({"EmailMessage", "EmailMultiAlternatives"})
 
 
 @fixer.register(ast.Call)

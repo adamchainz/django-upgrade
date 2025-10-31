@@ -20,12 +20,12 @@ fixer = Fixer(
     min_version=(2, 2),
 )
 
-MODULES = {
+MODULES = frozenset({
     "django.contrib.postgres.fields",
     "django.contrib.postgres.fields.ranges",
     "django.contrib.postgres.forms",
     "django.contrib.postgres.forms.ranges",
-}
+})
 NAME_MAP = {
     "FloatRangeField": "DecimalRangeField",
 }

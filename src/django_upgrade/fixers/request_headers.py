@@ -20,6 +20,8 @@ fixer = Fixer(
     min_version=(2, 2),
 )
 
+SPECIAL_HEADERS = frozenset({"CONTENT_LENGTH", "CONTENT_TYPE"})
+
 
 @fixer.register(ast.Subscript)
 def visit_Subscript(
@@ -109,7 +111,7 @@ def get_header_name(meta_name: str) -> str | None:
     http_prefix = "HTTP_"
     if meta_name.startswith(http_prefix):
         name = meta_name[len(http_prefix) :]
-    elif meta_name in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
+    elif meta_name in SPECIAL_HEADERS:
         name = meta_name
     else:
         return None

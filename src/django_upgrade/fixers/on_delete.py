@@ -21,6 +21,8 @@ fixer = Fixer(
     min_version=(1, 9),
 )
 
+RELATION_FIELD_NAMES = frozenset({"ForeignKey", "OneToOneField"})
+
 
 @fixer.register(ast.ImportFrom)
 def visit_ImportFrom(
@@ -31,7 +33,7 @@ def visit_ImportFrom(
     if (
         node.module == "django.db.models"
         and is_rewritable_import_from(node)
-        and any(alias.name in {"ForeignKey", "OneToOneField"} for alias in node.names)
+        and any(alias.name in RELATION_FIELD_NAMES for alias in node.names)
     ):
         yield (
             ast_start_offset(node),
@@ -70,14 +72,14 @@ def visit_Call(
         (
             (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr in {"ForeignKey", "OneToOneField"}
+                and node.func.attr in RELATION_FIELD_NAMES
                 and (models_imported := "models" in state.from_imports["django.db"])
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "models"
             )
             or (
                 isinstance(node.func, ast.Name)
-                and node.func.id in {"ForeignKey", "OneToOneField"}
+                and node.func.id in RELATION_FIELD_NAMES
                 and node.func.id in state.from_imports["django.db.models"]
                 and (models_imported := False) is False  # force walrus
             )

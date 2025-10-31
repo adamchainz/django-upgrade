@@ -23,6 +23,9 @@ INDENT_TYPES = frozenset({"INDENT", UNIMPORTANT_WS})
 DEDENT_NL_NEWLINE = frozenset({"DEDENT", "NL", "NEWLINE"})
 NEWLINE_ENDMARKER = frozenset({"NEWLINE", "ENDMARKER"})
 
+# Compiled regex patterns for performance
+QUOTE_RE = re.compile(r'[\'"]')
+
 # Basic functions
 
 
@@ -414,7 +417,7 @@ def str_repr_matching(text: str, *, match_quotes: str) -> str:
     literal represent in match_quotes uses double quotes.
     """
     result = repr(text)
-    first_quote = re.search(r'[\'"]', match_quotes)
+    first_quote = QUOTE_RE.search(match_quotes)
     assert first_quote is not None
     if first_quote[0] == '"' and result[0] != '"':
         result = result.translate(str_repr_single_to_double)

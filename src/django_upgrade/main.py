@@ -285,6 +285,6 @@ def fixup_dedent_tokens(tokens: list[Token]) -> None:
     |^    ^- DEDENT
     |+----UNIMPORTANT_WS
     """
-    for i, token in enumerate(tokens):
+    for i, token in enumerate(tokens[:-1]):
         if token.name == UNIMPORTANT_WS and tokens[i + 1].name == DEDENT:
             tokens[i], tokens[i + 1] = tokens[i + 1], tokens[i]

@@ -66,6 +66,9 @@ docs = [
   "sphinx-copybutton>=0.5.2",
 ]
 
+[tool.uv.sources]
+sphinx-build-compatibility = { git = "https://github.com/readthedocs/sphinx-build-compatibility", rev = "4f304bd4562cdc96316f4fec82b264ca379d23e0" }
+
 [tool.ruff]
 lint.select = [
   # flake8-bugbear
@@ -150,6 +153,3 @@ allow_untyped_defs = true
 
 [tool.rstcheck]
 report_level = "ERROR"
-
-[tool.uv.sources]
-sphinx-build-compatibility = { git = "https://github.com/readthedocs/sphinx-build-compatibility", rev = "4f304bd4562cdc96316f4fec82b264ca379d23e0" }

@@ -63,11 +63,13 @@ def defined_enumeration_types(module: ast.Module, up_to_line: int) -> set[str]:
     }
 
 
-DJANGO_CHOICES_TYPES = frozenset({
-    "TextChoices",
-    "IntegerChoices",
-    "Choices",
-})
+DJANGO_CHOICES_TYPES = frozenset(
+    {
+        "TextChoices",
+        "IntegerChoices",
+        "Choices",
+    }
+)
 
 
 def _is_django_choices_type(

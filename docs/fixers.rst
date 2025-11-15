@@ -213,7 +213,7 @@ Rewrites the ``ADMINS`` and ``MANAGERS`` settings from lists of 2-tuples to list
 .. code-block:: diff
 
     -ADMINS = [("Ad min", "admin@example.com")]
-    -ADMINS = ["admin@example.com"]
+    +ADMINS = ["admin@example.com"]
 
 Note: Django never used the name part of the tuple, so this fixer removes it, to preserve behaviour.
 To actually set a name, include it in the email address like ``'"Ad min" <admin@example.com>'``.

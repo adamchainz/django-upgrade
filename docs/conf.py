@@ -60,6 +60,8 @@ autodoc_typehints = "description"
 # a list of builtin themes.
 #
 html_logo = "_static/logo.svg"
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 html_theme = "furo"
 html_theme_options = {
     "dark_css_variables": {

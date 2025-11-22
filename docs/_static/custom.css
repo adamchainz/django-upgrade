@@ -1,0 +1,9 @@
+.highlight .gd { color: #A40000 !important; }
+.highlight .gi { color: #116600 !important; }
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .highlight .gd { color: #FF6B6B !important; }
+    body:not([data-theme="light"]) .highlight .gi { color: #69DB7C !important; }
+}
+body[data-theme="dark"] .highlight .gd { color: #FF6B6B !important; }
+body[data-theme="dark"] .highlight .gi { color: #69DB7C !important; }

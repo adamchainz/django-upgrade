@@ -160,4 +160,3 @@ def test_bad_header_error_builtin_ValueError_already_used():
         raise ValueError("Invalid header")
         """,
     )
-

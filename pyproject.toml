@@ -56,7 +56,6 @@ test = [
   "coverage[toml]",
   "pytest",
   "pytest-randomly",
-  "tokenize-rt",
 ]
 
 docs = [

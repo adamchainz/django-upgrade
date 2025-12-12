@@ -280,7 +280,6 @@ test = [
     { name = "coverage", extra = ["toml"] },
     { name = "pytest" },
     { name = "pytest-randomly" },
-    { name = "tokenize-rt" },
 ]
 
 [package.metadata]
@@ -297,7 +296,6 @@ test = [
     { name = "coverage", extras = ["toml"] },
     { name = "pytest" },
     { name = "pytest-randomly" },
-    { name = "tokenize-rt" },
 ]
 
 [[package]]

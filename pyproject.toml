@@ -115,14 +115,6 @@ addopts = """\
     """
 xfail_strict = true
 
-[tool.coverage.run]
-branch = true
-parallel = true
-source = [
-  "django_upgrade",
-  "tests",
-]
-
 [tool.coverage.paths]
 source = [
   "src",
@@ -133,6 +125,14 @@ source = [
 show_missing = true
 exclude_also = [
   "if TYPE_CHECKING:",
+]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = [
+  "django_upgrade",
+  "tests",
 ]
 
 [tool.mypy]

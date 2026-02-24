@@ -92,7 +92,7 @@ ASTFunc = Callable[
     [State, AST_T, tuple[ast.AST, ...]], Iterable[tuple[Offset, TokenFunc]]
 ]
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from typing import Protocol
 else:
     Protocol = object

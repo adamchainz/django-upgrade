@@ -192,6 +192,7 @@ def test_get_target_version_auto_no_pyproject_toml(tmp_path, capsys):
         ("django >= 2.2, <= 3.1", (2, 2)),
         ("django[argon2] >= 5.2", (5, 2)),
         ("django[argon2] >= 5.2, <6", (5, 2)),
+        ("django[argon2]>=6,<6.1", (6, 0)),
     ],
 )
 def test_get_target_version_auto_matched(tmp_path, capsys, deps_line, expected):

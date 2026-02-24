@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* Support parsing Django versions without a minor part from ``pyproject.toml``.
+  For example, ``django>=6`` will be parsed as for Django 6.0+.
+
+  `PR #625 <https://github.com/adamchainz/django-upgrade/pull/625>`__.
+
 * Drop Python 3.9 support.
 
 1.29.1 (2025-10-23)

@@ -161,8 +161,10 @@ def get_target_version(string: str) -> tuple[int, int]:
             \s*
             (
                 (?P<major>[0-9]+)
-                \.
-                (?P<minor>[0-9]+)
+                (
+                    \.
+                    (?P<minor>[0-9]+)
+                )?
                 (
                     (?:a|b|rc)
                     [0-9]+
@@ -192,7 +194,7 @@ def get_target_version(string: str) -> tuple[int, int]:
         )
         if match:
             major = int(match["major"])
-            minor = int(match["minor"])
+            minor = int(match["minor"] or 0)
             if (major, minor) in SUPPORTED_TARGET_VERSIONS:
                 print(
                     f"Detected Django version from pyproject.toml: {major}.{minor}",

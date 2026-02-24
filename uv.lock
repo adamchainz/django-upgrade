@@ -277,7 +277,7 @@ toml = [
 
 [[package]]
 name = "django-upgrade"
-version = "1.29.1"
+version = "1.30.0"
 source = { editable = "." }
 dependencies = [
     { name = "tokenize-rt" },

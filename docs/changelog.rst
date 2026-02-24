@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.30.0 (2026-02-24)
+-------------------
+
 * Support parsing Django versions without a minor part from ``pyproject.toml``.
   For example, ``django>=6`` will be parsed as for Django 6.0+.
 

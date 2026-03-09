@@ -1,6 +1,6 @@
 """
 Transforms HTTP headers from WSGI kwarg format to new 'headers' dictionary, for
-test Client and RequestFactory:
+test Client, AsyncClient, RequestFactory, and AsyncRequestFactory:
 https://docs.djangoproject.com/en/4.2/releases/4.2/#tests
 """
 
@@ -44,10 +44,15 @@ def visit_Call(
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        isinstance(node.func, ast.Name)
-        and node.func.id in ("Client", "RequestFactory")
-        and node.func.id in state.from_imports["django.test"]
-    ) or looks_like_test_client_call(node, "client"):
+        (
+            isinstance(node.func, ast.Name)
+            and node.func.id
+            in ("AsyncClient", "AsyncRequestFactory", "Client", "RequestFactory")
+            and node.func.id in state.from_imports["django.test"]
+        )
+        or looks_like_test_client_call(node, "client")
+        or looks_like_test_client_call(node, "async_client")
+    ):
         has_http_kwarg = False
         headers_keyword = None
         for keyword in node.keywords:

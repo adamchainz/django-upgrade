@@ -90,9 +90,10 @@ def _is_name_used(module: ast.Module, name: str) -> bool:
         if isinstance(node, ast.alias):
             if node.asname == name or (node.asname is None and node.name == name):
                 return True
-        if isinstance(
-            node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-        ) and node.name == name:
+        if (
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+            and node.name == name
+        ):
             return True
         if isinstance(node, ast.arg) and node.arg == name:
             return True
@@ -148,9 +149,7 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
     return details
 
 
-def add_datetime_import(
-    tokens: list[Token], i: int, *, dt_alias: str
-) -> None:
+def add_datetime_import(tokens: list[Token], i: int, *, dt_alias: str) -> None:
     j, indent = extract_indent(tokens, i)
     insert(tokens, j, new_src=f"{indent}import datetime as {dt_alias}\n")
 

@@ -87,9 +87,10 @@ def _is_name_used(module: ast.Module, name: str) -> bool:
     for node in ast.walk(module):
         if isinstance(node, ast.Name) and node.id == name:
             return True
-        if isinstance(node, ast.alias):
-            if node.asname == name or (node.asname is None and node.name == name):
-                return True
+        if isinstance(node, ast.alias) and (
+            node.asname == name or (node.asname is None and node.name == name)
+        ):
+            return True
         if (
             isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
             and node.name == name

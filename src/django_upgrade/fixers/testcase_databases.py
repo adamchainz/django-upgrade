@@ -34,7 +34,7 @@ def visit_Assign(
         and isinstance(node.targets[0], ast.Name)
         and node.targets[0].id in ("allow_database_queries", "multi_db")
         and isinstance(node.value, ast.Constant)
-        and (node.value.value is True or node.value.value is False)
+        and isinstance(node.value.value, bool)
     ):
         yield (
             ast_start_offset(node),

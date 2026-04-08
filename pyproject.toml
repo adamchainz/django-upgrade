@@ -53,7 +53,7 @@ scripts.django-upgrade = "django_upgrade.main:main"
 
 [dependency-groups]
 test = [
-  "coverage[toml]",
+  "coverage[toml]>=7.10",
   "pytest",
   "pytest-randomly",
 ]
@@ -137,9 +137,6 @@ run.source = [
 paths.source = [
   "src",
   ".tox/**/site-packages",
-]
-report.exclude_also = [
-  "if TYPE_CHECKING:",
 ]
 report.show_missing = true
 report.skip_covered = true

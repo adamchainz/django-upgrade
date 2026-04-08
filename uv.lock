@@ -325,7 +325,7 @@ docs = [
     { name = "sphinx-copybutton", specifier = ">=0.5.2" },
 ]
 test = [
-    { name = "coverage", extras = ["toml"] },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "pytest" },
     { name = "pytest-randomly" },
 ]

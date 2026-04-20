@@ -54,7 +54,7 @@ scripts.django-upgrade = "django_upgrade.main:main"
 [dependency-groups]
 test = [
   "coverage[toml]>=7.10",
-  "pytest",
+  "pytest>=9",
   "pytest-randomly",
 ]
 docs = [
@@ -120,11 +120,7 @@ warn_unreachable = true
 overrides = [ { module = "tests.*", allow_untyped_defs = true } ]
 
 [tool.pytest]
-ini_options.addopts = """\
-    --strict-config
-    --strict-markers
-    """
-ini_options.xfail_strict = true
+strict = true
 
 [tool.coverage]
 run.branch = true

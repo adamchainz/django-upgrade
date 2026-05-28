@@ -260,6 +260,31 @@ Django 5.1
 
 `Release Notes <https://docs.djangoproject.com/en/5.1/releases/5.1/>`__
 
+``BadHeaderError``
+~~~~~~~~~~~~~~~~~~
+
+**Name:** ``bad_header_error``
+
+Replaces ``django.core.mail.BadHeaderError`` with Python's built-in ``ValueError``.
+Django's ``BadHeaderError`` has been deprecated in favor of the standard ``ValueError``.
+
+.. code-block:: diff
+
+   -from django.core.mail import BadHeaderError, send_mail
+   +from django.core.mail import send_mail
+
+   -raise BadHeaderError("Invalid header")
+   +raise ValueError("Invalid header")
+
+.. code-block:: diff
+
+
+    try:
+        send_mail(...)
+   -except BadHeaderError:
+   +except ValueError:
+        pass
+
 .. _check_constraint_condition:
 
 ``CheckConstraint`` ``condition`` argument

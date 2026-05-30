@@ -10,11 +10,11 @@ from collections.abc import Iterable, MutableMapping
 from functools import partial
 from weakref import WeakKeyDictionary
 
-from tokenize_rt import Offset
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import replace, update_import_names
+from django_upgrade.tokens import extract_indent, insert, replace, update_import_names
 
 fixer = Fixer(
     __name__,
@@ -36,6 +36,7 @@ def visit_Name(
         )
         and details.datetime_module is not None
     ):
+        yield from maybe_add_datetime_import(details)
         yield from maybe_rewrite_import(details)
         new_src = f"{details.datetime_module}.timezone.utc"
         yield ast_start_offset(node), partial(replace, src=new_src)
@@ -55,6 +56,7 @@ def visit_Attribute(
         and (details := get_import_details(state, parents[0])).datetime_module
         is not None
     ):
+        yield from maybe_add_datetime_import(details)
         new_src = f"{details.datetime_module}.timezone"
         yield ast_start_offset(node), partial(replace, src=new_src)
 
@@ -64,15 +66,39 @@ class ImportDetails:
         "old_utc_import",
         "datetime_module",
         "rewrite_scheduled",
+        "first_import_node",
+        "needs_datetime_import",
+        "add_import_scheduled",
     )
 
     def __init__(self) -> None:
         self.old_utc_import: ast.ImportFrom | None = None
         self.datetime_module: str | None = None
         self.rewrite_scheduled = False
+        self.first_import_node: ast.Import | ast.ImportFrom | None = None
+        self.needs_datetime_import = False
+        self.add_import_scheduled = False
 
 
 import_details: MutableMapping[State, ImportDetails] = WeakKeyDictionary()
+
+
+def _is_name_used(module: ast.Module, name: str) -> bool:
+    for node in ast.walk(module):
+        if isinstance(node, ast.Name) and node.id == name:
+            return True
+        if isinstance(node, ast.alias) and (
+            node.asname == name or (node.asname is None and node.name == name)
+        ):
+            return True
+        if (
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+            and node.name == name
+        ):
+            return True
+        if isinstance(node, ast.arg) and node.arg == name:
+            return True
+    return False
 
 
 def get_import_details(state: State, module: ast.AST) -> ImportDetails:
@@ -96,6 +122,9 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         if not isinstance(node, (ast.Import, ast.ImportFrom)):
             break
 
+        if details.first_import_node is None:
+            details.first_import_node = node
+
         if isinstance(node, ast.Import):
             for alias in node.names:
                 if alias.name == "datetime":
@@ -113,8 +142,32 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         ):
             details.old_utc_import = node
 
+    if details.datetime_module is None and not _is_name_used(module, "dt"):
+        details.datetime_module = "dt"
+        details.needs_datetime_import = True
+
     import_details[state] = details
     return details
+
+
+def add_datetime_import(tokens: list[Token], i: int, *, dt_alias: str) -> None:
+    j, indent = extract_indent(tokens, i)
+    insert(tokens, j, new_src=f"{indent}import datetime as {dt_alias}\n")
+
+
+def maybe_add_datetime_import(
+    details: ImportDetails,
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if not details.needs_datetime_import or details.add_import_scheduled:
+        return
+
+    assert details.first_import_node is not None
+    yield (
+        ast_start_offset(details.first_import_node),
+        partial(add_datetime_import, dt_alias="dt"),
+    )
+
+    details.add_import_scheduled = True
 
 
 def maybe_rewrite_import(

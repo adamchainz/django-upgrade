@@ -102,6 +102,13 @@ For example:
      class Example3Tests(TestCase):
          ...
 
+Django 6.1
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/6.1/releases/6.1/>`__
+
+(No fixers yet.)
+
 Django 6.0
 ----------
 

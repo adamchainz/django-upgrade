@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Pending
+-------
+
+* Support Django 6.1 as a target version.
+
+  `PR #646 <https://github.com/adamchainz/django-upgrade/pull/646>`__.
+
 1.30.0 (2026-02-24)
 -------------------
 

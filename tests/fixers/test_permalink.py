@@ -177,6 +177,75 @@ def test_with_kwargs():
     )
 
 
+def test_decorator_with_trailing_comment():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink  # noqa
+            def url(self):
+                return ("guitarist_detail", [self.slug])
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug])
+        """,
+    )
+
+
+def test_return_bare_tuple():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return "guitarist_detail", [self.slug]
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug])
+        """,
+    )
+
+
+def test_return_bare_tuple_with_kwargs():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return "guitarist_detail", [], {"extra": 1}
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse("guitarist_detail", args=[], kwargs={"extra": 1})
+        """,
+    )
+
+
 def test_no_args():
     check_transformed(
         """\

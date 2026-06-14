@@ -138,8 +138,7 @@ def fix_permalink_return(
             return "".join(t.src for t in tokens[start_idx:end_idx]).strip()
 
         parts = [src_of(*inner_args[0])]
-        if len(inner_args) > 1:
-            parts.append(f"args={src_of(*inner_args[1])}")
+        parts.append(f"args={src_of(*inner_args[1])}")
         if len(inner_args) > 2:
             parts.append(f"kwargs={src_of(*inner_args[2])}")
 
@@ -160,15 +159,14 @@ def fix_permalink_return(
             elif tokens[k].src == "," and depth == 0:
                 comma_positions.append(k)
 
-        if len(comma_positions) >= 1:
-            parts = [src_of_range(tuple_start, comma_positions[0] - 1)]
-            if len(comma_positions) >= 2:
-                parts.append(
-                    f"args={src_of_range(comma_positions[0] + 1, comma_positions[1] - 1)}"
-                )
-                parts.append(f"kwargs={src_of_range(comma_positions[1] + 1, end)}")
-            else:
-                parts.append(f"args={src_of_range(comma_positions[0] + 1, end)}")
-            tokens[tuple_start : end + 1] = [
-                Token("CODE", "reverse(" + ", ".join(parts) + ")")
-            ]
+        parts = [src_of_range(tuple_start, comma_positions[0] - 1)]
+        if len(comma_positions) >= 2:
+            parts.append(
+                f"args={src_of_range(comma_positions[0] + 1, comma_positions[1] - 1)}"
+            )
+            parts.append(f"kwargs={src_of_range(comma_positions[1] + 1, end)}")
+        else:
+            parts.append(f"args={src_of_range(comma_positions[0] + 1, end)}")
+        tokens[tuple_start : end + 1] = [
+            Token("CODE", "reverse(" + ", ".join(parts) + ")")
+        ]

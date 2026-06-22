@@ -208,6 +208,45 @@ def test_pytest_mark_skipif_passing_comparison_class():
     )
 
 
+def test_unittest_attr_skipIf_always_skip_not_yet_reached():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION >= (4, 2), "Only applies to Django < 4.2")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_attr_skipUnless_always_skip_not_yet_reached():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipUnless(django.VERSION < (4, 2), "Only applies to Django < 4.2")
+        def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_pytest_mark_skipif_always_skip_not_yet_reached():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION >= (4, 2), reason="Only applies to Django < 4.2")
+        def test_thing():
+            pass
+        """,
+    )
+
+
 def test_unittest_attr_skipIf_removed():
     check_transformed(
         """\
@@ -504,5 +543,146 @@ def test_pytest_mark_skipif_failing_comparison_class():
         class TestThing:
             def test_thing():
                 pass
+        """,
+    )
+
+
+def test_unittest_attr_skipUnless_always_skip_removes_class():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipUnless(django.VERSION < (4, 1), "Only applies to Django < 4.1")
+        class TestThing(unittest.TestCase):
+            def test_thing(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+        """,
+    )
+
+
+def test_pytest_mark_skipif_always_skip_two_matching_decorators():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
+        """,
+    )
+
+
+def test_pytest_mark_skipif_always_skip_removes_function():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
+        """,
+    )
+
+
+def test_pytest_mark_skipif_always_skip_removes_class():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        class TestThing:
+            def test_thing():
+                pass
+        """,
+        """\
+        import pytest
+        import django
+        """,
+    )
+
+
+def test_unittest_attr_skipIf_always_skip_removes_function():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION >= (4, 1), "Only applies to Django < 4.1")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        import unittest
+        import django
+        """,
+    )
+
+
+def test_unittest_attr_skipUnless_always_skip_removes_function():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipUnless(django.VERSION < (4, 1), "Only applies to Django < 4.1")
+        def test_thing(self):
+            pass
+        """,
+        """\
+        import unittest
+        import django
+        """,
+    )
+
+
+def test_pytest_mark_skipif_always_skip_decorator_above():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        @pytest.mark.slow
+        def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
+        """,
+    )
+
+
+def test_pytest_mark_skipif_always_skip_decorator_below():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.slow
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
         """,
     )

@@ -471,6 +471,8 @@ Django 4.1
 
 `Release Notes <https://docs.djangoproject.com/en/4.1/releases/4.1/>`__
 
+.. _utils_timezone:
+
 ``django.utils.timezone.utc`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

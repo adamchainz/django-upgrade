@@ -395,6 +395,8 @@ It then uses ``**`` to extend that with any values in the current module:
     +    },
     +}
 
+.. _test_http_headers:
+
 Test client HTTP headers
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

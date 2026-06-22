@@ -1067,6 +1067,27 @@ Django 1.11
 
 `Release Notes <https://docs.djangoproject.com/en/1.11/releases/1.11/>`__
 
+.. _permalink:
+
+``models.permalink`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``permalink``
+
+Rewrites uses of the ``@models.permalink`` decorator to use :func:`django.urls.reverse` directly.
+
+.. code-block:: diff
+
+     from django.db import models
+    +from django.urls import reverse
+
+
+     class MyModel(models.Model):
+    -    @models.permalink
+         def get_absolute_url(self):
+    -        return ("guitarist_detail", [self.slug])
+    +        return reverse("guitarist_detail", args=[self.slug])
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

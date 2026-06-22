@@ -18,6 +18,11 @@ Pending
 
   `PR #649 <https://github.com/adamchainz/django-upgrade/pull/649>`__.
 
+* Add Django 1.11+ fixer :ref:`permalink <permalink>` to rewrite ``@models.permalink`` decorator usages to use ``reverse()`` directly.
+
+  `PR #647 <https://github.com/adamchainz/django-upgrade/pull/647>`__.
+  Thanks to Joerg Sonnenberger for the report in `Issue #645 <https://github.com/adamchainz/django-upgrade/issues/645>`__ and review.
+
 1.30.0 (2026-02-24)
 -------------------
 

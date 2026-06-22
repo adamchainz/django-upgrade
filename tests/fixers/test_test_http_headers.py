@@ -28,6 +28,26 @@ def test_instantiation_custom_client_class():
     )
 
 
+def test_instantiation_async_client_custom_class():
+    check_noop(
+        """
+        from example.test import AsyncClient
+        AsyncClient(HTTP_HOST="example.com")
+        """,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_async_request_factory_custom_class():
+    check_noop(
+        """
+        from example.test import AsyncRequestFactory
+        AsyncRequestFactory(HTTP_HOST="example.com")
+        """,
+        filename="tests.py",
+    )
+
+
 def test_instantiation_unpacked_kwargs():
     check_noop(
         """
@@ -60,6 +80,24 @@ def test_client_call_unpacked_kwargs():
     check_noop(
         """
         self.client.get("/", HTTP_ACCEPT="text/plain", **maybe_has_headers)
+        """,
+        filename="tests.py",
+    )
+
+
+def test_async_client_call_non_http_kwarg():
+    check_noop(
+        """
+        self.async_client.get("/", SCRIPT_NAME="/app/"),
+        """,
+        filename="tests.py",
+    )
+
+
+def test_async_client_call_unpacked_kwargs():
+    check_noop(
+        """
+        self.async_client.get("/", HTTP_ACCEPT="text/plain", **maybe_has_headers)
         """,
         filename="tests.py",
     )

@@ -284,6 +284,29 @@ def test_return_bare_tuple_with_args_and_kwargs():
     )
 
 
+def test_parenthesized_tuple_with_kwargs():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return ("guitarist_detail", [], {"extra": 1})
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse("guitarist_detail", kwargs={"extra": 1})
+        """,
+    )
+
+
 def test_no_args():
     check_transformed(
         """\

@@ -68,11 +68,7 @@ def visit_FunctionDef(
         )
         yield (
             ast_start_offset(ret_node),
-            partial(
-                fix_permalink_return,
-                ret_node=ret_node,
-                elts=ret_node.value.elts,
-            ),
+            partial(fix_permalink_return, ret_node=ret_node),
         )
 
 
@@ -124,13 +120,13 @@ def fix_permalink_return(
     i: int,
     *,
     ret_node: ast.Return,
-    elts: list[ast.expr],
 ) -> None:
     assert isinstance(ret_node.value, ast.Tuple)
 
-    has_args = not (isinstance(elts[1], ast.List) and len(elts[1].elts) == 0)
+    elts = ret_node.value.elts
+    has_args = not (isinstance(elts[1], ast.List) and not elts[1].elts)
     has_kwargs = len(elts) == 3 and not (
-        isinstance(elts[2], ast.Dict) and len(elts[2].keys) == 0
+        isinstance(elts[2], ast.Dict) and not elts[2].keys
     )
 
     j = find(tokens, i, name=NAME, src="return")

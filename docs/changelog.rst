@@ -9,6 +9,10 @@ Pending
 
   `PR #646 <https://github.com/adamchainz/django-upgrade/pull/646>`__.
 
+* Extend :ref:`test_http_headers` fixer to cover ``AsyncClient``, ``AsyncRequestFactory``, and ``self.async_client.*()`` calls.
+
+  `PR #633 <https://github.com/adamchainz/django-upgrade/pull/633>`__.
+
 * Extend :ref:`versioned_test_skip_decorators` fixer to also remove the entire decorated function or class when the skip condition is always true.
   For example, when targeting Django 5.2+, a function decorated with ``@pytest.mark.skipif(django.VERSION >= (5, 2), ...)`` will be removed.
 

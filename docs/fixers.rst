@@ -402,9 +402,9 @@ Test client HTTP headers
 
 Transforms HTTP headers from the old WSGI kwarg format to use the new ``headers`` dictionary, for:
 
-* ``Client`` method like ``self.client.get()``
-* ``Client`` instantiation
-* ``RequestFactory`` instantiation
+* ``Client`` and ``AsyncClient`` method calls like ``self.client.get()`` / ``self.async_client.get()``
+* ``Client`` and ``AsyncClient`` instantiation
+* ``RequestFactory`` and ``AsyncRequestFactory`` instantiation
 
 .. code-block:: diff
 

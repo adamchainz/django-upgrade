@@ -33,9 +33,6 @@ fixer = Fixer(
     min_version=(1, 11),
 )
 
-MODULE = "django.db.models"
-DECORATOR_NAME = "permalink"
-
 # Set when a @models.permalink method is detected, so the django.db import
 # visitor knows to add `from django.urls import reverse`.
 _state_needs_reverse: MutableMapping[State, bool] = WeakKeyDictionary()
@@ -51,7 +48,7 @@ def visit_FunctionDef(
         len(node.decorator_list) == 1
         and (decorator := node.decorator_list[0])  # type: ignore [truthy-bool]
         and isinstance(decorator, ast.Attribute)
-        and decorator.attr == DECORATOR_NAME
+        and decorator.attr == "permalink"
         and isinstance(decorator.value, ast.Name)
         and decorator.value.id == "models"
         and "models" in state.from_imports["django.db"]

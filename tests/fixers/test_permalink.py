@@ -375,3 +375,146 @@ def test_reverse_already_imported():
                 return reverse("guitarist_detail", args=[self.slug])
         """,
     )
+
+
+# from django.db.models import permalink
+
+
+# noop cases
+
+
+def test_direct_wrong_module():
+    check_noop(
+        """\
+        from myapp.db.models import permalink
+
+
+        class MyModel:
+            @permalink
+            def url(self):
+                return ("view_name", [self.pk])
+        """,
+    )
+
+
+def test_direct_older_version():
+    check_noop(
+        """\
+        from django.db.models import permalink
+
+
+        class MyModel:
+            @permalink
+            def url(self):
+                return ("view_name", [self.pk])
+        """,
+        settings=Settings(target_version=(1, 10)),
+    )
+
+
+def test_direct_multiple_decorators():
+    check_noop(
+        """\
+        from django.db.models import permalink
+
+
+        class MyModel:
+            @classmethod
+            @permalink
+            def url(cls):
+                return ("view_name", [cls.pk])
+        """,
+    )
+
+
+# transforms
+
+
+def test_direct_basic():
+    check_transformed(
+        """\
+        from django.db.models import permalink
+
+
+        class MyModel:
+            @permalink
+            def url(self):
+                return ("guitarist_detail", [self.slug])
+        """,
+        """\
+        from django.urls import reverse
+
+
+        class MyModel:
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug])
+        """,
+    )
+
+
+def test_direct_with_other_imports():
+    check_transformed(
+        """\
+        from django.db.models import Model, permalink
+
+
+        class MyModel(Model):
+            @permalink
+            def url(self):
+                return ("guitarist_detail", [self.slug])
+        """,
+        """\
+        from django.urls import reverse
+        from django.db.models import Model
+
+
+        class MyModel(Model):
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug])
+        """,
+    )
+
+
+def test_direct_reverse_already_imported():
+    check_transformed(
+        """\
+        from django.db.models import permalink
+        from django.urls import reverse
+
+
+        class MyModel:
+            @permalink
+            def url(self):
+                return ("guitarist_detail", [self.slug])
+        """,
+        """\
+        from django.urls import reverse
+
+
+        class MyModel:
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug])
+        """,
+    )
+
+
+def test_direct_with_kwargs():
+    check_transformed(
+        """\
+        from django.db.models import permalink
+
+
+        class MyModel:
+            @permalink
+            def url(self):
+                return ("guitarist_detail", [self.slug], {"extra": 1})
+        """,
+        """\
+        from django.urls import reverse
+
+
+        class MyModel:
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug], kwargs={"extra": 1})
+        """,
+    )

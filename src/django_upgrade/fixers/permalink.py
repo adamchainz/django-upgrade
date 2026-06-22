@@ -15,6 +15,7 @@ from tokenize_rt import UNIMPORTANT_WS, Offset, Token
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
+    CODE,
     INDENT,
     NAME,
     OP,
@@ -26,6 +27,7 @@ from django_upgrade.tokens import (
     parse_call_args,
     reverse_consume,
     reverse_find,
+    update_import_names,
 )
 
 fixer = Fixer(
@@ -47,11 +49,20 @@ def visit_FunctionDef(
     if (
         len(node.decorator_list) == 1
         and (decorator := node.decorator_list[0])  # type: ignore [truthy-bool]
-        and isinstance(decorator, ast.Attribute)
-        and decorator.attr == "permalink"
-        and isinstance(decorator.value, ast.Name)
-        and decorator.value.id == "models"
-        and "models" in state.from_imports["django.db"]
+        and (
+            (
+                isinstance(decorator, ast.Attribute)
+                and decorator.attr == "permalink"
+                and isinstance(decorator.value, ast.Name)
+                and decorator.value.id == "models"
+                and "models" in state.from_imports["django.db"]
+            )
+            or (
+                isinstance(decorator, ast.Name)
+                and decorator.id == "permalink"
+                and "permalink" in state.from_imports["django.db.models"]
+            )
+        )
         and len(node.body) == 1
         and (ret_node := node.body[0])  # type: ignore [truthy-bool]
         and isinstance(ret_node, ast.Return)
@@ -86,6 +97,23 @@ def visit_ImportFrom(
         )
 
 
+@fixer.register(ast.ImportFrom)
+def visit_ImportFrom_direct_permalink(
+    state: State,
+    node: ast.ImportFrom,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        node.module == "django.db.models"
+        and is_rewritable_import_from(node)
+        and any(alias.name == "permalink" for alias in node.names)
+    ):
+        yield (
+            ast_start_offset(node),
+            partial(fix_permalink_direct_import, node=node, state=state),
+        )
+
+
 def fix_models_import(
     tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
 ) -> None:
@@ -96,6 +124,17 @@ def fix_models_import(
     _, indent = extract_indent(tokens, i)
     _, j = find_node(tokens, i, node=node)
     insert(tokens, j + 1, new_src=f"{indent}from django.urls import reverse\n")
+
+
+def fix_permalink_direct_import(
+    tokens: list[Token], i: int, *, node: ast.ImportFrom, state: State
+) -> None:
+    if not _state_needs_reverse.pop(state, False):
+        return
+    j, indent = extract_indent(tokens, i)
+    update_import_names(tokens, i, node=node, name_map={"permalink": ""})
+    if "reverse" not in state.from_imports["django.urls"]:
+        insert(tokens, j, new_src=f"{indent}from django.urls import reverse\n")
 
 
 def fix_permalink_decorator(tokens: list[Token], i: int, *, node: ast.expr) -> None:
@@ -146,7 +185,7 @@ def fix_permalink_return(
         if has_kwargs:
             parts.append(f"kwargs={src_of(*inner_args[2])}")
 
-        tokens[tuple_start:end] = [Token("CODE", "reverse(" + ", ".join(parts) + ")")]
+        tokens[tuple_start:end] = [Token(CODE, "reverse(" + ", ".join(parts) + ")")]
     else:
         end = find_last_token(tokens, i, node=ret_node)
 
@@ -174,5 +213,5 @@ def fix_permalink_return(
         if has_kwargs:
             parts.append(f"kwargs={src_of_range(comma_positions[1] + 1, end)}")
         tokens[tuple_start : end + 1] = [
-            Token("CODE", "reverse(" + ", ".join(parts) + ")")
+            Token(CODE, "reverse(" + ", ".join(parts) + ")")
         ]

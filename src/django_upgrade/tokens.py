@@ -372,7 +372,7 @@ def erase_decorated_def(
     i: int,
     *,
     first_decorator: ast.expr,
-    node: ast.FunctionDef | ast.ClassDef,
+    node: ast.AsyncFunctionDef | ast.FunctionDef | ast.ClassDef,
 ) -> None:
     """
     Erase a decorated function or class definition entirely, including all

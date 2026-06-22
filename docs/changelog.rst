@@ -14,6 +14,10 @@ Pending
 
   `PR #648 <https://github.com/adamchainz/django-upgrade/pull/648>`__.
 
+* Extend :ref:`versioned_test_skip_decorators` fixer to support async function definitions.
+
+  `PR #649 <https://github.com/adamchainz/django-upgrade/pull/649>`__.
+
 1.30.0 (2026-02-24)
 -------------------
 

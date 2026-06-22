@@ -39,6 +39,15 @@ fixer = Fixer(
 )
 
 
+@fixer.register(ast.AsyncFunctionDef)
+def visit_AsyncFunctionDef(
+    state: State,
+    node: ast.AsyncFunctionDef,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    yield from _handle_decorator(state, node, parents)
+
+
 @fixer.register(ast.FunctionDef)
 def visit_FunctionDef(
     state: State,
@@ -59,7 +68,7 @@ def visit_ClassDef(
 
 def _handle_decorator(
     state: State,
-    node: ast.FunctionDef | ast.ClassDef,
+    node: ast.AsyncFunctionDef | ast.FunctionDef | ast.ClassDef,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     for decorator in node.decorator_list:

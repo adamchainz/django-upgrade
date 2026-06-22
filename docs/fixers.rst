@@ -71,7 +71,10 @@ Supports these test skip decorators:
   .. |pytest.mark.skipif| replace:: ``@pytest.mark.skipif``
   __ https://docs.pytest.org/en/stable/how-to/skipping.html#id1
 
-For example:
+When the skip condition is always false for the target version, meaning the test will always run, the decorator is removed.
+When the skip condition is always true, meaning the test will never run, the entire decorated function or class is removed.
+
+For example, some always-false conditions triggering decorator removals:
 
 .. code-block:: diff
 
@@ -101,6 +104,28 @@ For example:
     -@pytest.mark.skipif(django.VERSION < (5, 1), reason="Django 5.1+")
      class Example3Tests(TestCase):
          ...
+
+…and some always-true conditions triggering function removals:
+
+.. code-block:: diff
+
+     import unittest
+
+     import django
+     import pytest
+     from django.test import TestCase
+
+     class ExampleTests(TestCase):
+         def test_one(self):
+             ...
+
+    -    @pytest.mark.skipif(django.VERSION >= (5, 1), reason="Only applies to Django < 5.1")
+    -    def test_four(self):
+    -        ...
+
+    -@unittest.skipUnless(django.VERSION < (5, 1), "Only applies to Django < 5.1")
+    -class Example2Tests(TestCase):
+    -    ...
 
 Django 6.1
 ----------

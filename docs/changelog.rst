@@ -9,6 +9,11 @@ Pending
 
   `PR #646 <https://github.com/adamchainz/django-upgrade/pull/646>`__.
 
+* Extend :ref:`versioned_test_skip_decorators` fixer to also remove the entire decorated function or class when the skip condition is always true.
+  For example, when targeting Django 5.2+, a function decorated with ``@pytest.mark.skipif(django.VERSION >= (5, 2), ...)`` will be removed.
+
+  `PR #648 <https://github.com/adamchainz/django-upgrade/pull/648>`__.
+
 1.30.0 (2026-02-24)
 -------------------
 

@@ -367,6 +367,26 @@ def erase_decorator(tokens: list[Token], i: int, *, node: ast.Call) -> None:
     del tokens[i : j + 1]
 
 
+def erase_decorated_def(
+    tokens: list[Token],
+    i: int,
+    *,
+    first_decorator: ast.expr,
+    node: ast.FunctionDef | ast.ClassDef,
+) -> None:
+    """
+    Erase a decorated function or class definition entirely, including all
+    decorators.
+    """
+    _, j = find_node(tokens, i, node=node)
+    i, _ = find_node(tokens, i, node=first_decorator)
+    i = reverse_find(tokens, i, name=OP, src="@")
+    i = reverse_consume(tokens, i, name=INDENT)
+    i = reverse_consume(tokens, i, name=UNIMPORTANT_WS)
+    i = reverse_consume(tokens, i, name=PHYSICAL_NEWLINE)
+    del tokens[i : j + 1]
+
+
 def find_and_replace_name(tokens: list[Token], i: int, *, name: str, new: str) -> None:
     j = find(tokens, i, name=NAME, src=name)
     tokens[j] = tokens[j]._replace(name=CODE, src=new)

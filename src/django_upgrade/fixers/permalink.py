@@ -68,7 +68,11 @@ def visit_FunctionDef(
         )
         yield (
             ast_start_offset(ret_node),
-            partial(fix_permalink_return, ret_node=ret_node),
+            partial(
+                fix_permalink_return,
+                ret_node=ret_node,
+                elts=ret_node.value.elts,
+            ),
         )
 
 
@@ -120,8 +124,14 @@ def fix_permalink_return(
     i: int,
     *,
     ret_node: ast.Return,
+    elts: list[ast.expr],
 ) -> None:
     assert isinstance(ret_node.value, ast.Tuple)
+
+    has_args = not (isinstance(elts[1], ast.List) and len(elts[1].elts) == 0)
+    has_kwargs = len(elts) == 3 and not (
+        isinstance(elts[2], ast.Dict) and len(elts[2].keys) == 0
+    )
 
     j = find(tokens, i, name=NAME, src="return")
     j += 1
@@ -138,8 +148,9 @@ def fix_permalink_return(
             return "".join(t.src for t in tokens[start_idx:end_idx]).strip()
 
         parts = [src_of(*inner_args[0])]
-        parts.append(f"args={src_of(*inner_args[1])}")
-        if len(inner_args) > 2:
+        if has_args:
+            parts.append(f"args={src_of(*inner_args[1])}")
+        if has_kwargs:
             parts.append(f"kwargs={src_of(*inner_args[2])}")
 
         tokens[tuple_start:end] = [Token("CODE", "reverse(" + ", ".join(parts) + ")")]
@@ -160,13 +171,15 @@ def fix_permalink_return(
                 comma_positions.append(k)
 
         parts = [src_of_range(tuple_start, comma_positions[0] - 1)]
-        if len(comma_positions) >= 2:
-            parts.append(
-                f"args={src_of_range(comma_positions[0] + 1, comma_positions[1] - 1)}"
-            )
+        if has_args:
+            if len(comma_positions) >= 2:
+                parts.append(
+                    f"args={src_of_range(comma_positions[0] + 1, comma_positions[1] - 1)}"
+                )
+            else:
+                parts.append(f"args={src_of_range(comma_positions[0] + 1, end)}")
+        if has_kwargs:
             parts.append(f"kwargs={src_of_range(comma_positions[1] + 1, end)}")
-        else:
-            parts.append(f"args={src_of_range(comma_positions[0] + 1, end)}")
         tokens[tuple_start : end + 1] = [
             Token("CODE", "reverse(" + ", ".join(parts) + ")")
         ]

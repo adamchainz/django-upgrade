@@ -57,6 +57,21 @@ def test_multiple_decorators():
     )
 
 
+def test_classmethod_and_permalink():
+    check_noop(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @classmethod
+            @models.permalink
+            def url(cls):
+                return ("view_name", [cls.pk])
+        """,
+    )
+
+
 def test_multiple_statements():
     check_noop(
         """\
@@ -241,7 +256,30 @@ def test_return_bare_tuple_with_kwargs():
 
         class MyModel(models.Model):
             def url(self):
-                return reverse("guitarist_detail", args=[], kwargs={"extra": 1})
+                return reverse("guitarist_detail", kwargs={"extra": 1})
+        """,
+    )
+
+
+def test_return_bare_tuple_with_args_and_kwargs():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return "guitarist_detail", [self.slug], {"extra": 1}
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug], kwargs={"extra": 1})
         """,
     )
 
@@ -264,7 +302,30 @@ def test_no_args():
 
         class MyModel(models.Model):
             def url(self):
-                return reverse("guitarist_detail", args=[])
+                return reverse("guitarist_detail")
+        """,
+    )
+
+
+def test_empty_kwargs():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return ("guitarist_detail", [self.slug], {})
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse("guitarist_detail", args=[self.slug])
         """,
     )
 

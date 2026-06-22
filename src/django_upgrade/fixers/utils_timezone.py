@@ -12,7 +12,11 @@ from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.ast import (
+    ast_start_offset,
+    get_module_names,
+    is_rewritable_import_from,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import extract_indent, insert, replace, update_import_names
 
@@ -83,24 +87,6 @@ class ImportDetails:
 import_details: MutableMapping[State, ImportDetails] = WeakKeyDictionary()
 
 
-def _is_name_used(module: ast.Module, name: str) -> bool:
-    for node in ast.walk(module):
-        if isinstance(node, ast.Name) and node.id == name:
-            return True
-        if isinstance(node, ast.alias) and (
-            node.asname == name or (node.asname is None and node.name == name)
-        ):
-            return True
-        if (
-            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-            and node.name == name
-        ):
-            return True
-        if isinstance(node, ast.arg) and node.arg == name:
-            return True
-    return False
-
-
 def get_import_details(state: State, module: ast.AST) -> ImportDetails:
     assert isinstance(module, ast.Module)
     try:
@@ -142,7 +128,7 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         ):
             details.old_utc_import = node
 
-    if details.datetime_module is None and not _is_name_used(module, "dt"):
+    if details.datetime_module is None and "dt" not in get_module_names(module):
         details.datetime_module = "dt"
         details.needs_datetime_import = True
 

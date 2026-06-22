@@ -17,6 +17,10 @@ Pending
 
   Thanks to Benjamin Aduo in `PR #633 <https://github.com/adamchainz/django-upgrade/pull/633>`__.
 
+* Extend :ref:`utils_timezone` fixer to work when no ``import datetime`` statement exists, by inserting ``import datetime as dt`` when the name ``dt`` is unused.
+
+  Thanks to Ryan Siemens for the report in `Issue #568 <https://github.com/adamchainz/django-upgrade/issues/568>`__ and Benjamin Aduo for the implementation in `PR #631 <https://github.com/adamchainz/django-upgrade/pull/631>`__.
+
 * Extend :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixer to also remove the entire decorated function or class when the skip condition is always true.
   For example, when targeting Django 5.2+, a function decorated with ``@pytest.mark.skipif(django.VERSION >= (5, 2), ...)`` will be removed.
 

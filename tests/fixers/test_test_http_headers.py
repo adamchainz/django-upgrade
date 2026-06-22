@@ -28,6 +28,26 @@ def test_instantiation_custom_client_class():
     )
 
 
+def test_instantiation_async_client_custom_class():
+    check_noop(
+        """
+        from example.test import AsyncClient
+        AsyncClient(HTTP_HOST="example.com")
+        """,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_async_request_factory_custom_class():
+    check_noop(
+        """
+        from example.test import AsyncRequestFactory
+        AsyncRequestFactory(HTTP_HOST="example.com")
+        """,
+        filename="tests.py",
+    )
+
+
 def test_instantiation_unpacked_kwargs():
     check_noop(
         """
@@ -65,6 +85,24 @@ def test_client_call_unpacked_kwargs():
     )
 
 
+def test_async_client_call_non_http_kwarg():
+    check_noop(
+        """
+        self.async_client.get("/", SCRIPT_NAME="/app/"),
+        """,
+        filename="tests.py",
+    )
+
+
+def test_async_client_call_unpacked_kwargs():
+    check_noop(
+        """
+        self.async_client.get("/", HTTP_ACCEPT="text/plain", **maybe_has_headers)
+        """,
+        filename="tests.py",
+    )
+
+
 def test_instantiation_request_factory():
     check_transformed(
         """\
@@ -79,6 +117,20 @@ def test_instantiation_request_factory():
     )
 
 
+def test_instantiation_async_request_factory():
+    check_transformed(
+        """\
+        from django.test import AsyncRequestFactory
+        AsyncRequestFactory(HTTP_ACCEPT="application/json")
+        """,
+        """\
+        from django.test import AsyncRequestFactory
+        AsyncRequestFactory(headers={"accept": "application/json"})
+        """,
+        filename="tests.py",
+    )
+
+
 def test_instantiation():
     check_transformed(
         """\
@@ -88,6 +140,20 @@ def test_instantiation():
         """\
         from django.test import Client
         Client(headers={"host": "example.com"})
+        """,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_async_client():
+    check_transformed(
+        """\
+        from django.test import AsyncClient
+        AsyncClient(HTTP_HOST="example.com")
+        """,
+        """\
+        from django.test import AsyncClient
+        AsyncClient(headers={"host": "example.com"})
         """,
         filename="tests.py",
     )
@@ -266,6 +332,18 @@ def test_client_call():
     )
 
 
+def test_async_client_call():
+    check_transformed(
+        """\
+        self.async_client.get("/", HTTP_HOST="example.com")
+        """,
+        """\
+        self.async_client.get("/", headers={"host": "example.com"})
+        """,
+        filename="tests.py",
+    )
+
+
 def test_client_call_multiple():
     check_transformed(
         """\
@@ -273,6 +351,18 @@ def test_client_call_multiple():
         """,
         """\
         self.client.get("/", headers={"host": "example.com", "accept": "text/plain"})
+        """,
+        filename="tests.py",
+    )
+
+
+def test_async_client_call_multiple():
+    check_transformed(
+        """\
+        self.async_client.get("/", HTTP_HOST="example.com", HTTP_ACCEPT="text/plain")
+        """,
+        """\
+        self.async_client.get("/", headers={"host": "example.com", "accept": "text/plain"})
         """,
         filename="tests.py",
     )
@@ -327,6 +417,24 @@ def test_client_call_multiline():
         response = self.client.get(
             "/",
             {"q": "abc"},
+            headers={"host": "example.com"}
+        )
+        """,
+        filename="tests.py",
+    )
+
+
+def test_async_client_call_multiline():
+    check_transformed(
+        """\
+        response = self.async_client.get(
+            "/",
+            HTTP_HOST="example.com",
+        )
+        """,
+        """\
+        response = self.async_client.get(
+            "/",
             headers={"host": "example.com"}
         )
         """,

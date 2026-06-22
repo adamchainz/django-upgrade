@@ -395,6 +395,8 @@ It then uses ``**`` to extend that with any values in the current module:
     +    },
     +}
 
+.. _test_http_headers:
+
 Test client HTTP headers
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -402,9 +404,9 @@ Test client HTTP headers
 
 Transforms HTTP headers from the old WSGI kwarg format to use the new ``headers`` dictionary, for:
 
-* ``Client`` method like ``self.client.get()``
-* ``Client`` instantiation
-* ``RequestFactory`` instantiation
+* ``Client`` and ``AsyncClient`` method calls like ``self.client.get()`` / ``self.async_client.get()``
+* ``Client`` and ``AsyncClient`` instantiation
+* ``RequestFactory`` and ``AsyncRequestFactory`` instantiation
 
 .. code-block:: diff
 

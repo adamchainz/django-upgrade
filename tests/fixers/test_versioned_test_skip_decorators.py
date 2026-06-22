@@ -61,6 +61,19 @@ def test_unittest_attr_skipIf_passing_comparison():
     )
 
 
+def test_unittest_attr_skipIf_async_passing_comparison():
+    check_noop(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 2), "Django 4.2+")
+        async def test_thing(self):
+            pass
+        """,
+    )
+
+
 def test_unittest_attr_skipIf_unknown_comparison():
     check_noop(
         """\
@@ -194,6 +207,19 @@ def test_pytest_mark_skipif_passing_comparison():
     )
 
 
+def test_pytest_mark_skipif_async_passing_comparison():
+    check_noop(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 2), reason="Django 4.2+")
+        async def test_thing():
+            pass
+        """,
+    )
+
+
 def test_pytest_mark_skipif_passing_comparison_class():
     check_noop(
         """\
@@ -262,6 +288,26 @@ def test_unittest_attr_skipIf_removed():
         import django
 
         def test_thing(self):
+            pass
+        """,
+    )
+
+
+def test_unittest_attr_skipIf_async_removed():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION < (4, 1), "Django 4.1+")
+        async def test_thing(self):
+            pass
+        """,
+        """\
+        import unittest
+        import django
+
+        async def test_thing(self):
             pass
         """,
     )
@@ -525,6 +571,26 @@ def test_pytest_mark_skipif_failing_comparison():
     )
 
 
+def test_pytest_mark_skipif_async_failing_comparison():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION < (4, 1), reason="Django 4.1+")
+        async def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
+
+        async def test_thing():
+            pass
+        """,
+    )
+
+
 def test_pytest_mark_skipif_failing_comparison_class():
     check_transformed(
         """\
@@ -600,6 +666,23 @@ def test_pytest_mark_skipif_always_skip_removes_function():
     )
 
 
+def test_pytest_mark_skipif_async_always_skip_removes_function():
+    check_transformed(
+        """\
+        import pytest
+        import django
+
+        @pytest.mark.skipif(django.VERSION >= (4, 1), reason="Only applies to Django < 4.1")
+        async def test_thing():
+            pass
+        """,
+        """\
+        import pytest
+        import django
+        """,
+    )
+
+
 def test_pytest_mark_skipif_always_skip_removes_class():
     check_transformed(
         """\
@@ -626,6 +709,23 @@ def test_unittest_attr_skipIf_always_skip_removes_function():
 
         @unittest.skipIf(django.VERSION >= (4, 1), "Only applies to Django < 4.1")
         def test_thing(self):
+            pass
+        """,
+        """\
+        import unittest
+        import django
+        """,
+    )
+
+
+def test_unittest_attr_skipIf_async_always_skip_removes_function():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        @unittest.skipIf(django.VERSION >= (4, 1), "Only applies to Django < 4.1")
+        async def test_thing(self):
             pass
         """,
         """\

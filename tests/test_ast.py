@@ -63,6 +63,11 @@ class TestGetModuleNames:
     def test_pattern(self, src: str, expected: frozenset[str]) -> None:
         assert self.names(src) == expected
 
+    def test_pattern_wildcard(self) -> None:
+        assert self.names("match value:\n    case _:\n        pass") == frozenset(
+            {"value"}
+        )
+
     def test_except_handler(self) -> None:
         assert self.names(
             "try:\n    pass\nexcept Exception as x:\n    pass"

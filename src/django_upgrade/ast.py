@@ -24,12 +24,24 @@ def get_module_names(module: ast.Module) -> frozenset[str]:
     for node in ast.walk(module):
         if isinstance(node, ast.Name):
             names.add(node.id)
-        elif isinstance(node, ast.alias):
-            names.add(node.asname if node.asname is not None else node.name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.asname is not None:
+                    names.add(alias.asname)
+                else:
+                    names.add(alias.name.partition(".")[0])
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                names.add(alias.asname if alias.asname is not None else alias.name)
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             names.add(node.name)
         elif isinstance(node, ast.arg):
             names.add(node.arg)
+        elif isinstance(node, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar)):
+            if node.name is not None:
+                names.add(node.name)
+        elif isinstance(node, ast.MatchMapping) and node.rest is not None:
+            names.add(node.rest)
 
     result = frozenset(names)
     _module_names[module] = result

@@ -113,6 +113,9 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         if not isinstance(node, (ast.Import, ast.ImportFrom)):
             break
 
+        if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+            continue
+
         if details.first_import_node is None:
             details.first_import_node = node
 
@@ -133,7 +136,11 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         ):
             details.old_utc_import = node
 
-    if details.datetime_module is None and "dt" not in get_module_names(module):
+    if (
+        details.datetime_module is None
+        and details.first_import_node is not None
+        and "dt" not in get_module_names(module)
+    ):
         details.datetime_module = "dt"
         details.needs_datetime_import = True
 

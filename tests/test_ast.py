@@ -31,8 +31,11 @@ class TestGetModuleNames:
             "from m import y as x",
         ),
     )
-    def test_alias(self, src: str) -> None:
+    def test_import_alias(self, src: str) -> None:
         assert self.names(src) == frozenset({"x"})
+
+    def test_dotted_import(self) -> None:
+        assert self.names("import x.y") == frozenset({"x"})
 
     def test_function_def(self) -> None:
         assert self.names("def x(): pass") == frozenset({"x"})
@@ -46,8 +49,29 @@ class TestGetModuleNames:
     def test_arg(self) -> None:
         assert self.names("def f(x): pass") == frozenset({"f", "x"})
 
-    def test_not_present(self) -> None:
+    def test_assignment(self) -> None:
         assert self.names("y = 1") == frozenset({"y"})
+
+    @pytest.mark.parametrize(
+        ("src", "expected"),
+        (
+            ("match value:\n    case x:\n        pass", frozenset({"value", "x"})),
+            ("match value:\n    case [*x]:\n        pass", frozenset({"value", "x"})),
+            ("match value:\n    case {**x}:\n        pass", frozenset({"value", "x"})),
+        ),
+    )
+    def test_pattern(self, src: str, expected: frozenset[str]) -> None:
+        assert self.names(src) == expected
+
+    def test_pattern_wildcard(self) -> None:
+        assert self.names("match value:\n    case _:\n        pass") == frozenset(
+            {"value"}
+        )
+
+    def test_except_handler(self) -> None:
+        assert self.names(
+            "try:\n    pass\nexcept Exception as x:\n    pass"
+        ) == frozenset({"Exception", "x"})
 
     def test_caching(self) -> None:
         module = ast.parse("x = 1")

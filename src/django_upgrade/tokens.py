@@ -367,11 +367,10 @@ def erase_decorator(tokens: list[Token], i: int, *, node: ast.Call) -> None:
     del tokens[i : j + 1]
 
 
-def erase_decorated_def(
+def erase_def(
     tokens: list[Token],
     i: int,
     *,
-    first_decorator: ast.expr,
     node: ast.AsyncFunctionDef | ast.FunctionDef | ast.ClassDef,
 ) -> None:
     """
@@ -379,7 +378,6 @@ def erase_decorated_def(
     decorators.
     """
     _, j = find_node(tokens, i, node=node)
-    i, _ = find_node(tokens, i, node=first_decorator)
     i = reverse_find(tokens, i, name=OP, src="@")
     i = reverse_consume(tokens, i, name=INDENT)
     i = reverse_consume(tokens, i, name=UNIMPORTANT_WS)

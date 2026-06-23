@@ -471,13 +471,15 @@ Django 4.1
 
 `Release Notes <https://docs.djangoproject.com/en/4.1/releases/4.1/>`__
 
+.. _utils_timezone:
+
 ``django.utils.timezone.utc`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Name:** ``utils_timezone``
 
 Rewrites imports of ``django.utils.timezone.utc`` to use ``datetime.timezone.utc``.
-Requires an existing import of the ``datetime`` module.
+Uses an existing ``import datetime`` statement if present, otherwise inserts ``import datetime as dt`` if the name ``dt`` is unused in the module.
 
 .. code-block:: diff
 
@@ -495,6 +497,15 @@ Requires an existing import of the ``datetime`` module.
 
     -do_a_thing(timezone.utc)
     +do_a_thing(dt.timezone.utc)
+
+.. code-block:: diff
+
+    +import datetime as dt
+     from datetime import datetime
+     from django.utils import timezone
+
+    -do_a_thing(datetime.now(tz=timezone.utc))
+    +do_a_thing(datetime.now(tz=dt.timezone.utc))
 
 ``assertFormError()`` and ``assertFormsetError()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

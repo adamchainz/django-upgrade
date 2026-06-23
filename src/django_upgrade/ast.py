@@ -3,11 +3,37 @@ from __future__ import annotations
 import ast
 import warnings
 from typing import TYPE_CHECKING, Literal, cast
+from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset
 
 if TYPE_CHECKING:
     from django_upgrade.data import State
+
+
+_module_names: WeakKeyDictionary[ast.Module, frozenset[str]] = WeakKeyDictionary()
+
+
+def get_module_names(module: ast.Module) -> frozenset[str]:
+    try:
+        return _module_names[module]
+    except KeyError:
+        pass
+
+    names: set[str] = set()
+    for node in ast.walk(module):
+        if isinstance(node, ast.Name):
+            names.add(node.id)
+        elif isinstance(node, ast.alias):
+            names.add(node.asname if node.asname is not None else node.name)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            names.add(node.name)
+        elif isinstance(node, ast.arg):
+            names.add(node.arg)
+
+    result = frozenset(names)
+    _module_names[module] = result
+    return result
 
 
 def ast_parse(contents_text: str) -> ast.Module:

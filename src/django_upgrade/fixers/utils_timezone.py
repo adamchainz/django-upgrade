@@ -10,11 +10,21 @@ from collections.abc import Iterable, MutableMapping
 from functools import partial
 from weakref import WeakKeyDictionary
 
-from tokenize_rt import Offset
+from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.ast import (
+    ast_start_offset,
+    get_module_names,
+    is_rewritable_import_from,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import replace, update_import_names
+from django_upgrade.tokens import (
+    extract_indent,
+    find_first_token,
+    insert,
+    replace,
+    update_import_names,
+)
 
 fixer = Fixer(
     __name__,
@@ -36,7 +46,7 @@ def visit_Name(
         )
         and details.datetime_module is not None
     ):
-        yield from maybe_rewrite_import(details)
+        yield from maybe_rewrite_imports(details, erase=True)
         new_src = f"{details.datetime_module}.timezone.utc"
         yield ast_start_offset(node), partial(replace, src=new_src)
 
@@ -55,6 +65,7 @@ def visit_Attribute(
         and (details := get_import_details(state, parents[0])).datetime_module
         is not None
     ):
+        yield from maybe_rewrite_imports(details, erase=False)
         new_src = f"{details.datetime_module}.timezone"
         yield ast_start_offset(node), partial(replace, src=new_src)
 
@@ -64,12 +75,18 @@ class ImportDetails:
         "old_utc_import",
         "datetime_module",
         "rewrite_scheduled",
+        "first_import_node",
+        "needs_datetime_import",
+        "add_import_scheduled",
     )
 
     def __init__(self) -> None:
         self.old_utc_import: ast.ImportFrom | None = None
         self.datetime_module: str | None = None
         self.rewrite_scheduled = False
+        self.first_import_node: ast.Import | ast.ImportFrom | None = None
+        self.needs_datetime_import = False
+        self.add_import_scheduled = False
 
 
 import_details: MutableMapping[State, ImportDetails] = WeakKeyDictionary()
@@ -96,6 +113,9 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         if not isinstance(node, (ast.Import, ast.ImportFrom)):
             break
 
+        if details.first_import_node is None:
+            details.first_import_node = node
+
         if isinstance(node, ast.Import):
             for alias in node.names:
                 if alias.name == "datetime":
@@ -113,24 +133,55 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         ):
             details.old_utc_import = node
 
+    if details.datetime_module is None and "dt" not in get_module_names(module):
+        details.datetime_module = "dt"
+        details.needs_datetime_import = True
+
     import_details[state] = details
     return details
 
 
-def maybe_rewrite_import(
+def maybe_rewrite_imports(
     details: ImportDetails,
+    *,
+    erase: bool,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if details.rewrite_scheduled:
+    do_insert = details.needs_datetime_import and not details.add_import_scheduled
+    do_erase = erase and not details.rewrite_scheduled
+
+    if not do_insert and not do_erase:
         return
 
-    assert details.old_utc_import is not None
+    assert details.first_import_node is not None
     yield (
-        ast_start_offset(details.old_utc_import),
+        ast_start_offset(details.first_import_node),
         partial(
-            update_import_names,
+            rewrite_imports,
             node=details.old_utc_import,
-            name_map={"utc": ""},
+            insert_dt=do_insert,
+            erase_utc=do_erase,
         ),
     )
 
-    details.rewrite_scheduled = True
+    if do_insert:
+        details.add_import_scheduled = True
+    if do_erase:
+        details.rewrite_scheduled = True
+
+
+def rewrite_imports(
+    tokens: list[Token],
+    i: int,
+    *,
+    node: ast.ImportFrom | None,
+    insert_dt: bool,
+    erase_utc: bool,
+) -> None:
+    if insert_dt:
+        j, indent = extract_indent(tokens, i)
+        insert(tokens, j, new_src=f"{indent}import datetime as dt\n")
+        i += 1
+    if erase_utc:
+        assert node is not None
+        i = find_first_token(tokens, i, node=node)
+        update_import_names(tokens, i, node=node, name_map={"utc": ""})

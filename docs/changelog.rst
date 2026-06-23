@@ -13,6 +13,10 @@ Pending
 
   `PR #658 <https://github.com/adamchainz/django-upgrade/pull/658>`__.
 
+* Add Django 6.1+ :ref:`transaction_savepoint` fixer to rename ``django.db.transaction``\’s ``savepoint`` to ``savepoint_create``.
+
+  `PR #660 <https://github.com/adamchainz/django-upgrade/pull/660>`__.
+
 * Extend :ref:`test_http_headers <test_http_headers>` fixer to cover ``AsyncClient``, ``AsyncRequestFactory``, and ``self.async_client.*()`` calls.
 
   Thanks to Benjamin Aduo in `PR #633 <https://github.com/adamchainz/django-upgrade/pull/633>`__.

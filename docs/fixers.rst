@@ -146,6 +146,26 @@ Rewrites imports of ``BitAnd``, ``BitOr``, and ``BitXor`` from ``django.contrib.
     -from django.contrib.postgres.aggregates import BitAnd, BitOr, BitXor
     +from django.db.models import BitAnd, BitOr, BitXor
 
+.. _transaction_savepoint:
+
+``transaction.savepoint()`` rename
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``transaction_savepoint``
+
+Renames the deprecated ``savepoint`` function in ``django.db.transaction`` to ``savepoint_create``, per `this change <https://docs.djangoproject.com/en/6.1/releases/6.1/#:~:text=django.db.transaction.savepoint>`__.
+
+.. code-block:: diff
+
+    -from django.db.transaction import savepoint
+    +from django.db.transaction import savepoint_create
+
+     # or
+    -from django.db import transaction
+    -transaction.savepoint("name")
+    +from django.db import transaction
+    +transaction.savepoint_create("name")
+
 Django 6.0
 ----------
 

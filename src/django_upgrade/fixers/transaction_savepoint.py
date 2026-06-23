@@ -1,0 +1,76 @@
+"""
+Rewrite django.db.transaction.savepoint to savepoint_create:
+https://docs.djangoproject.com/en/6.1/releases/6.1/#:~:text=django.db.transaction.savepoint
+"""
+
+from __future__ import annotations
+
+import ast
+from collections.abc import Iterable
+from functools import partial
+
+from tokenize_rt import Offset
+
+from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.data import Fixer, State, TokenFunc
+from django_upgrade.tokens import find_and_replace_name, update_import_names
+
+fixer = Fixer(
+    __name__,
+    min_version=(6, 1),
+)
+
+NAMES = {
+    "savepoint": "savepoint_create",
+}
+
+
+@fixer.register(ast.ImportFrom)
+def visit_ImportFrom(
+    state: State,
+    node: ast.ImportFrom,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (
+        node.module == "django.db.transaction"
+        and is_rewritable_import_from(node)
+        and any(alias.name in NAMES for alias in node.names)
+    ):
+        yield (
+            ast_start_offset(node),
+            partial(update_import_names, node=node, name_map=NAMES),
+        )
+
+
+@fixer.register(ast.Name)
+def visit_Name(
+    state: State,
+    node: ast.Name,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if (name := node.id) in NAMES and name in state.from_imports[
+        "django.db.transaction"
+    ]:
+        yield (
+            ast_start_offset(node),
+            partial(find_and_replace_name, name=name, new=NAMES[name]),
+        )
+
+
+@fixer.register(ast.Attribute)
+def visit_Attribute(
+    state: State,
+    node: ast.Attribute,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    name = node.attr
+    if (
+        name in NAMES
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "transaction"
+        and "transaction" in state.from_imports["django.db"]
+    ):
+        yield (
+            ast_start_offset(node),
+            partial(find_and_replace_name, name=name, new=NAMES[name]),
+        )

@@ -31,7 +31,7 @@ from tokenize_rt import Offset
 
 from django_upgrade.ast import ast_start_offset, is_passing_comparison
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import erase_decorated_def, erase_decorator
+from django_upgrade.tokens import erase_decorator, erase_def
 
 fixer = Fixer(
     __name__,
@@ -127,11 +127,7 @@ def _handle_decorator(
             if always_skipped:
                 yield (
                     ast_start_offset(node.decorator_list[0]),
-                    partial(
-                        erase_decorated_def,
-                        first_decorator=node.decorator_list[0],
-                        node=node,
-                    ),
+                    partial(erase_def, node=node),
                 )
                 break
             else:

@@ -5,7 +5,12 @@ import ast
 import pytest
 from tokenize_rt import Token, src_to_tokens, tokens_to_src
 
-from django_upgrade.tokens import str_repr_matching, update_import_names
+from django_upgrade.tokens import (
+    erase_def,
+    find_first_token,
+    str_repr_matching,
+    update_import_names,
+)
 
 
 @pytest.mark.parametrize(
@@ -25,6 +30,49 @@ def test_str_repr_matching(text, match_quotes, expected):
 
 def tokenize_and_parse(source: str) -> tuple[list[Token], ast.Module]:
     return src_to_tokens(source), ast.parse(source)
+
+
+class TestEraseDef:
+    def check_transformed(
+        self, *, before: str, after: str, node_index: int = 0
+    ) -> None:
+        tokens, mod = tokenize_and_parse(before)
+        node = mod.body[node_index]
+        assert isinstance(node, (ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef))
+        i = find_first_token(tokens, 0, node=node.decorator_list[0])
+        erase_def(tokens, i, node=node)
+        assert tokens_to_src(tokens) == after
+
+    def test_function(self):
+        self.check_transformed(
+            before="@dec\ndef foo():\n    pass\n",
+            after="",
+        )
+
+    def test_two_decorators(self):
+        self.check_transformed(
+            before="@dec1\n@dec2\ndef foo():\n    pass\n",
+            after="",
+        )
+
+    def test_preceding_statement(self):
+        self.check_transformed(
+            before="x = 1\n\n@dec\ndef foo():\n    pass\n",
+            after="x = 1\n",
+            node_index=1,
+        )
+
+    def test_async_function(self):
+        self.check_transformed(
+            before="@dec\nasync def foo():\n    pass\n",
+            after="",
+        )
+
+    def test_class(self):
+        self.check_transformed(
+            before="@dec\nclass Foo:\n    pass\n",
+            after="",
+        )
 
 
 class TestUpdateImportNames:

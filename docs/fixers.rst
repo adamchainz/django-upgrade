@@ -132,7 +132,19 @@ Django 6.1
 
 `Release Notes <https://docs.djangoproject.com/en/6.1/releases/6.1/>`__
 
-(No fixers yet.)
+.. _postgres_bit_aggregates:
+
+``BitAnd``, ``BitOr``, and ``BitXor`` aggregate move
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``compatibility_imports``
+
+Rewrites imports of ``BitAnd``, ``BitOr``, and ``BitXor`` from ``django.contrib.postgres.aggregates`` to the new all-database versions in ``django.db.models``, per `this change <https://docs.djangoproject.com/en/6.1/releases/6.1/#:~:text=The%20BitAnd%2C%20BitOr%2C%20and%20BitXor%20classes>`__.
+
+.. code-block:: diff
+
+    -from django.contrib.postgres.aggregates import BitAnd, BitOr, BitXor
+    +from django.db.models import BitAnd, BitOr, BitXor
 
 Django 6.0
 ----------

@@ -103,6 +103,18 @@ REPLACEMENTS_EXACT = {
             "TRANSLATOR_COMMENT_MARK": "django.utils.translation.template"
         }
     },
+    (6, 1): {
+        "django.contrib.postgres.aggregates": {
+            "BitAnd": "django.db.models",
+            "BitOr": "django.db.models",
+            "BitXor": "django.db.models",
+        },
+        "django.contrib.postgres.aggregates.general": {
+            "BitAnd": "django.db.models",
+            "BitOr": "django.db.models",
+            "BitXor": "django.db.models",
+        },
+    },
 }
 REPLACEMENTS_EXCEPT_MIGRATIONS = {
     (3, 1): {

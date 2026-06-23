@@ -10,6 +10,8 @@ All versions
 
 The below fixers run regardless of the target version.
 
+.. _versioned_branches:
+
 Versioned blocks
 ~~~~~~~~~~~~~~~~
 

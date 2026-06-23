@@ -47,6 +47,11 @@ Pending
 
   `PR #664 <https://github.com/adamchainz/django-upgrade/pull/664>`__.
 
+* Fix :ref:`versioned_branches <versioned_branches>` fixer to avoid leaving code with broken syntax emptying a parent block.
+  A ``pass`` is now inserted to keep the code valid.
+
+  `PR #665 <https://github.com/adamchainz/django-upgrade/pull/665>`__.
+
 1.30.0 (2026-02-24)
 -------------------
 

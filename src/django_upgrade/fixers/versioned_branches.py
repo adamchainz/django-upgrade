@@ -39,14 +39,30 @@ def visit_If(
             not node.orelse or not isinstance(node.orelse[0], ast.If)
         )
     ):
+        needs_pass = (
+            pass_fail == "fail"
+            and not node.orelse
+            and _is_sole_statement_in_block(node, parents[-1])
+        )
         yield (
             ast_start_offset(node),
             partial(
                 _fix_block,
                 node=node,
                 keep_branch=("first" if pass_fail == "pass" else "second"),
+                needs_pass=needs_pass,
             ),
         )
+
+
+def _is_sole_statement_in_block(node: ast.stmt, parent: ast.AST) -> bool:
+    if isinstance(parent, ast.Module):
+        return False
+    for attr in ("body", "orelse", "finalbody"):
+        body = getattr(parent, attr, [])
+        if len(body) == 1 and body[0] is node:
+            return True
+    return False
 
 
 def _fix_block(
@@ -55,6 +71,7 @@ def _fix_block(
     *,
     node: ast.If,
     keep_branch: Literal["first", "second"],
+    needs_pass: bool,
 ) -> None:
     if tokens[i].src != "if":
         # do not handle 'elif'
@@ -75,7 +92,13 @@ def _fix_block(
             if_block.dedent(tokens)
             del tokens[if_block.start : if_block.block]
         else:
-            del tokens[if_block.start : if_block.end]
+            if needs_pass:
+                indent = " " * if_block._initial_indent(tokens)
+                tokens[if_block.start : if_block.end] = [
+                    Token("CODE", f"{indent}pass\n")
+                ]
+            else:
+                del tokens[if_block.start : if_block.end]
 
 
 def _find_if_else_block(tokens: list[Token], i: int) -> tuple[Block, Block]:

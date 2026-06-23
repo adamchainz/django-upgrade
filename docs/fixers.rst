@@ -132,6 +132,30 @@ Django 6.1
 
 `Release Notes <https://docs.djangoproject.com/en/6.1/releases/6.1/>`__
 
+.. _settings_logging_admin_email_handler:
+
+``AdminEmailHandler`` ``email_backend`` argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``settings_logging_admin_email_handler``
+
+Renames the deprecated ``email_backend`` argument of ``AdminEmailHandler`` in the ``LOGGING`` setting to ``using``, per `this change <https://docs.djangoproject.com/en/6.1/releases/6.1/#:~:text=email_backend%20argument>`__.
+
+Settings files are heuristically detected as modules with the whole word ``settings`` somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+.. code-block:: diff
+
+    LOGGING = {
+        "handlers": {
+            "mail_admins": {
+                "class": "django.utils.log.AdminEmailHandler",
+   -            "email_backend": "myapp.backends.EmailBackend",
+   +            "using": "myapp.backends.EmailBackend",
+            },
+        },
+    }
+
 .. _postgres_bit_aggregates:
 
 ``BitAnd``, ``BitOr``, and ``BitXor`` aggregate move

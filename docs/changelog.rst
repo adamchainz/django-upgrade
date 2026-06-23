@@ -9,11 +9,15 @@ Pending
 
   `PR #646 <https://github.com/adamchainz/django-upgrade/pull/646>`__.
 
+* Add Django 6.1+ :ref:`settings_logging_admin_email_handler <settings_logging_admin_email_handler>` fixer to rename the ``email_backend`` argument of ``AdminEmailHandler`` in the ``LOGGING`` setting to ``using``.
+
+  `PR #662 <https://github.com/adamchainz/django-upgrade/pull/662>`__.
+
 * Add Django 6.1+ ``compatibility_imports`` :ref:`fixer entries <postgres_bit_aggregates>` to move ``BitAnd``, ``BitOr``, and ``BitXor`` imports from ``django.contrib.postgres.aggregates`` to ``django.db.models``.
 
   `PR #658 <https://github.com/adamchainz/django-upgrade/pull/658>`__.
 
-* Add Django 6.1+ :ref:`transaction_savepoint` fixer to rename ``django.db.transaction``\’s ``savepoint`` to ``savepoint_create``.
+* Add Django 6.1+ :ref:`transaction_savepoint <transaction_savepoint>` fixer to rename ``django.db.transaction``\’s ``savepoint`` to ``savepoint_create``.
 
   `PR #660 <https://github.com/adamchainz/django-upgrade/pull/660>`__.
 

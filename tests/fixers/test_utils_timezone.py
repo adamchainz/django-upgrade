@@ -70,6 +70,46 @@ def test_no_datetime_import_dt_name_conflict():
     )
 
 
+def test_no_datetime_import_dt_dotted_import_conflict():
+    check_noop(
+        """\
+        import dt.foo
+        from django.utils import timezone
+
+        do_a_thing(timezone.utc)
+        """,
+    )
+
+
+def test_no_datetime_import_dt_except_handler_conflict():
+    check_noop(
+        """\
+        from django.utils import timezone
+
+        try:
+            pass
+        except Exception as dt:
+            pass
+
+        do_a_thing(timezone.utc)
+        """,
+    )
+
+
+def test_no_datetime_import_dt_pattern_conflict():
+    check_noop(
+        """\
+        from django.utils import timezone
+
+        match value:
+            case dt:
+                pass
+
+        do_a_thing(timezone.utc)
+        """,
+    )
+
+
 def test_basic():
     check_transformed(
         """\
@@ -378,5 +418,23 @@ def test_from_datetime_import_attr():
         from django.utils import timezone
 
         do_a_thing(datetime.now(tz=dt.timezone.utc))
+        """,
+    )
+
+
+def test_no_datetime_import_future_import():
+    check_transformed(
+        """\
+        from __future__ import annotations
+        from django.utils import timezone
+
+        do_a_thing(timezone.utc)
+        """,
+        """\
+        from __future__ import annotations
+        import datetime as dt
+        from django.utils import timezone
+
+        do_a_thing(dt.timezone.utc)
         """,
     )

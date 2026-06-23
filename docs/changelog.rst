@@ -43,6 +43,10 @@ Pending
   `PR #647 <https://github.com/adamchainz/django-upgrade/pull/647>`__.
   Thanks to Joerg Sonnenberger for the report in `Issue #645 <https://github.com/adamchainz/django-upgrade/issues/645>`__ and review.
 
+* Fix :ref:`null_boolean_field <null_boolean_field>` fixer when ``NullBooleanField`` is used in non-call contexts, for example as a base class.
+
+  `PR #664 <https://github.com/adamchainz/django-upgrade/pull/664>`__.
+
 1.30.0 (2026-02-24)
 -------------------
 

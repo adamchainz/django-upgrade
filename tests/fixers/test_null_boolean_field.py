@@ -30,6 +30,32 @@ def test_untransformed_in_migration_file():
     )
 
 
+def test_name_used_as_base_class():
+    check_noop(
+        """\
+        from django.db.models import BooleanField, NullBooleanField
+
+        class MyNullBooleanField(NullBooleanField):
+            ...
+        """,
+        filename="models/blog.py",
+    )
+
+
+def test_name_used_as_base_class_and_call():
+    check_noop(
+        """\
+        from django.db.models import NullBooleanField
+
+        class MyNullBooleanField(NullBooleanField):
+            ...
+
+        field = NullBooleanField()
+        """,
+        filename="models/blog.py",
+    )
+
+
 def test_transform_in_class():
     check_transformed(
         """\

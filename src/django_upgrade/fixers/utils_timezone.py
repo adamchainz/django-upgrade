@@ -18,7 +18,13 @@ from django_upgrade.ast import (
     is_rewritable_import_from,
 )
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import extract_indent, insert, replace, update_import_names
+from django_upgrade.tokens import (
+    extract_indent,
+    find_first_token,
+    insert,
+    replace,
+    update_import_names,
+)
 
 fixer = Fixer(
     __name__,
@@ -40,8 +46,7 @@ def visit_Name(
         )
         and details.datetime_module is not None
     ):
-        yield from maybe_add_datetime_import(details)
-        yield from maybe_rewrite_import(details)
+        yield from maybe_rewrite_imports(details, erase=True)
         new_src = f"{details.datetime_module}.timezone.utc"
         yield ast_start_offset(node), partial(replace, src=new_src)
 
@@ -60,7 +65,7 @@ def visit_Attribute(
         and (details := get_import_details(state, parents[0])).datetime_module
         is not None
     ):
-        yield from maybe_add_datetime_import(details)
+        yield from maybe_rewrite_imports(details, erase=False)
         new_src = f"{details.datetime_module}.timezone"
         yield ast_start_offset(node), partial(replace, src=new_src)
 
@@ -136,40 +141,47 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
     return details
 
 
-def add_datetime_import(tokens: list[Token], i: int, *, dt_alias: str) -> None:
-    j, indent = extract_indent(tokens, i)
-    insert(tokens, j, new_src=f"{indent}import datetime as {dt_alias}\n")
-
-
-def maybe_add_datetime_import(
+def maybe_rewrite_imports(
     details: ImportDetails,
+    *,
+    erase: bool,
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if not details.needs_datetime_import or details.add_import_scheduled:
+    do_insert = details.needs_datetime_import and not details.add_import_scheduled
+    do_erase = erase and not details.rewrite_scheduled
+
+    if not do_insert and not do_erase:
         return
 
     assert details.first_import_node is not None
     yield (
         ast_start_offset(details.first_import_node),
-        partial(add_datetime_import, dt_alias="dt"),
-    )
-
-    details.add_import_scheduled = True
-
-
-def maybe_rewrite_import(
-    details: ImportDetails,
-) -> Iterable[tuple[Offset, TokenFunc]]:
-    if details.rewrite_scheduled:
-        return
-
-    assert details.old_utc_import is not None
-    yield (
-        ast_start_offset(details.old_utc_import),
         partial(
-            update_import_names,
+            rewrite_imports,
             node=details.old_utc_import,
-            name_map={"utc": ""},
+            insert_dt=do_insert,
+            erase_utc=do_erase,
         ),
     )
 
-    details.rewrite_scheduled = True
+    if do_insert:
+        details.add_import_scheduled = True
+    if do_erase:
+        details.rewrite_scheduled = True
+
+
+def rewrite_imports(
+    tokens: list[Token],
+    i: int,
+    *,
+    node: ast.ImportFrom | None,
+    insert_dt: bool,
+    erase_utc: bool,
+) -> None:
+    if insert_dt:
+        j, indent = extract_indent(tokens, i)
+        insert(tokens, j, new_src=f"{indent}import datetime as dt\n")
+        i += 1
+    if erase_utc:
+        assert node is not None
+        i = find_first_token(tokens, i, node=node)
+        update_import_names(tokens, i, node=node, name_map={"utc": ""})

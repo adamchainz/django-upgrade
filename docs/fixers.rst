@@ -479,7 +479,7 @@ Django 4.1
 **Name:** ``utils_timezone``
 
 Rewrites imports of ``django.utils.timezone.utc`` to use ``datetime.timezone.utc``.
-Requires an existing import of the ``datetime`` module, or that the name ``dt`` is unused, in which case ``import datetime as dt`` is inserted.
+Uses an existing ``import datetime`` statement if present, otherwise inserts ``import datetime as dt`` if the name ``dt`` is unused in the module.
 
 .. code-block:: diff
 

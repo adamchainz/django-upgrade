@@ -8,6 +8,7 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterable
 from functools import partial
+from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
 
@@ -29,13 +30,50 @@ fixer = Fixer(
 )
 
 
+_nullbooleanfield_check_cache: WeakKeyDictionary[ast.Module, bool] = WeakKeyDictionary()
+
+
+def _all_nullbooleanfield_name_usages_are_calls(module: ast.AST) -> bool:
+    assert isinstance(module, ast.Module)
+    try:
+        return _nullbooleanfield_check_cache[module]
+    except KeyError:
+        pass
+
+    call_func_nodes: set[ast.Name] = set()
+    for node in ast.walk(module):
+        # Calls are yielded before their children, including 'func'. So if we
+        # encounter a Name that wasn’t set in a previous Call node’s func attr,
+        # it’s used for a different purpose.
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "NullBooleanField"
+        ):
+            call_func_nodes.add(node.func)
+        elif (
+            isinstance(node, ast.Name)
+            and node.id == "NullBooleanField"
+            and node not in call_func_nodes
+        ):
+            _nullbooleanfield_check_cache[module] = False
+            return False
+
+    _nullbooleanfield_check_cache[module] = True
+    return True
+
+
 @fixer.register(ast.ImportFrom)
 def visit_ImportFrom(
     state: State,
     node: ast.ImportFrom,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if is_rewritable_import_from(node) and node.module == "django.db.models":
+    if (
+        is_rewritable_import_from(node)
+        and node.module == "django.db.models"
+        and _all_nullbooleanfield_name_usages_are_calls(parents[0])
+    ):
         yield (
             ast_start_offset(node),
             partial(
@@ -56,6 +94,7 @@ def visit_Call(
         isinstance(node.func, ast.Name)
         and "NullBooleanField" in state.from_imports["django.db.models"]
         and node.func.id == "NullBooleanField"
+        and _all_nullbooleanfield_name_usages_are_calls(parents[0])
     ) or (
         isinstance(node.func, ast.Attribute)
         and node.func.attr == "NullBooleanField"

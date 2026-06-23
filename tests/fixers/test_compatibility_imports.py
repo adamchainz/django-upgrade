@@ -414,3 +414,98 @@ def test_urlresolvers_transformed():
         """,
         Settings(target_version=(1, 10)),
     )
+
+
+class TestPostgresBitAggregates:
+    settings = Settings(target_version=(6, 1))
+
+    def test_unmatched_import(self):
+        check_noop(
+            """\
+            from example import BitAnd
+            """,
+            self.settings,
+        )
+
+    def test_no_matching_name(self):
+        check_noop(
+            """\
+            from django.contrib.postgres.aggregates import ArrayAgg
+            """,
+            self.settings,
+        )
+
+    def test_old_target_version(self):
+        check_noop(
+            """\
+            from django.contrib.postgres.aggregates import BitAnd
+            """,
+            Settings(target_version=(6, 0)),
+        )
+
+    def test_bitand(self):
+        check_transformed(
+            """\
+            from django.contrib.postgres.aggregates import BitAnd
+            """,
+            """\
+            from django.db.models import BitAnd
+            """,
+            self.settings,
+        )
+
+    def test_bitor(self):
+        check_transformed(
+            """\
+            from django.contrib.postgres.aggregates import BitOr
+            """,
+            """\
+            from django.db.models import BitOr
+            """,
+            self.settings,
+        )
+
+    def test_bitxor(self):
+        check_transformed(
+            """\
+            from django.contrib.postgres.aggregates import BitXor
+            """,
+            """\
+            from django.db.models import BitXor
+            """,
+            self.settings,
+        )
+
+    def test_all_three(self):
+        check_transformed(
+            """\
+            from django.contrib.postgres.aggregates import BitAnd, BitOr, BitXor
+            """,
+            """\
+            from django.db.models import BitAnd, BitOr, BitXor
+            """,
+            self.settings,
+        )
+
+    def test_mixed_with_other_imports(self):
+        check_transformed(
+            """\
+            from django.contrib.postgres.aggregates import ArrayAgg, BitAnd, BitOr
+            """,
+            """\
+            from django.db.models import BitAnd, BitOr
+            from django.contrib.postgres.aggregates import ArrayAgg
+            """,
+            self.settings,
+        )
+
+    def test_general_submodule(self):
+        check_transformed(
+            """\
+            from django.contrib.postgres.aggregates.general import BitAnd
+            """,
+            """\
+            from django.db.models import BitAnd
+            """,
+            self.settings,
+        )

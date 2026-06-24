@@ -9,6 +9,10 @@ Pending
 
   `PR #646 <https://github.com/adamchainz/django-upgrade/pull/646>`__.
 
+* Add Django 6.1+ :ref:`mail_get_connection <mail_get_connection>` fixer to replace no-argument mail ``get_connection()`` calls with ``mailers.default``, and remove inline ``connection=get_connection()`` kwargs from mail sending functions.
+
+  `PR #666 <https://github.com/adamchainz/django-upgrade/pull/666>`__.
+
 * Add Django 6.1+ :ref:`settings_logging_admin_email_handler <settings_logging_admin_email_handler>` fixer to rename the ``email_backend`` argument of ``AdminEmailHandler`` in the ``LOGGING`` setting to ``using``.
 
   `PR #662 <https://github.com/adamchainz/django-upgrade/pull/662>`__.

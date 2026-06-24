@@ -23,7 +23,7 @@ Pending
 
 * Add Django 4.0+ fixer :ref:`gis_admin_deprecations <gis_admin_deprecations>` to migrate from deprecated GIS admin classes to the new ones.
 
-  Thanks to Adolfo Fitoria in `PR #484 <https://github.com/adamchainz/django-upgrade/pull/484>`__.
+  Thanks to Adolfo Fitoria for the initial implementation in `PR #484 <https://github.com/adamchainz/django-upgrade/pull/484>`__.
 
 * Extend :ref:`test_http_headers <test_http_headers>` fixer to cover ``AsyncClient``, ``AsyncRequestFactory``, and ``self.async_client.*()`` calls.
 

@@ -134,6 +134,36 @@ Django 6.1
 
 `Release Notes <https://docs.djangoproject.com/en/6.1/releases/6.1/>`__
 
+.. _mail_get_connection:
+
+``mail.get_connection()`` replacement
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``mail_get_connection``
+
+Replaces no-argument calls to ``mail.get_connection()`` with ``mail.mailers.default``, and removes inline ``connection=get_connection()`` keyword arguments from ``send_mail()``, ``send_mass_mail()``, ``mail_admins()``, and ``mail_managers()`` calls, per `the mailers migration guide <https://docs.djangoproject.com/en/6.1/howto/mailers-migration/#replacing-get-connection-and-connection-arguments>`__.
+
+.. code-block:: diff
+
+   -from django.core.mail import get_connection, send_mail
+   +from django.core.mail import mailers, send_mail
+
+    # Standalone usage
+   -conn = get_connection()
+   +conn = mailers.default
+    conn.send_messages([msg1, msg2])
+
+    # Or with module import
+    from django.core import mail
+    from django.core import mail
+   -conn = mail.get_connection()
+   +conn = mail.mailers.default
+
+    # Inline connection= kwarg is removed entirely
+   -send_mail("subject", "message", "from@example.com", ["to@example.com"],
+   -          connection=get_connection())
+   +send_mail("subject", "message", "from@example.com", ["to@example.com"])
+
 .. _settings_logging_admin_email_handler:
 
 ``AdminEmailHandler`` ``email_backend`` argument

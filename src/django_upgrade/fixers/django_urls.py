@@ -31,6 +31,15 @@ fixer = Fixer(
     min_version=(2, 0),
 )
 
+# Track which names are used for translation functions in a given state.
+state_translation_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
+# Track if re_path has been used, and which names need adding.
+# When fixing import statements, these variables determine which names to
+# import/remove.
+state_re_path_used: MutableMapping[State, bool] = WeakKeyDictionary()
+# Track which names have been added to the import statement for a given state.
+state_added_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
+
 
 @fixer.register(ast.ImportFrom)
 def visit_ImportFrom(
@@ -64,13 +73,11 @@ def visit_ImportFrom(
                 state=state,
             ),
         )
-
-
-# Track if re_path has been used, and which names need adding.
-# When fixing import statements, these variables determine which names to
-# import/remove.
-state_re_path_used: MutableMapping[State, bool] = WeakKeyDictionary()
-state_added_names: MutableMapping[State, set[str]] = WeakKeyDictionary()
+    if node.module == "django.utils.translation":
+        for alias in node.names:
+            if alias.name == "gettext_lazy":
+                local_name = alias.asname if alias.asname else alias.name
+                state_translation_names.setdefault(state, set()).add(local_name)
 
 
 def update_django_conf_import(
@@ -160,6 +167,15 @@ def visit_Call(
                 node.args[0].value, str
             ):
                 regex_path = node.args[0]
+            elif (
+                isinstance(node.args[0], ast.Call)
+                and isinstance(node.args[0].func, ast.Name)
+                and node.args[0].func.id in state_translation_names.get(state, set())
+                and len(node.args[0].args) >= 1
+                and isinstance(node.args[0].args[0], ast.Constant)
+                and isinstance(node.args[0].args[0].value, str)
+            ):
+                regex_path = node.args[0].args[0]
 
             include_called = (
                 len(node.args) >= 2

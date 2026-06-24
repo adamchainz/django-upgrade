@@ -25,6 +25,10 @@ Pending
 
   Thanks to Benjamin Aduo in `PR #633 <https://github.com/adamchainz/django-upgrade/pull/633>`__.
 
+* Extend :ref:`django_urls <django_urls>` fixer to convert translated URL patterns wrapped in translation functions, like ``_(r'^about/$')``, when the pattern is convertible.
+
+  `PR #667 <https://github.com/adamchainz/django-upgrade/pull/667>`__.
+
 * Extend :ref:`utils_timezone` fixer to work when no ``import datetime`` statement exists, by inserting ``import datetime as dt`` when the name ``dt`` is unused.
 
   Thanks to Ryan Siemens for the report in `Issue #568 <https://github.com/adamchainz/django-upgrade/issues/568>`__ and Benjamin Aduo for the implementation in `PR #631 <https://github.com/adamchainz/django-upgrade/pull/631>`__.

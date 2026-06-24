@@ -133,30 +133,13 @@ def test_re_path_unconverted_regex():
     )
 
 
-def test_url_translation():
-    check_transformed(
-        """\
-        from django.conf.urls import url
-        from django.utils.translation import gettext_lazy as _
-
-        url(_(r'^about/$'), views.about)
-        """,
-        """\
-        from django.urls import re_path
-        from django.utils.translation import gettext_lazy as _
-
-        re_path(_(r'^about/$'), views.about)
-        """,
-    )
-
-
-def test_re_path_translation():
+def test_re_path_translation_unconverted_regex():
     check_noop(
         """\
         from django.urls import re_path
         from django.utils.translation import gettext_lazy as _
 
-        re_path(_(r'^about/$'), views.about)
+        re_path(_(r'^about/[0-9]/$'), views.about)
         """,
     )
 
@@ -655,6 +638,57 @@ def test_re_path_uuid_converter():
         from django.urls import path
 
         path('uuid/<uuid:uuid>/', by_uuid)
+        """,
+    )
+
+
+def test_url_translation():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+        from django.utils.translation import gettext_lazy as _
+
+        url(_(r'^about/$'), views.about)
+        """,
+        """\
+        from django.urls import path
+        from django.utils.translation import gettext_lazy as _
+
+        path(_('about/'), views.about)
+        """,
+    )
+
+
+def test_url_translation_unconverted_regex():
+    check_transformed(
+        """\
+        from django.conf.urls import url
+        from django.utils.translation import gettext_lazy as _
+
+        url(_(r'^about/[0-9]/$'), views.about)
+        """,
+        """\
+        from django.urls import re_path
+        from django.utils.translation import gettext_lazy as _
+
+        re_path(_(r'^about/[0-9]/$'), views.about)
+        """,
+    )
+
+
+def test_re_path_translation():
+    check_transformed(
+        """\
+        from django.urls import re_path
+        from django.utils.translation import gettext_lazy as _
+
+        re_path(_(r'^about/$'), views.about)
+        """,
+        """\
+        from django.urls import path
+        from django.utils.translation import gettext_lazy as _
+
+        path(_('about/'), views.about)
         """,
     )
 

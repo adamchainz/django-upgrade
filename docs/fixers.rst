@@ -1141,6 +1141,26 @@ Thus, you should test affected paths after this fixer makes any changes.
 Note that ``[\w-]`` is sometimes used for slugs, but is not converted because it might be incompatible.
 That pattern matches all Unicode word characters, such as “α”, unlike Django's ``slug`` converter, which only matches Latin characters.
 
+.. _render_to_response:
+
+``render_to_response()``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``render_to_response``
+
+Rewrites deprecated ``django.shortcuts.render_to_response()`` to ``render()``, adding ``request`` as the first argument.
+
+Only applied when every call in the file is inside a function whose first argument is named ``request``, and there are no ``*args`` or ``**kwargs`` splats in the call.
+
+.. code-block:: diff
+
+    -from django.shortcuts import render_to_response
+    +from django.shortcuts import render
+
+     def my_view(request):
+    -    return render_to_response("index.html", {"key": "value"})
+    +    return render(request, "index.html", {"key": "value"})
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 

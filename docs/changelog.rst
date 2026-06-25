@@ -29,6 +29,10 @@ Pending
 
   `PR #660 <https://github.com/adamchainz/django-upgrade/pull/660>`__.
 
+* Add Django 2.0+ :ref:`render_to_response <render_to_response>` fixer to rewrite ``render_to_response()`` calls to ``render()``, inserting ``request`` as the first argument.
+
+  `PR #669 <https://github.com/adamchainz/django-upgrade/pull/669>`__.
+
 * Extend :ref:`test_http_headers <test_http_headers>` fixer to cover ``AsyncClient``, ``AsyncRequestFactory``, and ``self.async_client.*()`` calls.
 
   Thanks to Benjamin Aduo in `PR #633 <https://github.com/adamchainz/django-upgrade/pull/633>`__.

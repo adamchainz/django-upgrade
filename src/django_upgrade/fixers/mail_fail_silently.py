@@ -28,6 +28,7 @@ fixer = Fixer(
 )
 
 MAIL_MODULE = "django.core.mail"
+MESSAGE_MODULE = "django.core.mail.message"
 CORE_MODULE = "django.core"
 MAIL_NAME = "mail"
 
@@ -77,6 +78,10 @@ def visit_Call(
                 (
                     isinstance(node.func.value.func, ast.Name)
                     and node.func.value.func.id in EMAIL_MESSAGE_CLASSES
+                    and (
+                        node.func.value.func.id in state.from_imports[MAIL_MODULE]
+                        or node.func.value.func.id in state.from_imports[MESSAGE_MODULE]
+                    )
                 )
                 or (
                     isinstance(node.func.value.func, ast.Attribute)

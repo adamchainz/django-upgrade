@@ -238,6 +238,15 @@ def test_all_send_functions_module_import():
 # EmailMessage(...).send()
 
 
+def test_email_message_unmatched_direct_import():
+    check_noop(
+        """\
+        from example import EmailMessage
+        EmailMessage("s", "m", "f", ["t"]).send(fail_silently=False)
+        """,
+    )
+
+
 def test_email_message_send_direct():
     check_transformed(
         """\
@@ -246,6 +255,19 @@ def test_email_message_send_direct():
         """,
         """\
         from django.core.mail import EmailMessage
+        EmailMessage("s", "m", "f", ["t"]).send()
+        """,
+    )
+
+
+def test_email_message_send_message_module_import():
+    check_transformed(
+        """\
+        from django.core.mail.message import EmailMessage
+        EmailMessage("s", "m", "f", ["t"]).send(fail_silently=False)
+        """,
+        """\
+        from django.core.mail.message import EmailMessage
         EmailMessage("s", "m", "f", ["t"]).send()
         """,
     )

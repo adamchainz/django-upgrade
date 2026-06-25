@@ -164,6 +164,28 @@ Replaces no-argument calls to ``mail.get_connection()`` with ``mail.mailers.defa
    -          connection=get_connection())
    +send_mail("subject", "message", "from@example.com", ["to@example.com"])
 
+.. _mail_fail_silently:
+
+``fail_silently=False`` removal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``mail_fail_silently``
+
+Removes ``fail_silently=False`` keyword arguments from calls to ``send_mail()``, ``send_mass_mail()``, ``mail_admins()``, ``mail_managers()``, and ``EmailMessage(...).send()`` / ``EmailMultiAlternatives(...).send()``, since ``False`` is the default, per `the mailers migration guide <https://docs.djangoproject.com/en/6.1/howto/mailers-migration/#replacing-fail-silently>`__.
+
+.. code-block:: diff
+
+    from django.core.mail import send_mail, EmailMessage
+
+   -send_mail("subject", "message", "from@example.com", ["to@example.com"],
+   -          fail_silently=False)
+   +send_mail("subject", "message", "from@example.com", ["to@example.com"])
+
+   -EmailMessage("subject", "message", "from@example.com", ["to@example.com"]).send(
+   -    fail_silently=False
+   -)
+   +EmailMessage("subject", "message", "from@example.com", ["to@example.com"]).send()
+
 .. _settings_logging_admin_email_handler:
 
 ``AdminEmailHandler`` ``email_backend`` argument

@@ -99,6 +99,15 @@ def test_unknown_keyword_argument():
     )
 
 
+def test_starred_argument_not_rewritten():
+    check_noop(
+        """\
+        from django.core.mail import send_mail
+        send_mail("Subject", "Message", "from@example.com", ["to@example.com"], *args)
+        """,
+    )
+
+
 def test_get_connection():
     check_transformed(
         """\

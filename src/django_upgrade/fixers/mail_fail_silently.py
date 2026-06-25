@@ -9,17 +9,17 @@ import ast
 from collections.abc import Iterable
 from functools import partial
 
-from tokenize_rt import UNIMPORTANT_WS, Offset, Token
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
-    INDENT,
     OP,
     find,
+    find_call_arg,
     find_last_token,
     parse_call_args,
-    reverse_consume,
+    remove_call_arg,
 )
 
 fixer = Fixer(
@@ -93,7 +93,7 @@ def visit_Call(
             )
         )
     ):
-        for kw_idx, kw in enumerate(node.keywords):
+        for kw in node.keywords:
             if (
                 kw.arg == "fail_silently"
                 and isinstance(kw.value, ast.Constant)
@@ -104,7 +104,7 @@ def visit_Call(
                     partial(
                         remove_fail_silently_kwarg,
                         node=node,
-                        kwarg_idx=len(node.args) + kw_idx,
+                        kwarg=kw,
                     ),
                 )
                 break
@@ -115,17 +115,11 @@ def remove_fail_silently_kwarg(
     i: int,
     *,
     node: ast.Call,
-    kwarg_idx: int,
+    kwarg: ast.keyword,
 ) -> None:
     j = find_last_token(tokens, i, node=node.func)
     open_paren = find(tokens, j, name=OP, src="(")
     func_args, _ = parse_call_args(tokens, open_paren)
 
-    start_idx, end_idx = func_args[kwarg_idx]
-
-    # Walk back over whitespace/indent and the preceding comma
-    start_idx = reverse_consume(tokens, start_idx, name=UNIMPORTANT_WS)
-    start_idx = reverse_consume(tokens, start_idx, name=INDENT)
-    start_idx = reverse_consume(tokens, start_idx, name=OP, src=",")
-
-    del tokens[start_idx:end_idx]
+    start_idx, end_idx = find_call_arg(tokens, func_args, kwarg)
+    remove_call_arg(tokens, start_idx, end_idx)

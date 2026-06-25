@@ -11,18 +11,18 @@ from collections.abc import Iterable
 from functools import partial
 from weakref import WeakKeyDictionary
 
-from tokenize_rt import UNIMPORTANT_WS, Offset, Token
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     CODE,
-    INDENT,
     OP,
     find,
+    find_call_arg,
     find_last_token,
     parse_call_args,
-    reverse_consume,
+    remove_call_arg,
     update_import_names,
 )
 
@@ -135,14 +135,14 @@ def visit_Call(
         and node.func.value.id == MAIL_NAME
         and MAIL_NAME in state.from_imports[CORE_MODULE]
     ):
-        for kw_idx, kw in enumerate(node.keywords):
+        for kw in node.keywords:
             if kw.arg == "connection" and _is_no_arg_get_connection(kw.value, state):
                 yield (
                     ast_start_offset(node),
                     partial(
                         remove_connection_kwarg,
                         node=node,
-                        kwarg_idx=len(node.args) + kw_idx,
+                        kwarg=kw,
                     ),
                 )
                 break
@@ -241,16 +241,10 @@ def replace_call(tokens: list[Token], i: int, *, node: ast.Call, new_src: str) -
 
 
 def remove_connection_kwarg(
-    tokens: list[Token], i: int, *, node: ast.Call, kwarg_idx: int
+    tokens: list[Token], i: int, *, node: ast.Call, kwarg: ast.keyword
 ) -> None:
     open_paren = find(tokens, i, name=OP, src="(")
     func_args, _ = parse_call_args(tokens, open_paren)
 
-    start_idx, end_idx = func_args[kwarg_idx]
-
-    # Walk back over whitespace/indent and the preceding comma
-    start_idx = reverse_consume(tokens, start_idx, name=UNIMPORTANT_WS)
-    start_idx = reverse_consume(tokens, start_idx, name=INDENT)
-    start_idx = reverse_consume(tokens, start_idx, name=OP, src=",")
-
-    del tokens[start_idx:end_idx]
+    start_idx, end_idx = find_call_arg(tokens, func_args, kwarg)
+    remove_call_arg(tokens, start_idx, end_idx)

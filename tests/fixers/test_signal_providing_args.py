@@ -87,6 +87,19 @@ def test_kwarg_alone():
     )
 
 
+def test_kwarg_before_starred_arg():
+    check_transformed(
+        """\
+        from django.dispatch import Signal
+        Signal(providing_args=["documented", "arg"], *args)
+        """,
+        """\
+        from django.dispatch import Signal
+        Signal(*args)
+        """,
+    )
+
+
 def test_kwarg_with_caching():
     check_transformed(
         """\
@@ -140,6 +153,20 @@ def test_kwarg_with_caching_multiline():
         Signal(
             use_caching=True,
         )
+        """,
+    )
+
+
+def test_kwarg_with_caching_inline_comment_starting_on_same_line():
+    check_transformed(
+        """\
+        from django.dispatch import Signal
+        Signal(providing_args=["documented", "arg"],  # documents the arguments
+            use_caching=True)
+        """,
+        """\
+        from django.dispatch import Signal
+        Signal(use_caching=True)
         """,
     )
 

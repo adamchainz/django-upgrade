@@ -68,6 +68,18 @@ Pending
 
   `PR #665 <https://github.com/adamchainz/django-upgrade/pull/665>`__.
 
+* Fix these fixers to correctly handle calls with starred arguments:
+
+  * :ref:`email_validator <email_validator>`
+  * :ref:`mail_api_kwargs <mail_api_kwargs>`
+  * :ref:`on_delete <on_delete>`
+  * :ref:`signal_providing_args <signal_providing_args>`
+  * :ref:`timezone_fixedoffset <timezone_fixedoffset>`
+
+  For example, the :ref:`signal_providing_args <signal_providing_args>` fixer now rewrites ``Signal(providing_args=[...], *args)`` to ``Signal(*args)``.
+
+  `PR #670 <https://github.com/adamchainz/django-upgrade/pull/670>`__.
+
 1.30.0 (2026-02-24)
 -------------------
 

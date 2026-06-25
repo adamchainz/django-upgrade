@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Pending
--------
+1.31.0 (2026-06-25)
+-------------------
 
 * Support Django 6.1 as a target version.
 

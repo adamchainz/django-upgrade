@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* Remove the ``settings_logging_admin_email_handler`` fixer because it made an incorrect change and cannot be salvaged.
+
+  Thanks to Mike Edmunds for spotting the mistake in `this GitHub comment <https://github.com/adamchainz/django-upgrade/pull/662#discussion_r3463198673>`__.
+  `PR #671 <https://github.com/adamchainz/django-upgrade/pull/671>`__.
+
 1.31.0 (2026-06-25)
 -------------------
 
@@ -17,7 +22,7 @@ Changelog
 
   `PR #668 <https://github.com/adamchainz/django-upgrade/pull/668>`__.
 
-* Add Django 6.1+ :ref:`settings_logging_admin_email_handler <settings_logging_admin_email_handler>` fixer to rename the ``email_backend`` argument of ``AdminEmailHandler`` in the ``LOGGING`` setting to ``using``.
+* Add Django 6.1+ ``settings_logging_admin_email_handler`` fixer to rename the ``email_backend`` argument of ``AdminEmailHandler`` in the ``LOGGING`` setting to ``using``.
 
   `PR #662 <https://github.com/adamchainz/django-upgrade/pull/662>`__.
 

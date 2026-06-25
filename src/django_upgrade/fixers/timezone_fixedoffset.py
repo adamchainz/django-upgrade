@@ -17,6 +17,7 @@ from django_upgrade.tokens import (
     OP,
     extract_indent,
     find,
+    find_call_arg,
     insert,
     parse_call_args,
     replace,
@@ -63,28 +64,31 @@ def visit_Call(
         and isinstance(node.func, ast.Name)
         and node.func.id == OLD_NAME
     ):
-        yield ast_start_offset(node), partial(fix_offset_arg, node=node)
+        arg: ast.expr | ast.keyword | None
+        if len(node.args) >= 1 and not isinstance(node.args[0], ast.Starred):
+            arg = node.args[0]
+        else:
+            arg = next((k for k in node.keywords if k.arg == "offset"), None)
+
+        if arg is not None:
+            yield ast_start_offset(node), partial(fix_offset_arg, arg=arg)
 
 
-def fix_offset_arg(tokens: list[Token], i: int, *, node: ast.Call) -> None:
+def fix_offset_arg(
+    tokens: list[Token],
+    i: int,
+    *,
+    arg: ast.expr | ast.keyword,
+) -> None:
     j = find(tokens, i, name=OP, src="(")
     func_args, _ = parse_call_args(tokens, j)
+    start_idx, end_idx = find_call_arg(tokens, func_args, arg)
 
-    rewrote_offset_arg = False
-    if len(node.args) >= 1:
-        if not isinstance(node.args[0], ast.Starred):
-            start_idx, end_idx = func_args[0]
-            insert(tokens, end_idx, new_src=")")
-            insert(tokens, start_idx, new_src="timedelta(minutes=")
-            rewrote_offset_arg = True
+    insert(tokens, end_idx, new_src=")")
+    if isinstance(arg, ast.keyword):
+        equal_idx = find(tokens, start_idx, name=OP, src="=")
+        insert(tokens, equal_idx + 1, new_src="timedelta(minutes=")
     else:
-        for n, keyword in enumerate(node.keywords):
-            if keyword.arg == "offset":
-                start_idx, end_idx = func_args[n]
-                insert(tokens, end_idx, new_src=")")
-                equal_idx = find(tokens, start_idx, name=OP, src="=")
-                insert(tokens, equal_idx + 1, new_src="timedelta(minutes=")
-                rewrote_offset_arg = True
+        insert(tokens, start_idx, new_src="timedelta(minutes=")
 
-    if rewrote_offset_arg:
-        replace(tokens, i, src="timezone")
+    replace(tokens, i, src="timezone")

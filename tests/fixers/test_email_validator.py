@@ -41,6 +41,32 @@ def test_whitelist():
     )
 
 
+def test_whitelist_before_starred_argument():
+    check_transformed(
+        """\
+        from django.core.validators import EmailValidator
+        EmailValidator(whitelist=["example.com"], *args)
+        """,
+        """\
+        from django.core.validators import EmailValidator
+        EmailValidator(allowlist=["example.com"], *args)
+        """,
+    )
+
+
+def test_whitelist_after_starred_argument():
+    check_transformed(
+        """\
+        from django.core.validators import EmailValidator
+        EmailValidator(*args, whitelist=["example.com"])
+        """,
+        """\
+        from django.core.validators import EmailValidator
+        EmailValidator(*args, allowlist=["example.com"])
+        """,
+    )
+
+
 def test_other_args():
     check_transformed(
         """\

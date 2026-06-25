@@ -115,6 +115,32 @@ def test_send_mail_only_kwarg():
     )
 
 
+def test_send_mail_first_kwarg_not_last_kwarg():
+    check_transformed(
+        """\
+        from django.core.mail import send_mail
+        send_mail(fail_silently=False, subject="s")
+        """,
+        """\
+        from django.core.mail import send_mail
+        send_mail(subject="s")
+        """,
+    )
+
+
+def test_send_mail_kwarg_before_starred_arg():
+    check_transformed(
+        """\
+        from django.core.mail import send_mail
+        send_mail(fail_silently=False, *args)
+        """,
+        """\
+        from django.core.mail import send_mail
+        send_mail(*args)
+        """,
+    )
+
+
 def test_send_mail_direct_import_not_last_kwarg():
     check_transformed(
         """\

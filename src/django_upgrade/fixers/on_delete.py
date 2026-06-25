@@ -85,6 +85,7 @@ def visit_Call(
             )
         )
         and len(node.args) < 2
+        and not any(isinstance(arg, ast.Starred) for arg in node.args)
         and all(kw.arg != "on_delete" for kw in node.keywords)
     ):
         should_update_import[state] = not models_imported

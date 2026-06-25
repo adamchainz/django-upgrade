@@ -256,6 +256,32 @@ def test_send_mail_direct_import():
     )
 
 
+def test_send_mail_connection_first_kwarg_not_last():
+    check_transformed(
+        """\
+        from django.core import mail
+        mail.send_mail(connection=mail.get_connection(), subject="s")
+        """,
+        """\
+        from django.core import mail
+        mail.send_mail(subject="s")
+        """,
+    )
+
+
+def test_send_mail_connection_before_starred_arg():
+    check_transformed(
+        """\
+        from django.core import mail
+        mail.send_mail(connection=mail.get_connection(), *args)
+        """,
+        """\
+        from django.core import mail
+        mail.send_mail(*args)
+        """,
+    )
+
+
 def test_send_mail_connection_not_last():
     check_transformed(
         """\

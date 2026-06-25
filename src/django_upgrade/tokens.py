@@ -156,6 +156,64 @@ def parse_call_args(
     return args, i
 
 
+CALL_ARGUMENT_PREFIX_TOKENS = frozenset(
+    {
+        COMMENT,
+        INDENT,
+        PHYSICAL_NEWLINE,
+        UNIMPORTANT_WS,
+    }
+)
+
+
+def find_call_arg(
+    tokens: list[Token],
+    func_args: list[tuple[int, int]],
+    node: ast.expr | ast.keyword,
+) -> tuple[int, int]:
+    for start_idx, end_idx in func_args:
+        token_idx = start_idx
+        while (
+            token_idx < end_idx
+            and tokens[token_idx].name in CALL_ARGUMENT_PREFIX_TOKENS
+        ):
+            token_idx += 1
+
+        if (
+            token_idx < end_idx
+            and tokens[token_idx].line == node.lineno
+            and tokens[token_idx].utf8_byte_offset == node.col_offset
+        ):
+            return start_idx, end_idx
+
+    raise AssertionError(
+        f"Could not find tokens for call argument {node!r}"
+    )  # pragma: no cover
+
+
+def remove_call_arg(tokens: list[Token], start_idx: int, end_idx: int) -> None:
+    start_idx = reverse_consume(tokens, start_idx, name=UNIMPORTANT_WS)
+    start_idx = reverse_consume(tokens, start_idx, name=INDENT)
+
+    if tokens[start_idx - 1].name == OP and tokens[start_idx - 1].src == ",":
+        start_idx -= 1
+    elif tokens[end_idx].name == OP and tokens[end_idx].src == ",":
+        end_idx += 1
+        while tokens[end_idx].name == UNIMPORTANT_WS:
+            end_idx += 1
+        if tokens[end_idx].name == COMMENT:
+            end_idx += 1
+            assert tokens[end_idx].name == PHYSICAL_NEWLINE
+            end_idx += 1
+            if tokens[start_idx].name == PHYSICAL_NEWLINE:
+                start_idx += 1
+            else:
+                while tokens[end_idx].name in (INDENT, UNIMPORTANT_WS):
+                    end_idx += 1
+
+    del tokens[start_idx:end_idx]
+
+
 def find_block_start(tokens: list[Token], i: int) -> int:
     depth = 0
     while depth or tokens[i].src != ":":
@@ -403,11 +461,11 @@ def replace_argument_names(
     """
     j = find(tokens, i, name=OP, src="(")
     func_args, _ = parse_call_args(tokens, j)
-    kwarg_func_args = func_args[len(node.args) :]
 
-    for n, keyword in reversed(list(enumerate(node.keywords))):
+    for keyword in reversed(node.keywords):
         if keyword.arg in arg_map:
-            for k in range(*kwarg_func_args[n]):
+            start_idx, end_idx = find_call_arg(tokens, func_args, keyword)
+            for k in range(start_idx, end_idx):
                 if tokens[k].src == keyword.arg:
                     tokens[k] = tokens[k]._replace(src=arg_map[keyword.arg])
                     break

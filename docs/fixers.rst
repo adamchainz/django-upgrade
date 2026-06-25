@@ -782,6 +782,8 @@ This only applies in command files, which are heuristically detected as files wi
     -    requires_system_checks = False
     +    requires_system_checks = []
 
+.. _email_validator:
+
 ``EmailValidator``
 ~~~~~~~~~~~~~~~~~~
 
@@ -840,6 +842,8 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
 
     -PASSWORD_RESET_TIMEOUT_DAYS = 4
     +PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 4
+
+.. _signal_providing_args:
 
 ``Signal``
 ~~~~~~~~~~
@@ -1013,6 +1017,7 @@ Rewrites deprecated alias ``django.core.paginator.QuerySetPaginator`` to ``Pagin
     -QuerySetPaginator(...)
     +Paginator(...)
 
+.. _timezone_fixedoffset:
 
 ``FixedOffset``
 ~~~~~~~~~~~~~~~
@@ -1297,6 +1302,8 @@ Django 1.9
 -----------
 
 `Release Notes <https://docs.djangoproject.com/en/stable/releases/1.9/>`__
+
+.. _on_delete:
 
 ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~

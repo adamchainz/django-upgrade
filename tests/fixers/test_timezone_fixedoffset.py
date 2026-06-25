@@ -190,6 +190,19 @@ def test_call_with_star_star_args_not_rewritten():
     )
 
 
+def test_call_with_keyword_argument_before_starred_arg_rewritten():
+    check_transformed(
+        """\
+        from django.utils.timezone import FixedOffset
+        FixedOffset(offset=120, *args)
+        """,
+        """\
+        from datetime import timedelta, timezone
+        timezone(offset=timedelta(minutes=120), *args)
+        """,
+    )
+
+
 def test_call_with_keyword_arguments_rewritten():
     check_transformed(
         """\

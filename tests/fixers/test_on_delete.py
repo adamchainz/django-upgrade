@@ -110,6 +110,15 @@ def test_foreignkey_with_args_ending_comma():
     )
 
 
+def test_foreignkey_with_starred_argument_not_rewritten():
+    check_noop(
+        """\
+        from django.db import models
+        models.ForeignKey(to="auth.User", *args)
+        """,
+    )
+
+
 def test_foreignkey_with_args_and_kwargs():
     check_transformed(
         """\

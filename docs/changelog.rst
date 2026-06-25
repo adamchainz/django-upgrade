@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.31.1 (2026-06-26)
+-------------------
+
 * Remove the ``settings_logging_admin_email_handler`` fixer because it made an incorrect change and cannot be salvaged.
 
   Thanks to Mike Edmunds for spotting the mistake in `this GitHub comment <https://github.com/adamchainz/django-upgrade/pull/662#discussion_r3463198673>`__.

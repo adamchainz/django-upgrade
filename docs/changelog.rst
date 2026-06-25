@@ -13,6 +13,10 @@ Pending
 
   `PR #666 <https://github.com/adamchainz/django-upgrade/pull/666>`__.
 
+* Add Django 6.1+ :ref:`mail_fail_silently <mail_fail_silently>` fixer to remove ``fail_silently=False`` keyword arguments from mail sending function calls.
+
+  `PR #668 <https://github.com/adamchainz/django-upgrade/pull/668>`__.
+
 * Add Django 6.1+ :ref:`settings_logging_admin_email_handler <settings_logging_admin_email_handler>` fixer to rename the ``email_backend`` argument of ``AdminEmailHandler`` in the ``LOGGING`` setting to ``using``.
 
   `PR #662 <https://github.com/adamchainz/django-upgrade/pull/662>`__.

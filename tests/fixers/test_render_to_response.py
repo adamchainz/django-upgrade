@@ -166,22 +166,28 @@ def test_double_star_kwargs():
     )
 
 
-# render already imported
+# render already imported or used
 
 
 def test_render_already_imported():
-    check_transformed(
+    check_noop(
         """\
         from django.shortcuts import render, render_to_response
 
         def my_view(request):
             return render_to_response("t.html")
         """,
+    )
+
+
+def test_render_used_elsewhere():
+    check_noop(
         """\
-        from django.shortcuts import render
+        from django.shortcuts import render_to_response
+        from myapp.shortcuts import render
 
         def my_view(request):
-            return render(request, "t.html")
+            return render_to_response("t.html")
         """,
     )
 
@@ -236,6 +242,23 @@ def test_with_keyword_args():
 
         def my_view(request):
             return render(request, "t.html", context={"key": "value"})
+        """,
+    )
+
+
+def test_with_template_name_keyword_arg():
+    check_transformed(
+        """\
+        from django.shortcuts import render_to_response
+
+        def my_view(request):
+            return render_to_response(template_name="t.html")
+        """,
+        """\
+        from django.shortcuts import render
+
+        def my_view(request):
+            return render(request, template_name="t.html")
         """,
     )
 

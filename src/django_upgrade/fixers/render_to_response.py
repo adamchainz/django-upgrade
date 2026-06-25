@@ -8,11 +8,16 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterable
 from functools import partial
+from typing import cast
 from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.ast import (
+    ast_start_offset,
+    get_module_names,
+    is_rewritable_import_from,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     CODE,
@@ -42,6 +47,7 @@ def visit_ImportFrom(
         node.module == MODULE
         and any(alias.name == OLD_NAME and alias.asname is None for alias in node.names)
         and is_rewritable_import_from(node)
+        and NEW_NAME not in get_module_names(cast(ast.Module, parents[0]))
         and _all_render_to_response_calls_rewritable(parents[0])
     ):
         yield (
@@ -64,6 +70,7 @@ def visit_Call(
         isinstance(node.func, ast.Name)
         and node.func.id == OLD_NAME
         and OLD_NAME in state.from_imports[MODULE]
+        and NEW_NAME not in get_module_names(cast(ast.Module, parents[0]))
         and _all_render_to_response_calls_rewritable(parents[0])
     ):
         yield (

@@ -60,12 +60,8 @@ test = [
 docs = [
   "furo>=2024.8.6",
   "sphinx>=7.4.7",
-  "sphinx-build-compatibility",
   "sphinx-copybutton>=0.5.2",
 ]
-
-[tool.uv]
-sources.sphinx-build-compatibility = { git = "https://github.com/readthedocs/sphinx-build-compatibility", rev = "4f304bd4562cdc96316f4fec82b264ca379d23e0" }
 
 [tool.ruff]
 lint.select = [

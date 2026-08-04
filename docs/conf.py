@@ -5,7 +5,6 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -42,8 +41,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
 ]
-if os.environ.get("READTHEDOCS") == "True":
-    extensions.append("sphinx_build_compatibility.extension")
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -72,6 +69,9 @@ html_theme_options = {
         "admonition-font-size": "100%",
         "admonition-title-font-size": "100%",
     },
+    "source_repository": "https://github.com/adamchainz/django-upgrade/",
+    "source_branch": "main",
+    "source_directory": "docs/",
 }
 
 # -- Options for LaTeX output ------------------------------------------

@@ -53,7 +53,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         default="auto",
         choices=[
             "auto",
-            *[f"{major}.{minor}" for major, minor in SUPPORTED_TARGET_VERSIONS],
+            *[f"{major}.{minor}" for major, minor in sorted(SUPPORTED_TARGET_VERSIONS)],
         ],
         help="The version of Django to target.",
     )

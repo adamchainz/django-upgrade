@@ -239,6 +239,17 @@ def test_in():
     )
 
 
+def test_in_parenthesized():
+    check_transformed(
+        """\
+        ('HTTP_SERVER') in request.META
+        """,
+        """\
+        ('server') in request.headers
+        """,
+    )
+
+
 def test_in_double_quotes():
     check_transformed(
         """\

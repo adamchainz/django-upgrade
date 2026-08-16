@@ -16,6 +16,8 @@ Unreleased
 
 * Fix :ref:`null_boolean_field <null_boolean_field>` fixer to add a missing comma before ``null=True`` when the final argument contains commas within brackets.
 
+* Fix :ref:`test_http_headers <test_http_headers>` fixer to avoid a double comma when the existing ``headers=`` dict has a trailing comma.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

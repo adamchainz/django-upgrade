@@ -91,12 +91,19 @@ def combine_http_headers_kwargs(
 ) -> None:
     if headers_keyword is not None:
         existing_headers_idx = find_last_token(tokens, i, node=headers_keyword)
-        existing_headers_needs_comma = (
-            len(cast(ast.Dict, headers_keyword.value).keys) > 0
-        )
+        headers_dict = cast(ast.Dict, headers_keyword.value)
+        if headers_dict.keys:
+            last_value_idx = find_last_token(tokens, i, node=headers_dict.values[-1])
+            existing_has_trailing_comma = any(
+                t.name == OP and t.src == ","
+                for t in tokens[last_value_idx + 1 : existing_headers_idx]
+            )
+            existing_headers_prefix = " " if existing_has_trailing_comma else ", "
+        else:
+            existing_headers_prefix = ""
     else:
         existing_headers_idx = 0
-        existing_headers_needs_comma = False
+        existing_headers_prefix = ""
 
     j = i
     src_fragments = []
@@ -137,8 +144,8 @@ def combine_http_headers_kwargs(
             kwargs_after_first_http_kwarg = True
 
     if headers_keyword is not None:
-        if existing_headers_needs_comma:
-            src_fragments.insert(0, ", ")
+        if existing_headers_prefix:
+            src_fragments.insert(0, existing_headers_prefix)
         insert_op = (
             existing_headers_idx,
             Insert("".join(src_fragments)),

@@ -52,6 +52,9 @@ Unreleased
 
 * Fix :ref:`admin_allow_tags <admin_allow_tags>` fixer to only remove assignments at module or class level, not e.g. ``self.allow_tags`` assignments in methods.
 
+* Fix fixers that erase statements to handle statements sharing a line with another statement, separated by a semicolon.
+  Previously the leftover semicolon made the file invalid syntax.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

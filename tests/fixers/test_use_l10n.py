@@ -175,6 +175,20 @@ def test_class_success():
     )
 
 
+def test_class_success_followed_by_statement_on_same_line():
+    check_transformed(
+        """\
+        class Settings:
+            USE_L10N = True; MANAGERS = []
+        """,
+        """\
+        class Settings:
+            MANAGERS = []
+        """,
+        filename="myapp/settings/base.py",
+    )
+
+
 def test_class_success_inheritance():
     check_transformed(
         """\

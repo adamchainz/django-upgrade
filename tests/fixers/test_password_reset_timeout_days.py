@@ -42,6 +42,30 @@ def test_success_settings_subfolder():
     )
 
 
+def test_success_conditional_expression():
+    check_transformed(
+        """\
+        PASSWORD_RESET_TIMEOUT_DAYS = 1 if DEBUG else 3
+        """,
+        """\
+        PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * (1 if DEBUG else 3)
+        """,
+        filename="myapp/settings.py",
+    )
+
+
+def test_success_binary_operation():
+    check_transformed(
+        """\
+        PASSWORD_RESET_TIMEOUT_DAYS = 1 + 2
+        """,
+        """\
+        PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * (1 + 2)
+        """,
+        filename="myapp/settings.py",
+    )
+
+
 def test_success_function_call():
     check_transformed(
         """\

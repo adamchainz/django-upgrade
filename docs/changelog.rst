@@ -50,6 +50,8 @@ Unreleased
 
 * Fix :ref:`versioned_branches <versioned_branches>` fixer to preserve indentation when removing single-line ``if`` suites.
 
+* Fix :ref:`admin_allow_tags <admin_allow_tags>` fixer to only remove assignments at module or class level, not e.g. ``self.allow_tags`` assignments in methods.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

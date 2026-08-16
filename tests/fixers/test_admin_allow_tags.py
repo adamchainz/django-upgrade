@@ -23,6 +23,45 @@ def test_false():
     )
 
 
+def test_self_attribute_in_method():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+
+        class LegacyWidget:
+            def __init__(self):
+                self.allow_tags = True
+        """,
+    )
+
+
+def test_in_conditional_block():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        def upper_case_name(obj):
+            ...
+
+        if True:
+            upper_case_name.allow_tags = True
+        """,
+    )
+
+
+def test_sole_statement_in_class():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+
+        class MyAdmin:
+            upper_case_name.allow_tags = True
+        """,
+    )
+
+
 def test_not_name():
     check_noop(
         """\

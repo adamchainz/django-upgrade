@@ -42,7 +42,9 @@ def visit_ImportFrom(
     if (
         node.module == MODULE
         and is_rewritable_import_from(node)
-        and any(alias.name == OLD_NAME for alias in node.names)
+        and any(
+            (alias.name == OLD_NAME and alias.asname is None) for alias in node.names
+        )
     ):
         yield ast_start_offset(node), partial(fix_import_from, node=node)
 

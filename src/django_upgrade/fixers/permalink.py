@@ -172,9 +172,17 @@ def fix_permalink_return(
         j += 1
 
     tuple_start = j
+    end = find_last_token(tokens, i, node=ret_node)
 
     if tokens[tuple_start].src == "(":
-        inner_args, end = parse_call_args(tokens, tuple_start)
+        inner_args, call_end = parse_call_args(tokens, tuple_start)
+        # Only a parenthesized tuple if the parens span the whole return
+        # value, not e.g. `return ("name"), [self.pk]`
+        parenthesized_tuple = call_end - 1 == end
+    else:
+        parenthesized_tuple = False
+
+    if parenthesized_tuple:
 
         def src_of(start_idx: int, end_idx: int) -> str:
             return "".join(t.src for t in tokens[start_idx:end_idx]).strip()
@@ -185,9 +193,10 @@ def fix_permalink_return(
         if has_kwargs:
             parts.append(f"kwargs={src_of(*inner_args[2])}")
 
-        tokens[tuple_start:end] = [Token(CODE, "reverse(" + ", ".join(parts) + ")")]
+        tokens[tuple_start:call_end] = [
+            Token(CODE, "reverse(" + ", ".join(parts) + ")")
+        ]
     else:
-        end = find_last_token(tokens, i, node=ret_node)
 
         def src_of_range(start_idx: int, end_idx: int) -> str:
             return "".join(t.src for t in tokens[start_idx : end_idx + 1]).strip()

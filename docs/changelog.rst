@@ -38,7 +38,7 @@ Unreleased
 
   `PR #662 <https://github.com/adamchainz/django-upgrade/pull/662>`__.
 
-* Add Django 6.1+ ``compatibility_imports`` :ref:`fixer entries <postgres_bit_aggregates>` to move ``BitAnd``, ``BitOr``, and ``BitXor`` imports from ``django.contrib.postgres.aggregates`` to ``django.db.models``.
+* Add Django 6.1+ ``compatibility_imports`` :ref:`fixer entries <compatibility_imports_6_1>` to move ``BitAnd``, ``BitOr``, and ``BitXor`` imports from ``django.contrib.postgres.aggregates`` to ``django.db.models``.
 
   `PR #658 <https://github.com/adamchainz/django-upgrade/pull/658>`__.
 

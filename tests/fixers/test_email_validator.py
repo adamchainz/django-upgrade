@@ -28,6 +28,15 @@ def test_no_keyword_arguments():
     )
 
 
+def test_whitelist_and_allowlist():
+    check_noop(
+        """\
+        from django.core.validators import EmailValidator
+        EmailValidator(whitelist=["example.com"], allowlist=["example.org"])
+        """,
+    )
+
+
 def test_whitelist():
     check_transformed(
         """\

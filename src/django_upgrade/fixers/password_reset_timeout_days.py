@@ -13,7 +13,14 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import CODE, OP, find
+from django_upgrade.tokens import (
+    CODE,
+    OP,
+    find,
+    find_first_token,
+    find_last_token,
+    insert,
+)
 
 fixer = Fixer(
     __name__,
@@ -42,4 +49,12 @@ def visit_Assign(
 def rewrite_setting(tokens: list[Token], i: int, *, node: ast.Assign) -> None:
     tokens[i] = tokens[i]._replace(name=CODE, src=NEW_NAME)
     j = find(tokens, i, name=OP, src="=")
+    if not isinstance(
+        node.value, (ast.Attribute, ast.Call, ast.Constant, ast.Name, ast.Subscript)
+    ):
+        # Parenthesize values that may bind less tightly than '*'
+        start = find_first_token(tokens, j, node=node.value)
+        end = find_last_token(tokens, start, node=node.value)
+        insert(tokens, end + 1, new_src=")")
+        insert(tokens, start, new_src="(")
     tokens.insert(j + 1, Token(name=CODE, src=" 60 * 60 * 24 *"))

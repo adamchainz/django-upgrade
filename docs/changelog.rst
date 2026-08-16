@@ -48,6 +48,8 @@ Unreleased
 
 * Fix :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixer to leave a ``pass`` statement when removing the only test in a class or other block.
 
+* Fix :ref:`versioned_branches <versioned_branches>` fixer to preserve indentation when removing single-line ``if`` suites.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

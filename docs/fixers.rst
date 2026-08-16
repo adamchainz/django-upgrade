@@ -186,7 +186,7 @@ Removes ``fail_silently=False`` keyword arguments from calls to ``send_mail()``,
    -)
    +EmailMessage("subject", "message", "from@example.com", ["to@example.com"]).send()
 
-.. _postgres_bit_aggregates:
+.. _compatibility_imports_6_1:
 
 ``BitAnd``, ``BitOr``, and ``BitXor`` aggregate move
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -419,6 +419,8 @@ This change is possible because the ``choices`` parameter now accepts enumeratio
     -    suit = models.IntegerField(choices=Suit.choices, default=Suit.DEFAULT)
     +    suit = models.IntegerField(choices=Suit, default=Suit.DEFAULT)
 
+.. _format_html:
+
 ``format_html()`` calls
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -442,6 +444,8 @@ Django 4.2
 ----------
 
 `Release Notes <https://docs.djangoproject.com/en/4.2/releases/4.2/>`__
+
+.. _settings_storages:
 
 ``STORAGES`` setting
 ~~~~~~~~~~~~~~~~~~~~
@@ -525,6 +529,8 @@ Rewrites ``index_together`` declarations into ``indexes`` declarations in model 
     -       index_together = [["bill", "tail"]]
     +       indexes = [models.Index(fields=["bill", "tail"])]
 
+.. _assert_set_methods:
+
 ``assertFormsetError`` and ``assertQuerysetEqual``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -581,6 +587,8 @@ Uses an existing ``import datetime`` statement if present, otherwise inserts ``i
     -do_a_thing(datetime.now(tz=timezone.utc))
     +do_a_thing(datetime.now(tz=dt.timezone.utc))
 
+.. _assert_form_error:
+
 ``assertFormError()`` and ``assertFormsetError()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -607,6 +615,8 @@ Django 4.0
 
 `Release Notes <https://docs.djangoproject.com/en/4.0/releases/4.0/>`__
 
+.. _use_l10n:
+
 ``USE_L10N``
 ~~~~~~~~~~~~
 
@@ -625,6 +635,8 @@ Settings assignments may be module-level or class-level.
      class BaseSettings:
     -    USE_L10N = True
 
+.. _admin_lookup_needs_distinct:
+
 ``lookup_needs_distinct``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -640,6 +652,8 @@ Renames the undocumented ``django.contrib.admin.utils.lookup_needs_distinct`` to
     -if lookup_needs_distinct(self.opts, search_spec):
     +if lookup_spawns_duplicates(self.opts, search_spec):
         ...
+
+.. _compatibility_imports_3_2:
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
@@ -657,6 +671,8 @@ Django 3.2
 ----------
 
 `Release Notes <https://docs.djangoproject.com/en/3.2/releases/3.2/>`__
+
+.. _admin_decorators_action:
 
 ``@admin.action()``
 ~~~~~~~~~~~~~~~~~~~
@@ -696,6 +712,8 @@ This only applies in files that use ``from django.contrib import admin`` or ``fr
 
     -    make_unpublished.allowed_permissions = ("unpublish",)
     -    make_unpublished.short_description = "Unpublish articles"
+
+.. _admin_decorators_display:
 
 ``@admin.display()``
 ~~~~~~~~~~~~~~~~~~~~
@@ -738,6 +756,8 @@ This only applies in files that use ``from django.contrib import admin`` or ``fr
     -    is_published.admin_order_field = '-publish_date'
     -    is_published.short_description = 'Is Published?'
 
+.. _management_commands:
+
 ``BaseCommand.requires_system_checks``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -774,6 +794,8 @@ Rewrites the ``whitelist`` keyword argument to its new name ``allowlist``.
     -EmailValidator(whitelist=["example.com"])
     +EmailValidator(allowlist=["example.com"])
 
+.. _default_app_config:
+
 ``default_app_config``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -790,6 +812,8 @@ Django 3.1
 
 `Release Notes <https://docs.djangoproject.com/en/3.1/releases/3.1/>`__
 
+.. _compatibility_imports_3_1:
+
 ``JSONField``
 ~~~~~~~~~~~~~
 
@@ -803,6 +827,8 @@ You will need to make migrations after this fix makes changes to models.
 
     -from django.contrib.postgres.fields import JSONField
     +from django.db.models import JSONField
+
+.. _password_reset_timeout_days:
 
 ``PASSWORD_RESET_TIMEOUT_DAYS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -833,6 +859,8 @@ Removes the deprecated documentation-only ``providing_args`` argument.
      from django.dispatch import Signal
     -my_cool_signal = Signal(providing_args=["documented", "arg"])
     +my_cool_signal = Signal()
+
+.. _crypto_get_random_string:
 
 ``get_random_string``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -867,6 +895,8 @@ You will need to make migrations after this fix makes changes to models.
     -    valuable = NullBooleanField("Valuable")
     +    valuable = BooleanField("Valuable", null=True)
 
+.. _forms_model_multiple_choice_field:
+
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -883,6 +913,8 @@ Django 3.0
 ----------
 
 `Release Notes <https://docs.djangoproject.com/en/3.0/releases/3.0/>`__
+
+.. _utils_encoding:
 
 ``django.utils.encoding`` aliases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -902,6 +934,8 @@ Rewrites ``smart_text()`` to ``smart_str()``, and ``force_text()`` to ``force_st
     +force_str("yada")
     +smart_str("yada")
 
+.. _utils_http:
+
 ``django.utils.http`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -918,6 +952,8 @@ Also rewrites the internal function ``is_safe_url()`` to ``url_has_allowed_host_
     -escaped_query_string = urlquote(query_string)
     +escaped_query_string = quote(query_string)
 
+.. _utils_text:
+
 ``django.utils.text`` deprecation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -932,6 +968,8 @@ Rewrites ``unescape_entities()`` with the standard library ``html.escape()``.
 
     -unescape_entities("some input string")
     +html.escape("some input string")
+
+.. _utils_translation:
 
 ``django.utils.translation`` deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -952,6 +990,8 @@ Django 2.2
 ----------
 
 `Release Notes <https://docs.djangoproject.com/en/2.2/releases/2.2/>`__
+
+.. _request_headers:
 
 ``HttpRequest.headers``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -977,6 +1017,8 @@ Header lookups are done in lowercase per `the HTTP/2 specification <https://http
 
     -"HTTP_SERVER" in request.META
     +"server" in request.headers
+
+.. _queryset_paginator:
 
 ``QuerySetPaginator``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1011,6 +1053,8 @@ Known limitation: this fixer will leave code broken with an ``ImportError`` if `
     +from datetime import timedelta, timezone
     +timezone(timedelta(minutes=120), "Super time")
 
+.. _postgres_float_range_field:
+
 ``FloatRangeField``
 ~~~~~~~~~~~~~~~~~~~
 
@@ -1027,6 +1071,8 @@ Rewrites model and form fields using ``FloatRangeField`` to ``DecimalRangeField`
      class MyModel(Model):
     -    my_field = FloatRangeField("My range of numbers")
     +    my_field = DecimalRangeField("My range of numbers")
+
+.. _testcase_databases:
 
 ``TestCase`` class database declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1142,6 +1188,8 @@ Only applied when every call in the file is inside a function whose first argume
     -    return render_to_response("index.html", {"key": "value"})
     +    return render(request, "index.html", {"key": "value"})
 
+.. _compatibility_imports_2_0:
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1163,6 +1211,8 @@ Rewrites some compatibility imports:
 
     -from django.http.cookie import SimpleCookie
     +from http.cookies import SimpleCookie
+
+.. _admin_allow_tags:
 
 ``<func>.allow_tags = True``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1212,6 +1262,8 @@ Rewrites uses of the ``@models.permalink`` decorator to use :func:`django.urls.r
     -        return ("guitarist_detail", [self.slug])
     +        return reverse("guitarist_detail", args=[self.slug])
 
+.. _compatibility_imports_1_11:
+
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1237,6 +1289,8 @@ Django 1.10
 
 `Release Notes <https://docs.djangoproject.com/en/1.10/releases/1.10/>`__
 
+.. _request_user_attributes:
+
 ``request.user`` boolean attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1251,6 +1305,8 @@ Rewrites calls to ``request.user.is_authenticated()`` and ``request.user.is_anon
 
     -self.request.user.is_anonymous()
     +self.request.user.is_anonymous
+
+.. _compatibility_imports_1_10:
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1308,6 +1364,8 @@ This fixer also support from-imports:
     -ForeignKey("auth.User")
     +ForeignKey("auth.User", on_delete=CASCADE)
 
+.. _settings_database_postgresql:
+
 ``DATABASES``
 ~~~~~~~~~~~~~
 
@@ -1331,6 +1389,8 @@ For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
             "PORT": "5432",
         }
     }
+
+.. _compatibility_imports_1_9:
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1361,6 +1421,8 @@ Django 1.7
 ----------
 
 `Release Notes <https://docs.djangoproject.com/en/stable/releases/1.7/>`__
+
+.. _admin_register:
 
 Admin model registration
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1416,6 +1478,8 @@ If a ``register()`` call is preceded by an ``unregister()`` call that includes t
 
     admin.site.unregister(MyModel1)
     admin.site.register(MyModel1, MyCustomAdmin)
+
+.. _compatibility_imports_1_7:
 
 Compatibility imports
 ~~~~~~~~~~~~~~~~~~~~~

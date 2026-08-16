@@ -22,6 +22,8 @@ Unreleased
 
 * Fix :ref:`request_headers <request_headers>` fixer crash on ``in`` comparisons with a parenthesized string.
 
+* Fix :ref:`request_headers <request_headers>` fixer to not corrupt implicitly concatenated header name strings.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

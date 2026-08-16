@@ -66,6 +66,30 @@ def test_tuple_assignment():
     )
 
 
+def test_subscript_implicit_str_concat():
+    check_noop(
+        """\
+        request.META['HTTP_' 'SERVER']
+        """,
+    )
+
+
+def test_get_implicit_str_concat():
+    check_noop(
+        """\
+        request.META.get('HTTP_' 'SERVER')
+        """,
+    )
+
+
+def test_in_implicit_str_concat():
+    check_noop(
+        """\
+        'HTTP_' 'SERVER' in request.META
+        """,
+    )
+
+
 def test_in_not_string():
     check_noop(
         """\

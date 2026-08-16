@@ -42,6 +42,30 @@ def test_delete():
     )
 
 
+def test_augmented_assignment():
+    check_noop(
+        """\
+        request.META['HTTP_SERVER'] += 'something'
+        """,
+    )
+
+
+def test_annotated_assignment():
+    check_noop(
+        """\
+        request.META['HTTP_SERVER']: str = 'something'
+        """,
+    )
+
+
+def test_tuple_assignment():
+    check_noop(
+        """\
+        request.META['HTTP_SERVER'], other = 'something', 'else'
+        """,
+    )
+
+
 def test_in_not_string():
     check_noop(
         """\

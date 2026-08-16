@@ -15,7 +15,11 @@ from typing import Literal
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset, is_passing_comparison
+from django_upgrade.ast import (
+    ast_start_offset,
+    is_passing_comparison,
+    is_sole_statement_in_block,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import Block
 
@@ -42,7 +46,7 @@ def visit_If(
         needs_pass = (
             pass_fail == "fail"
             and not node.orelse
-            and _is_sole_statement_in_block(node, parents[-1])
+            and is_sole_statement_in_block(node, parents[-1])
         )
         yield (
             ast_start_offset(node),
@@ -53,16 +57,6 @@ def visit_If(
                 needs_pass=needs_pass,
             ),
         )
-
-
-def _is_sole_statement_in_block(node: ast.stmt, parent: ast.AST) -> bool:
-    if isinstance(parent, ast.Module):
-        return False
-    for attr in ("body", "orelse", "finalbody"):
-        body = getattr(parent, attr, [])
-        if len(body) == 1 and body[0] is node:
-            return True
-    return False
 
 
 def _fix_block(

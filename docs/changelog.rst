@@ -46,6 +46,8 @@ Unreleased
 
 * Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not erase aliased ``FixedOffset`` imports.
 
+* Fix :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixer to leave a ``pass`` statement when removing the only test in a class or other block.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

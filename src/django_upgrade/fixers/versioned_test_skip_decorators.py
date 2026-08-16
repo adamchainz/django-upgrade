@@ -29,7 +29,11 @@ from functools import partial
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset, is_passing_comparison
+from django_upgrade.ast import (
+    ast_start_offset,
+    is_passing_comparison,
+    is_sole_statement_in_block,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import erase_decorator, erase_def
 
@@ -127,7 +131,11 @@ def _handle_decorator(
             if always_skipped:
                 yield (
                     ast_start_offset(node.decorator_list[0]),
-                    partial(erase_def, node=node),
+                    partial(
+                        erase_def,
+                        node=node,
+                        needs_pass=is_sole_statement_in_block(node, parents[-1]),
+                    ),
                 )
                 break
             else:

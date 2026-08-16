@@ -207,6 +207,61 @@ def test_current_version_gte_in_if():
     )
 
 
+def test_current_version_gte_single_line_block_indented():
+    check_transformed(
+        """\
+        import django
+
+        def f():
+            if django.VERSION >= (4, 0): foo()
+            bar()
+        """,
+        """\
+        import django
+
+        def f():
+            foo()
+            bar()
+        """,
+    )
+
+
+def test_old_version_lt_single_line_else_indented():
+    check_transformed(
+        """\
+        import django
+
+        def f():
+            if django.VERSION < (4, 0):
+                foo()
+            else: bar()
+        """,
+        """\
+        import django
+
+        def f():
+            bar()
+        """,
+    )
+
+
+def test_current_version_gte_single_line_block_module_level():
+    check_transformed(
+        """\
+        import django
+
+        if django.VERSION >= (4, 0): foo()
+        bar()
+        """,
+        """\
+        import django
+
+        foo()
+        bar()
+        """,
+    )
+
+
 def test_current_version_gte_with_else():
     check_transformed(
         """\

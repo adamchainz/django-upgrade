@@ -194,20 +194,23 @@ def extend_indexes(
 ) -> None:
     assert isinstance(indexes.value, (ast.List, ast.Tuple))  # type checked above
     closing_punctuation = find_last_token(tokens, i, node=indexes.value)
-    if len(indexes.value.elts) == 0 or tokens[closing_punctuation - 1].name in (
+    if len(indexes.value.elts) == 0:
+        insert(tokens, closing_punctuation, new_src=index_src)
+        return
+
+    j = find_last_token(tokens, i, node=indexes.value.elts[-1])
+    has_trailing_comma = any(
+        t.name == OP and t.src == "," for t in tokens[j + 1 : closing_punctuation]
+    )
+    if tokens[closing_punctuation - 1].name in (
         INDENT,
         DEDENT,
         UNIMPORTANT_WS,
         PHYSICAL_NEWLINE,
     ):
-        prefix = ""
+        insert(tokens, closing_punctuation, new_src=index_src)
+        if not has_trailing_comma:
+            insert(tokens, j + 1, new_src=",")
     else:
-        j = find_last_token(tokens, i, node=indexes.value.elts[-1])
-        if any(
-            t.name == OP and t.src == "," for t in tokens[j + 1 : closing_punctuation]
-        ):
-            prefix = " "
-        else:
-            prefix = ", "
-
-    insert(tokens, closing_punctuation, new_src=f"{prefix}{index_src}")
+        prefix = " " if has_trailing_comma else ", "
+        insert(tokens, closing_punctuation, new_src=f"{prefix}{index_src}")

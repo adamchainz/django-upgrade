@@ -12,6 +12,8 @@ Unreleased
 
 * Fix :ref:`index_together <index_together>` fixer to not add a duplicate ``indexes`` declaration when the existing one is not a list or tuple literal.
 
+* Fix :ref:`index_together <index_together>` fixer to add a missing comma when extending a multiline ``indexes`` list that has no trailing comma.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

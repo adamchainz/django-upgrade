@@ -397,7 +397,7 @@ def find_node(
         j += 1
     if tokens[j + 1].name == COMMENT:
         j += 1
-    if tokens[j + 1].name == LOGICAL_NEWLINE:  # pragma: no branch
+    if tokens[j + 1].name == LOGICAL_NEWLINE:
         j += 1
     i, _ = extract_indent(tokens, i)
     return (i, j)
@@ -410,6 +410,29 @@ def erase_node(
     Erase all tokens corresponding to the given node.
     """
     i, j = find_node(tokens, i, node=node)
+    if tokens[j + 1].name == OP and tokens[j + 1].src == ";":
+        # Another statement follows on the same line. Erase up to and
+        # including the semicolon and any following whitespace, keeping any
+        # indent for the following statement.
+        j += 1
+        if tokens[j + 1].name == UNIMPORTANT_WS:
+            j += 1
+        if tokens[i].name in (INDENT, UNIMPORTANT_WS):
+            i += 1
+    elif tokens[i - 1].name == OP and tokens[i - 1].src == ";":
+        # A previous statement sits on the same line. Blank out the
+        # semicolon and any whitespace before it, and keep the trailing
+        # newline and any comment. Blanking rather than erasing avoids
+        # invalidating token indices before the erased node.
+        tokens[i - 1] = tokens[i - 1]._replace(src="")
+        if tokens[i - 2].name == UNIMPORTANT_WS:
+            tokens[i - 2] = tokens[i - 2]._replace(src="")
+        if tokens[j].name == LOGICAL_NEWLINE:  # pragma: no branch
+            j -= 1
+        if tokens[j].name == COMMENT:
+            j -= 1
+        if tokens[j].name == UNIMPORTANT_WS:
+            j -= 1
     del tokens[i : j + 1]
 
 

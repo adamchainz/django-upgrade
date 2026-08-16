@@ -95,3 +95,63 @@ def test_with_other_lines():
         """,
         filename="__init__.py",
     )
+
+
+def test_followed_by_statement_on_same_line():
+    check_transformed(
+        """\
+        default_app_config = 'myapp.apps.MyAppConfig'; widgets = 12
+        """,
+        """\
+        widgets = 12
+        """,
+        filename="__init__.py",
+    )
+
+
+def test_preceded_by_statement_on_same_line():
+    check_transformed(
+        """\
+        widgets = 12; default_app_config = 'myapp.apps.MyAppConfig'
+        """,
+        """\
+        widgets = 12
+        """,
+        filename="__init__.py",
+    )
+
+
+def test_followed_by_statement_on_same_line_no_space():
+    check_transformed(
+        """\
+        default_app_config = 'myapp.apps.MyAppConfig';widgets = 12
+        """,
+        """\
+        widgets = 12
+        """,
+        filename="__init__.py",
+    )
+
+
+def test_preceded_by_statement_on_same_line_spaced_semicolon():
+    check_transformed(
+        """\
+        widgets = 12 ; default_app_config = 'myapp.apps.MyAppConfig'
+        """,
+        """\
+        widgets = 12
+        """,
+        filename="__init__.py",
+    )
+
+
+def test_preceded_by_statement_on_same_line_with_comment():
+    check_transformed(
+        """\
+        widgets = 12; default_app_config = 'myapp.apps.MyAppConfig'  # config
+        """,
+        """\
+        widgets = 12  # config
+        """,
+        filename="__init__.py",
+    )

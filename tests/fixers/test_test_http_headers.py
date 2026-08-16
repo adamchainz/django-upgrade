@@ -219,6 +219,43 @@ def test_instantiation_multiple_surrounding_existing():
     )
 
 
+def test_instantiation_existing_trailing_comma():
+    check_transformed(
+        """\
+        from django.test import Client
+        Client(headers={"b": "2",}, HTTP_A="1")
+        """,
+        """\
+        from django.test import Client
+        Client(headers={"b": "2", "a": "1"}, )
+        """,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_existing_multiline_trailing_comma():
+    check_transformed(
+        """\
+        from django.test import Client
+        Client(
+            headers={
+                "b": "2",
+            },
+            HTTP_A="1",
+        )
+        """,
+        """\
+        from django.test import Client
+        Client(
+            headers={
+                "b": "2",
+             "a": "1"},
+        )
+        """,
+        filename="tests.py",
+    )
+
+
 def test_instantiation_multiple_before_existing():
     check_transformed(
         """\

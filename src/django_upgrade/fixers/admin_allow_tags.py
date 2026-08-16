@@ -12,7 +12,7 @@ from functools import partial
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import ast_start_offset, is_sole_statement_in_block
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import erase_node
 
@@ -38,5 +38,9 @@ def visit_Assign(
         and node.targets[0].attr == "allow_tags"
         and isinstance(node.value, ast.Constant)
         and node.value.value is True
+        # Only rewrite assignments to functions defined at module or class
+        # level, not e.g. `self.allow_tags = True` in a method.
+        and isinstance(parents[-1], (ast.Module, ast.ClassDef))
+        and not is_sole_statement_in_block(node, parents[-1])
     ):
         yield ast_start_offset(node), partial(erase_node, node=node)

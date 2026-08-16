@@ -261,6 +261,29 @@ def test_return_bare_tuple_parenthesized_first_element():
     )
 
 
+def test_return_bare_tuple_fstring_name():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return f"{self.kind}_detail", [self.pk]
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse(f"{self.kind}_detail", args=[self.pk])
+        """,
+    )
+
+
 def test_return_bare_tuple_with_kwargs():
     check_transformed(
         """\

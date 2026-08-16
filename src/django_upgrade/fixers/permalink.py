@@ -168,7 +168,15 @@ def fix_permalink_return(
     j = find(tokens, i, name=NAME, src="return")
     j += 1
 
-    while tokens[j].name not in ("OP", "NAME", "STRING", "NUMBER", "CODE"):
+    while tokens[j].name not in (
+        "OP",
+        "NAME",
+        "STRING",
+        "NUMBER",
+        "CODE",
+        # Python 3.12+ tokenizes f-strings with dedicated tokens
+        "FSTRING_START",
+    ):
         j += 1
 
     tuple_start = j

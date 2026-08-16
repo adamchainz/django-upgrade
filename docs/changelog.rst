@@ -44,6 +44,8 @@ Unreleased
 
 * Fix :ref:`utils_translation <utils_translation>`, :ref:`utils_encoding <utils_encoding>`, and :ref:`transaction_savepoint <transaction_savepoint>` fixers to not erase aliased imports when the new name is also imported.
 
+* Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not erase aliased ``FixedOffset`` imports.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

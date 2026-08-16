@@ -18,6 +18,16 @@ def test_no_deprecated_alias():
     )
 
 
+def test_aliased_import():
+    check_noop(
+        """\
+        from django.utils.timezone import FixedOffset as off
+
+        x = off(120)
+        """,
+    )
+
+
 def test_unrecognized_import_format():
     check_noop(
         """\

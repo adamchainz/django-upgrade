@@ -32,6 +32,8 @@ Unreleased
 
 * Fix :ref:`email_validator <email_validator>` fixer to skip calls that already pass ``allowlist``, which previously gained a repeated keyword argument.
 
+* Fix :ref:`on_delete <on_delete>` fixer to add the ``CASCADE`` import when both import styles are used in one file.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

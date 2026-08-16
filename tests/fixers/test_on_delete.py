@@ -83,6 +83,24 @@ def test_both_field_classes_imported() -> None:
     )
 
 
+def test_field_class_imported_and_models_style() -> None:
+    check_transformed(
+        """\
+        from django.db import models
+        from django.db.models import ForeignKey
+        ForeignKey("auth.User")
+        models.ForeignKey("auth.User")
+        """,
+        """\
+        from django.db import models
+        from django.db.models import CASCADE
+        from django.db.models import ForeignKey
+        ForeignKey("auth.User", on_delete=CASCADE)
+        models.ForeignKey("auth.User", on_delete=models.CASCADE)
+        """,
+    )
+
+
 @pytest.mark.parametrize("field_class", ["ForeignKey", "OneToOneField"])
 def test_field_class_with_args(field_class):
     check_transformed(

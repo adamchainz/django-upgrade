@@ -89,8 +89,9 @@ def visit_ClassDef(
             len(subnode.targets) == 1
             and isinstance(subnode.targets[0], ast.Name)
             and subnode.targets[0].id == "indexes"
-            and isinstance(subnode.value, (ast.List, ast.Tuple))
         ):
+            if not isinstance(subnode.value, (ast.List, ast.Tuple)):
+                return
             indexeses.append(subnode)
 
     if len(indexeses) > 1:

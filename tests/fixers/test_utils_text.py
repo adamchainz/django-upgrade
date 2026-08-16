@@ -30,7 +30,7 @@ def test_simple():
         """\
         import html
 
-        html.escape("input string")
+        html.unescape("input string")
         """,
     )
 
@@ -46,7 +46,7 @@ def test_with_other_import():
         import html
         from django.utils.text import slugify
 
-        html.escape("input string")
+        html.unescape("input string")
         """,
     )
 
@@ -64,6 +64,6 @@ def test_indented():
             import html
             from django.utils.text import slugify
 
-            html.escape("input string")
+            html.unescape("input string")
         """,
     )

@@ -26,6 +26,8 @@ Unreleased
 
 * Fix :ref:`permalink <permalink>` fixer crash on bare return tuples whose first element is parenthesized.
 
+* Fix :ref:`permalink <permalink>` fixer mangling f-string view names when running on Python 3.12+.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

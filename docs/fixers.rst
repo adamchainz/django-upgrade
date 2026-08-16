@@ -959,7 +959,7 @@ Also rewrites the internal function ``is_safe_url()`` to ``url_has_allowed_host_
 
 **Name:** ``utils_text``
 
-Rewrites ``unescape_entities()`` with the standard library ``html.escape()``.
+Rewrites ``unescape_entities()`` with the standard library ``html.unescape()``.
 
 .. code-block:: diff
 
@@ -967,7 +967,7 @@ Rewrites ``unescape_entities()`` with the standard library ``html.escape()``.
     +import html
 
     -unescape_entities("some input string")
-    +html.escape("some input string")
+    +html.unescape("some input string")
 
 .. _utils_translation:
 

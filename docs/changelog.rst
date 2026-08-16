@@ -5,6 +5,9 @@ Changelog
 Unreleased
 ----------
 
+* Fix :ref:`utils_text <utils_text>` fixer to rewrite ``unescape_entities()`` calls with ``html.unescape()``.
+  Previously it incorrectly used ``html.escape()``, which performs the inverse operation.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

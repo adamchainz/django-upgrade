@@ -63,5 +63,5 @@ def visit_Name(
     if node.id == OLD_NAME and OLD_NAME in state.from_imports[MODULE]:
         yield (
             ast_start_offset(node),
-            partial(find_and_replace_name, name=OLD_NAME, new="html.escape"),
+            partial(find_and_replace_name, name=OLD_NAME, new="html.unescape"),
         )

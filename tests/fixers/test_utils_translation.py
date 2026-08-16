@@ -71,3 +71,18 @@ def test_success_alias():
         ng.__name__
         """,
     )
+
+
+def test_success_alias_new_name_also_imported():
+    check_transformed(
+        """\
+        from django.utils.translation import ugettext as _, gettext
+
+        _("yada")
+        """,
+        """\
+        from django.utils.translation import gettext as _, gettext
+
+        _("yada")
+        """,
+    )

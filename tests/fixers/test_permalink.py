@@ -238,6 +238,29 @@ def test_return_bare_tuple():
     )
 
 
+def test_return_bare_tuple_parenthesized_first_element():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class MyModel(models.Model):
+            @models.permalink
+            def url(self):
+                return ("guitarist_detail"), [self.slug]
+        """,
+        """\
+        from django.db import models
+        from django.urls import reverse
+
+
+        class MyModel(models.Model):
+            def url(self):
+                return reverse(("guitarist_detail"), args=[self.slug])
+        """,
+    )
+
+
 def test_return_bare_tuple_with_kwargs():
     check_transformed(
         """\

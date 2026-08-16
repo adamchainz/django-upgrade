@@ -26,6 +26,14 @@ def test_not_self_request():
     )
 
 
+def test_keyword_argument():
+    check_noop(
+        """\
+        request.user.is_authenticated(x=f())
+        """,
+    )
+
+
 def test_not_user():
     check_noop(
         """\

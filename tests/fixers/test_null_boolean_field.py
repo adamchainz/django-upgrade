@@ -186,6 +186,20 @@ def test_transform_with_kwargs():
     )
 
 
+def test_transform_with_final_kwarg_containing_commas():
+    check_transformed(
+        """\
+        from django.db.models import NullBooleanField
+        field = NullBooleanField(choices=[(True, "Yes"), (False, "No")])
+        """,
+        """\
+        from django.db.models import BooleanField
+        field = BooleanField(choices=[(True, "Yes"), (False, "No")], null=True)
+        """,
+        filename="models/blog.py",
+    )
+
+
 def test_transform_with_kwargs_multiline():
     check_transformed(
         """\

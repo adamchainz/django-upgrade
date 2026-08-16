@@ -113,11 +113,9 @@ def fix_null_boolean_field(tokens: list[Token], i: int, *, node: ast.Call) -> No
         new_src = "null=True"
         if len(func_args) > 0:
             new_src = " " + new_src
-            final_start_idx, final_end_idx = func_args[-1]
-            final_has_comma = any(
-                t.name == OP and t.src == ","
-                for t in tokens[final_start_idx : final_end_idx + 1]
-            )
+            final_end_idx = func_args[-1][1]
+            final_token = tokens[final_end_idx]
+            final_has_comma = final_token.name == OP and final_token.src == ","
             if not final_has_comma:
                 new_src = "," + new_src
 

@@ -528,8 +528,7 @@ def update_import_names(
         if new_name == "" or (
             # Only deduplicate unaliased imports: an aliased import binds the
             # alias, so it must be renamed, not erased.
-            alias.asname is None
-            and new_name in existing_unaliased_names
+            alias.asname is None and new_name in existing_unaliased_names
         ):
             # Erase
             start_idx = find(tokens, j, name=NAME, src=alias.name)

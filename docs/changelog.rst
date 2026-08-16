@@ -40,6 +40,8 @@ Unreleased
 
 * Fix :ref:`stringagg <stringagg>` fixer to not partially rewrite files where an unrewritable call follows a rewritable one.
 
+* Fix :ref:`stringagg <stringagg>` fixer to correctly wrap implicitly concatenated delimiter strings in ``Value()``.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

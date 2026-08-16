@@ -16,7 +16,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import update_import_modules
+from django_upgrade.tokens import find_last_token, insert, update_import_modules
 
 fixer = Fixer(
     __name__,
@@ -102,6 +102,7 @@ def visit_Call(
                 partial(
                     wrap_delimiter,
                     wrap=wrap,
+                    node=delimiter,
                     module=module,
                 ),
             )
@@ -129,9 +130,11 @@ def rewrite_import_from(
 
 
 def wrap_delimiter(
-    tokens: list[Token], i: int, *, wrap: str, module: ast.Module
+    tokens: list[Token], i: int, *, wrap: str, node: ast.expr, module: ast.Module
 ) -> None:
     if do_rewrite.get(module) is not True:
         return
 
-    tokens[i] = tokens[i]._replace(src=f"{wrap}(" + tokens[i].src + ")")
+    end = find_last_token(tokens, i, node=node)
+    insert(tokens, end + 1, new_src=")")
+    insert(tokens, i, new_src=f"{wrap}(")

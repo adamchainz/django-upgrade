@@ -46,7 +46,7 @@ def visit_Call(
             )
         )
         and len(node.args) == 0
-        and not any(k.arg == "length" for k in node.keywords)
+        and not any(k.arg is None or k.arg == "length" for k in node.keywords)
     ):
         yield (
             ast_start_offset(node),

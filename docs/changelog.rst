@@ -28,6 +28,8 @@ Unreleased
 
 * Fix :ref:`permalink <permalink>` fixer mangling f-string view names when running on Python 3.12+.
 
+* Fix :ref:`crypto_get_random_string <crypto_get_random_string>` fixer to skip calls with ``**`` unpacking, which may contain ``length``.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

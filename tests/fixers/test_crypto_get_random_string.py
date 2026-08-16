@@ -37,6 +37,15 @@ def test_providing_length_as_kwarg():
     )
 
 
+def test_double_star_unpacking():
+    check_noop(
+        """\
+        from django.utils.crypto import get_random_string
+        get_random_string(**kwargs)
+        """,
+    )
+
+
 def test_no_pos_arg():
     check_transformed(
         """\

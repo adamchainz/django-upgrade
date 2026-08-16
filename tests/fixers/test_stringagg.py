@@ -78,6 +78,18 @@ def test_mixed_safe_and_unsafe_delimiters():
     )
 
 
+def test_mixed_safe_and_unsafe_delimiters_value_imported():
+    check_noop(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+        from django.db.models import Value
+
+        StringAgg("name", ", ")
+        StringAgg("title", some_var)
+        """,
+    )
+
+
 def test_import_aliased():
     check_noop(
         """\

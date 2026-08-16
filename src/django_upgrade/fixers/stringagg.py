@@ -102,6 +102,7 @@ def visit_Call(
                 partial(
                     wrap_delimiter,
                     wrap=wrap,
+                    module=module,
                 ),
             )
         elif (
@@ -127,5 +128,10 @@ def rewrite_import_from(
     )
 
 
-def wrap_delimiter(tokens: list[Token], i: int, *, wrap: str) -> None:
+def wrap_delimiter(
+    tokens: list[Token], i: int, *, wrap: str, module: ast.Module
+) -> None:
+    if do_rewrite.get(module) is not True:
+        return
+
     tokens[i] = tokens[i]._replace(src=f"{wrap}(" + tokens[i].src + ")")

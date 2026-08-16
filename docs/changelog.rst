@@ -38,6 +38,8 @@ Unreleased
 
 * Fix :ref:`password_reset_timeout_days <password_reset_timeout_days>` fixer to parenthesize values that bind less tightly than multiplication, such as conditional expressions.
 
+* Fix :ref:`stringagg <stringagg>` fixer to not partially rewrite files where an unrewritable call follows a rewritable one.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

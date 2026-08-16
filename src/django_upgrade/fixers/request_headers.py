@@ -31,8 +31,7 @@ def visit_Subscript(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         is_request_or_self_request_meta(node.value)
-        and not isinstance(parents[-1], ast.Delete)
-        and not (isinstance(parents[-1], ast.Assign) and node in parents[-1].targets)
+        and isinstance(node.ctx, ast.Load)
         and (meta_name := extract_constant(node.slice)) is not None
         and (header_name := get_header_name(meta_name)) is not None
     ):

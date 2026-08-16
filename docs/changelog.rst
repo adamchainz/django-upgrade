@@ -18,6 +18,8 @@ Unreleased
 
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to avoid a double comma when the existing ``headers=`` dict has a trailing comma.
 
+* Fix :ref:`request_headers <request_headers>` fixer to not rewrite writes to ``request.META``, such as augmented assignments, since ``request.headers`` is immutable.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

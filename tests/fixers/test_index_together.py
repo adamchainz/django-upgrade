@@ -37,6 +37,18 @@ def test_no_index_together():
     )
 
 
+def test_empty_index_together():
+    check_noop(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = []
+        """,
+    )
+
+
 def test_multiple_index_togethers():
     check_noop(
         """\

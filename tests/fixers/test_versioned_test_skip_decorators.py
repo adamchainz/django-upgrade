@@ -718,6 +718,53 @@ def test_unittest_attr_skipIf_always_skip_removes_function():
     )
 
 
+def test_unittest_attr_skipIf_always_skip_sole_method_leaves_pass():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        class MyTests(unittest.TestCase):
+            @unittest.skipIf(django.VERSION >= (4, 1), "Only applies to Django < 4.1")
+            def test_thing(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+
+        class MyTests(unittest.TestCase):
+            pass
+        """,
+    )
+
+
+def test_unittest_attr_skipIf_always_skip_not_sole_method_removed():
+    check_transformed(
+        """\
+        import unittest
+        import django
+
+        class MyTests(unittest.TestCase):
+            @unittest.skipIf(django.VERSION >= (4, 1), "Only applies to Django < 4.1")
+            def test_thing(self):
+                pass
+
+            def test_other(self):
+                pass
+        """,
+        """\
+        import unittest
+        import django
+
+        class MyTests(unittest.TestCase):
+
+            def test_other(self):
+                pass
+        """,
+    )
+
+
 def test_unittest_attr_skipIf_async_always_skip_removes_function():
     check_transformed(
         """\

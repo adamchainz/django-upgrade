@@ -430,17 +430,26 @@ def erase_def(
     i: int,
     *,
     node: ast.AsyncFunctionDef | ast.FunctionDef | ast.ClassDef,
+    needs_pass: bool = False,
 ) -> None:
     """
     Erase a decorated function or class definition entirely, including all
-    decorators.
+    decorators. If needs_pass is set, replace it with a 'pass' statement
+    instead, to keep the surrounding block non-empty.
     """
     _, j = find_node(tokens, i, node=node)
     i = reverse_find(tokens, i, name=OP, src="@")
+    if tokens[i - 1].name in (INDENT, UNIMPORTANT_WS):
+        indent = tokens[i - 1].src
+    else:
+        indent = ""
     i = reverse_consume(tokens, i, name=INDENT)
     i = reverse_consume(tokens, i, name=UNIMPORTANT_WS)
     i = reverse_consume(tokens, i, name=PHYSICAL_NEWLINE)
-    del tokens[i : j + 1]
+    if needs_pass:
+        tokens[i : j + 1] = [Token(CODE, f"{indent}pass\n")]
+    else:
+        del tokens[i : j + 1]
 
 
 def find_and_replace_name(tokens: list[Token], i: int, *, name: str, new: str) -> None:

@@ -64,6 +64,16 @@ def is_rewritable_import_from(node: ast.ImportFrom) -> bool:
     return node.level == 0 and not (len(node.names) == 1 and node.names[0].name == "*")
 
 
+def is_sole_statement_in_block(node: ast.stmt, parent: ast.AST) -> bool:
+    if isinstance(parent, ast.Module):
+        return False
+    for attr in ("body", "orelse", "finalbody"):
+        body = getattr(parent, attr, [])
+        if len(body) == 1 and body[0] is node:
+            return True
+    return False
+
+
 TEST_CLIENT_REQUEST_METHODS = frozenset(
     (
         "request",

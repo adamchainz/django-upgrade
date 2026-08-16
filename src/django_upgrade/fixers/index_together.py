@@ -55,6 +55,7 @@ def visit_ClassDef(
             and isinstance(subnode.targets[0], ast.Name)
             and subnode.targets[0].id == "index_together"
             and isinstance(subnode.value, (ast.List, ast.Tuple))
+            and len(subnode.value.elts) > 0
             and (
                 all(
                     (isinstance(elt, ast.Constant) and isinstance(elt.value, str))

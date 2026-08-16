@@ -145,6 +145,23 @@ def test_success_models_value_imported():
     )
 
 
+def test_implicit_string_concatenation_delimiter():
+    check_transformed(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+        from django.db.models import Value
+
+        StringAgg("name", ", " "x")
+        """,
+        """\
+        from django.db.models import StringAgg
+        from django.db.models import Value
+
+        StringAgg("name", Value(", " "x"))
+        """,
+    )
+
+
 def test_safe_value_wrapped_delimiter():
     check_transformed(
         """\

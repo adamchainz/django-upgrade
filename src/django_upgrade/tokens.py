@@ -530,6 +530,24 @@ def str_repr_matching(text: str, *, match_quotes: str) -> str:
     return result
 
 
+def statement_find(tokens: list[Token], i: int, *, name: str, src: str) -> int | None:
+    """
+    Find the next token matching name and src within the current statement,
+    or None if the statement ends first.
+    """
+    while True:
+        token = tokens[i]
+        if (
+            token.name == LOGICAL_NEWLINE
+            or token.name == "ENDMARKER"
+            or (token.name == OP and token.src == ";")
+        ):
+            return None
+        if token.name == name and token.src == src:
+            return i
+        i += 1
+
+
 def update_import_names(
     tokens: list[Token],
     i: int,
@@ -541,8 +559,8 @@ def update_import_names(
     Replace an ast.ImportFrom node’s imported names, where name_map maps old to
     new names. If a new name entry is the empty string, remove the import.
     """
-    j = find(tokens, i, name=NAME, src="from")
-    j = find(tokens, j, name=NAME, src="import")
+    from_idx = find(tokens, i, name=NAME, src="from")
+    j = find(tokens, from_idx, name=NAME, src="import")
 
     existing_unaliased_names = {
         alias.name for alias in node.names if alias.asname is None
@@ -550,11 +568,22 @@ def update_import_names(
 
     replacements: list[tuple[int, int, list[Token]]] = []  # start, end, new tokens
     remove_all = True
-    for alias_idx, alias in enumerate(node.names):
+    any_found = False
+    first_found = True
+    for alias in node.names:
+        # Another fixer may already have erased names from the same import
+        # statement, so search within its bounds and skip missing names.
+        found_idx = statement_find(tokens, j, name=NAME, src=alias.name)
+        if found_idx is None:
+            continue
+        is_first = first_found
+        any_found = True
+        first_found = False
+
         if alias.name not in name_map:
             # Skip over
             remove_all = False
-            j = find(tokens, j, name=NAME, src=alias.name)
+            j = found_idx
             if alias.asname is not None:
                 j = find(tokens, j, name=NAME, src="as")
                 j = find(tokens, j, name=NAME, src=alias.asname)
@@ -567,7 +596,7 @@ def update_import_names(
             alias.asname is None and new_name in existing_unaliased_names
         ):
             # Erase
-            start_idx = find(tokens, j, name=NAME, src=alias.name)
+            start_idx = found_idx
 
             end_idx = start_idx
             if alias.asname is not None:
@@ -575,8 +604,10 @@ def update_import_names(
                 end_idx = find(tokens, end_idx, name=NAME, src=alias.asname)
 
             if len(node.names) > 1:
-                if alias_idx == 0:
-                    end_idx = find(tokens, end_idx, name=OP, src=",")
+                if is_first:
+                    comma_idx = statement_find(tokens, end_idx, name=OP, src=",")
+                    if comma_idx is not None:
+                        end_idx = comma_idx
                 else:
                     start_idx = reverse_find(tokens, start_idx, name=OP, src=",")
 
@@ -592,7 +623,7 @@ def update_import_names(
         else:
             # Replace
             remove_all = False
-            start_idx = find(tokens, j, name=NAME, src=alias.name)
+            start_idx = found_idx
             replacements.append(
                 (
                     start_idx,
@@ -602,8 +633,11 @@ def update_import_names(
             )
             j = start_idx
 
+    if not any_found:  # pragma: no cover
+        # Defensive: all names already erased by other fixers.
+        return
     if remove_all:
-        erase_node(tokens, i, node=node)
+        erase_node(tokens, from_idx, node=node)
     else:
         for start_idx, end_idx, replacement in reversed(replacements):
             tokens[start_idx : end_idx + 1] = replacement
@@ -630,7 +664,10 @@ def update_import_modules(
             new_name = f"{name} as {alias.asname}" if alias.asname else name
             imports_to_add[module_rewrites[name]].append(new_name)
 
-    j, indent = extract_indent(tokens, i)
+    # Another fixer may have inserted tokens at i, such as its own new import
+    # statements, so find the import statement’s first token.
+    from_idx = find(tokens, i, name=NAME, src="from")
+    j, indent = extract_indent(tokens, from_idx)
     update_import_names(tokens, i, node=node, name_map=name_map)
     for module, names in reversed(imports_to_add.items()):
         joined_names = ", ".join(sorted(names))

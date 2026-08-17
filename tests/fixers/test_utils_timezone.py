@@ -451,3 +451,24 @@ def test_no_datetime_import_future_import():
         do_a_thing(dt.timezone.utc)
         """,
     )
+
+
+def test_fixedoffset_and_utc_in_same_import():
+    # timezone_fixedoffset and utils_timezone both edit the same import
+    check_transformed(
+        """\
+        from django.utils.timezone import FixedOffset, utc
+        from datetime import datetime
+
+        x = datetime(2020, 1, 1, tzinfo=utc)
+        y = FixedOffset(120)
+        """,
+        """\
+        import datetime as dt
+        from datetime import timedelta, timezone
+        from datetime import datetime
+
+        x = datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+        y = timezone(timedelta(minutes=120))
+        """,
+    )

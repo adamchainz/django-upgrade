@@ -144,3 +144,13 @@ def test_starargs():
         )
         """,
     )
+
+
+def test_implicitly_concatenated_key_not_rewritten():
+    check_noop(
+        """\
+        from django import forms
+
+        forms.ModelMultipleChoiceField(error_messages={"li" "st": "Enter multiple values."})
+        """,
+    )

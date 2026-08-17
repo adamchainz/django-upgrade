@@ -36,6 +36,8 @@ Unreleased
 
 * Fix :ref:`request_headers <request_headers>` fixer to not corrupt implicitly concatenated header name strings.
 
+* Fix :ref:`forms_model_multiple_choice_field <forms_model_multiple_choice_field>` fixer to not corrupt implicitly concatenated ``"list"`` keys.
+
 * Fix :ref:`permalink <permalink>` fixer crash on bare return tuples whose first element is parenthesized.
 
 * Fix :ref:`permalink <permalink>` fixer mangling f-string view names when running on Python 3.12+.

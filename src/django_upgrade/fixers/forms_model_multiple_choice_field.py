@@ -7,9 +7,8 @@ from __future__ import annotations
 
 import ast
 from collections.abc import Iterable
-from functools import partial
 
-from tokenize_rt import Offset
+from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
@@ -51,4 +50,11 @@ def visit_Call(
             for key in error_message_node.value.keys
         )
     ):
-        yield ast_start_offset(list_node), partial(replace, src='"invalid_list"')
+        yield ast_start_offset(list_node), replace_list_key
+
+
+def replace_list_key(tokens: list[Token], i: int) -> None:
+    if ast.literal_eval(tokens[i].src) != "list":
+        # Implicitly concatenated string, cannot rewrite one token
+        return
+    replace(tokens, i, src='"invalid_list"')

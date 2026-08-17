@@ -132,7 +132,7 @@ def get_import_details(state: State, module: ast.AST) -> ImportDetails:
         elif (  # pragma: no cover
             is_rewritable_import_from(node)
             and node.module == "django.utils.timezone"
-            and any(a.name == "utc" for a in node.names)
+            and any(a.name == "utc" and a.asname is None for a in node.names)
         ):
             details.old_utc_import = node
 

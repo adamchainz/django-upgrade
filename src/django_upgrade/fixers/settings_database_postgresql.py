@@ -50,5 +50,8 @@ def visit_Dict(
 
 
 def replace_engine(tokens: list[Token], i: int) -> None:
+    if ast.literal_eval(tokens[i].src) != "django.db.backends.postgresql_psycopg2":
+        # Implicitly concatenated string, cannot rewrite one token
+        return
     src = str_repr_matching("django.db.backends.postgresql", match_quotes=tokens[i].src)
     replace(tokens, i, src=src)

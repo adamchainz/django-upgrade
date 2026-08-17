@@ -51,6 +51,21 @@ def test_wrong_setting():
     )
 
 
+def test_implicit_str_concat():
+    check_noop(
+        """\
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends."
+                "postgresql_psycopg2",
+                "NAME": "mydb",
+            }
+        }
+        """,
+        filename="settings.py",
+    )
+
+
 def test_already_up_to_date():
     check_noop(
         """\

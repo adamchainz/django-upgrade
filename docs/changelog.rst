@@ -61,6 +61,8 @@ Unreleased
 
 * Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing unescaped dots, which match any character.
 
+* Fix :ref:`settings_database_postgresql <settings_database_postgresql>` fixer to not corrupt implicitly concatenated ``ENGINE`` strings.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

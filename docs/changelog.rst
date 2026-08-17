@@ -65,6 +65,8 @@ Unreleased
 
 * Fix :ref:`settings_storages <settings_storages>` fixer to handle implicitly concatenated setting strings, which were previously truncated.
 
+* Fix :ref:`admin_register <admin_register>` fixer to skip ``register()`` calls with an empty sequence of models, which were previously rewritten to ``@admin.register()``, an error.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

@@ -37,6 +37,32 @@ def test_kwargs_not_supported():
     )
 
 
+def test_empty_tuple_not_supported():
+    # Registering an empty sequence of models is a no-op, but rewriting it
+    # to bare `@admin.register()` would raise an error.
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register((), AuthorAdmin)
+        """,
+    )
+
+
+def test_empty_list_not_supported():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class AuthorAdmin(admin.ModelAdmin):
+            pass
+        admin.site.register([], AuthorAdmin)
+        """,
+    )
+
+
 def test_imported_custom_admin():
     check_noop(
         """\

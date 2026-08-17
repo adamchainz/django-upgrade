@@ -186,6 +186,7 @@ def visit_Call(
                 isinstance((first_arg := node.args[0]), ast.Name)
                 or (
                     isinstance(first_arg, (ast.Tuple, ast.List))
+                    and first_arg.elts
                     and all(isinstance(elt, ast.Name) for elt in first_arg.elts)
                 )
             )

@@ -1082,7 +1082,7 @@ Rewrites model and form fields using ``FloatRangeField`` to ``DecimalRangeField`
 Rewrites the ``allow_database_queries`` and ``multi_db`` attributes of Django’s ``TestCase`` classes to the new ``databases`` attribute.
 This only applies in test files, which are heuristically detected as files with either “test” or “tests” somewhere in their path.
 
-Note that this will only rewrite to ``databases = []`` or ``databases = "__all__"``.
+Note that this will only rewrite to ``databases = []``, ``databases = ["default"]``, or ``databases = "__all__"``.
 With multiple databases you can save some test time by limiting test cases to the databases they require (which is why Django made the change).
 
 .. code-block:: diff

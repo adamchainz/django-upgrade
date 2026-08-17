@@ -133,7 +133,7 @@ def test_test_case_false():
         from django.test import TestCase
 
         class MyTests(TestCase):
-            databases = []
+            databases = ["default"]
 
             def test_something(self):
                 self.assertEqual(2 * 2, 4)

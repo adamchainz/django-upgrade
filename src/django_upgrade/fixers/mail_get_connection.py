@@ -13,7 +13,11 @@ from weakref import WeakKeyDictionary
 
 from tokenize_rt import Offset, Token
 
-from django_upgrade.ast import ast_start_offset, is_rewritable_import_from
+from django_upgrade.ast import (
+    ast_start_offset,
+    get_module_names,
+    is_rewritable_import_from,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     CODE,
@@ -63,9 +67,11 @@ def visit_ImportFrom(
     ):
         module = parents[0]
         assert isinstance(module, ast.Module)
-        unrewritable, standalone_no_arg = _direct_get_connection_usage(module)
+        unrewritable, standalone_no_arg = _direct_get_connection_usage(state, module)
         if unrewritable == 0:
             if standalone_no_arg > 0:
+                if _mailers_name_clashes(state, module):
+                    return
                 name_map: dict[str, str] = {GET_CONNECTION: MAILERS}
             else:
                 name_map = {GET_CONNECTION: ""}
@@ -90,7 +96,7 @@ def visit_Call(
         and MAIL_NAME in state.from_imports[CORE_MODULE]
         and len(node.args) == 0
         and len(node.keywords) == 0
-        and not _is_inline_connection_kwarg(parents)
+        and not _is_inline_connection_kwarg(state, parents)
     ):
         yield (
             ast_start_offset(node),
@@ -108,12 +114,12 @@ def visit_Call(
         and GET_CONNECTION in state.from_imports[MAIL_MODULE]
         and len(node.args) == 0
         and len(node.keywords) == 0
-        and not _is_inline_connection_kwarg(parents)
+        and not _is_inline_connection_kwarg(state, parents)
     ):
         module = parents[0]
         assert isinstance(module, ast.Module)
-        unrewritable, _ = _direct_get_connection_usage(module)
-        if unrewritable == 0:
+        unrewritable, _ = _direct_get_connection_usage(state, module)
+        if unrewritable == 0 and not _mailers_name_clashes(state, module):
             yield (
                 ast_start_offset(node),
                 partial(
@@ -148,8 +154,17 @@ def visit_Call(
                 break
 
 
-def _is_inline_connection_kwarg(parents: tuple[ast.AST, ...]) -> bool:
-    """Return True if the node is a connection= kwarg in a mail send function call."""
+def _mailers_name_clashes(state: State, module: ast.Module) -> bool:
+    """Return True if the mailers name is bound to something other than the
+    django.core.mail import."""
+    return MAILERS not in state.from_imports[
+        MAIL_MODULE
+    ] and MAILERS in get_module_names(module)
+
+
+def _is_inline_connection_kwarg(state: State, parents: tuple[ast.AST, ...]) -> bool:
+    """Return True if the node is a connection= kwarg in a call to a Django
+    mail send function."""
     return (
         len(parents) >= 2
         and isinstance(parents[-1], ast.keyword)
@@ -159,12 +174,14 @@ def _is_inline_connection_kwarg(parents: tuple[ast.AST, ...]) -> bool:
             (
                 isinstance(parents[-2].func, ast.Name)
                 and parents[-2].func.id in MAIL_SEND_FUNCTIONS
+                and parents[-2].func.id in state.from_imports[MAIL_MODULE]
             )
             or (
                 isinstance(parents[-2].func, ast.Attribute)
                 and parents[-2].func.attr in MAIL_SEND_FUNCTIONS
                 and isinstance(parents[-2].func.value, ast.Name)
                 and parents[-2].func.value.id == MAIL_NAME
+                and MAIL_NAME in state.from_imports[CORE_MODULE]
             )
         )
     )
@@ -176,6 +193,7 @@ _direct_get_connection_usage_cache: WeakKeyDictionary[ast.Module, tuple[int, int
 
 
 def _direct_get_connection_usage(
+    state: State,
     module: ast.Module,
 ) -> tuple[int, int]:
     """
@@ -204,7 +222,7 @@ def _direct_get_connection_usage(
         ):
             if len(node.args) > 0 or len(node.keywords) > 0:
                 unrewritable += 1
-            elif not _is_inline_connection_kwarg(parents):
+            elif not _is_inline_connection_kwarg(state, parents):
                 standalone_no_arg += 1
         elif (
             isinstance(node, ast.Name)

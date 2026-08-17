@@ -57,6 +57,8 @@ Unreleased
 
 * Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not remove the ``get_connection`` import when bare, non-call references remain.
 
+* Fix :ref:`mail_get_connection <mail_get_connection>` fixer handling of ``send_mail()`` and similar calls on modules other than ``django.core.mail``.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

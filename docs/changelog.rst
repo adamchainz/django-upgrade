@@ -5,103 +5,195 @@ Changelog
 Unreleased
 ----------
 
+* Support Python 3.15.
+
+  `PR #681 <https://github.com/adamchainz/django-upgrade/pull/681>`__.
+
 * Fix :ref:`utils_text <utils_text>` fixer to rewrite ``unescape_entities()`` calls with ``html.unescape()``.
   Previously it incorrectly used ``html.escape()``, which performs the inverse operation.
 
+  `PR #684 <https://github.com/adamchainz/django-upgrade/pull/684>`__.
+
 * Fix :ref:`index_together <index_together>` fixer crash on empty ``index_together`` declarations.
+
+  `PR #685 <https://github.com/adamchainz/django-upgrade/pull/685>`__.
 
 * Fix :ref:`index_together <index_together>` fixer to not add a duplicate ``indexes`` declaration when the existing one is not a list or tuple literal.
 
+  `PR #686 <https://github.com/adamchainz/django-upgrade/pull/686>`__.
+
 * Fix :ref:`index_together <index_together>` fixer to add a missing comma when extending a multiline ``indexes`` list that has no trailing comma.
+
+  `PR #687 <https://github.com/adamchainz/django-upgrade/pull/687>`__.
 
 * Fix :ref:`index_together <index_together>` fixer to keep an empty ``indexes`` tuple a tuple when extending it with a single index.
 
+  `PR #716 <https://github.com/adamchainz/django-upgrade/pull/716>`__.
+
 * Fix :ref:`format_html <format_html>` fixer to skip calls with a parenthesized argument, where removing the ``.format()`` call would create a tuple.
+
+  `PR #717 <https://github.com/adamchainz/django-upgrade/pull/717>`__.
 
 * Fix :ref:`null_boolean_field <null_boolean_field>` fixer to add a missing comma before ``null=True`` when the final argument contains commas within brackets.
 
+  `PR #688 <https://github.com/adamchainz/django-upgrade/pull/688>`__.
+
 * Fix fixers that modify call arguments to not treat a comment inside otherwise empty parentheses as an argument, which made the :ref:`null_boolean_field <null_boolean_field>` fixer produce invalid syntax.
 
+  `PR #718 <https://github.com/adamchainz/django-upgrade/pull/718>`__.
+
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to avoid a double comma when the existing ``headers=`` dict has a trailing comma.
+
+  `PR #689 <https://github.com/adamchainz/django-upgrade/pull/689>`__.
 
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to insert converted headers at the start of an existing ``headers=`` dict.
   Django gives ``headers=`` entries precedence over ``HTTP_`` arguments, and the last duplicate key wins in a dict literal, so appending converted entries at the end previously flipped which value took effect.
 
+  `PR #723 <https://github.com/adamchainz/django-upgrade/pull/723>`__.
+
 * Fix :ref:`testcase_databases <testcase_databases>` fixer to rewrite ``multi_db = False`` to ``databases = ["default"]`` rather than ``databases = []``.
   Django treated ``multi_db = False`` as allowing the default database, so the previous rewrite blocked all database queries in such tests.
 
+  `PR #727 <https://github.com/adamchainz/django-upgrade/pull/727>`__.
+
 * Fix :ref:`request_headers <request_headers>` fixer to not rewrite writes to ``request.META``, such as augmented assignments, since ``request.headers`` is immutable.
+
+  `PR #690 <https://github.com/adamchainz/django-upgrade/pull/690>`__.
 
 * Fix :ref:`request_headers <request_headers>` fixer crash on ``in`` comparisons with a parenthesized string.
 
+  `PR #691 <https://github.com/adamchainz/django-upgrade/pull/691>`__.
+
 * Fix :ref:`request_headers <request_headers>` fixer to not corrupt implicitly concatenated header name strings.
+
+  `PR #692 <https://github.com/adamchainz/django-upgrade/pull/692>`__.
 
 * Fix :ref:`forms_model_multiple_choice_field <forms_model_multiple_choice_field>` fixer to not corrupt implicitly concatenated ``"list"`` keys.
 
+  `PR #728 <https://github.com/adamchainz/django-upgrade/pull/728>`__.
+
 * Fix :ref:`permalink <permalink>` fixer crash on bare return tuples whose first element is parenthesized.
+
+  `PR #693 <https://github.com/adamchainz/django-upgrade/pull/693>`__.
 
 * Fix :ref:`permalink <permalink>` fixer mangling f-string view names when running on Python 3.12+.
 
+  `PR #694 <https://github.com/adamchainz/django-upgrade/pull/694>`__.
+
 * Fix :ref:`crypto_get_random_string <crypto_get_random_string>` fixer to skip calls with ``**`` unpacking, which may contain ``length``.
+
+  `PR #695 <https://github.com/adamchainz/django-upgrade/pull/695>`__.
 
 * Fix :ref:`email_validator <email_validator>` fixer to skip calls that already pass ``allowlist``, which previously gained a repeated keyword argument.
 
+  `PR #696 <https://github.com/adamchainz/django-upgrade/pull/696>`__.
+
 * Fix :ref:`on_delete <on_delete>` fixer to add the ``CASCADE`` import when both import styles are used in one file.
+
+  `PR #697 <https://github.com/adamchainz/django-upgrade/pull/697>`__.
 
 * Fix :ref:`on_delete <on_delete>` fixer to skip calls with ``**`` unpacking, which may contain ``on_delete``.
 
+  `PR #714 <https://github.com/adamchainz/django-upgrade/pull/714>`__.
+
 * Fix :ref:`request_user_attributes <request_user_attributes>` fixer to skip calls with keyword arguments, which previously produced unbalanced parentheses.
+
+  `PR #698 <https://github.com/adamchainz/django-upgrade/pull/698>`__.
 
 * Fix :ref:`password_reset_timeout_days <password_reset_timeout_days>` fixer to parenthesize values that bind less tightly than multiplication, such as conditional expressions.
 
+  `PR #699 <https://github.com/adamchainz/django-upgrade/pull/699>`__.
+
 * Fix :ref:`stringagg <stringagg>` fixer to not partially rewrite files where an unrewritable call follows a rewritable one.
+
+  `PR #700 <https://github.com/adamchainz/django-upgrade/pull/700>`__.
 
 * Fix :ref:`stringagg <stringagg>` fixer to correctly wrap implicitly concatenated delimiter strings in ``Value()``.
 
+  `PR #701 <https://github.com/adamchainz/django-upgrade/pull/701>`__.
+
 * Fix :ref:`stringagg <stringagg>` fixer to not move the ``StringAgg`` import when the file contains bare references to the name, such as alias assignments or subclass definitions, since the ``django.db.models`` version handles plain string delimiters differently.
+
+  `PR #722 <https://github.com/adamchainz/django-upgrade/pull/722>`__.
 
 * Fix :ref:`utils_translation <utils_translation>`, :ref:`utils_encoding <utils_encoding>`, and :ref:`transaction_savepoint <transaction_savepoint>` fixers to not erase aliased imports when the new name is also imported.
 
+  `PR #702 <https://github.com/adamchainz/django-upgrade/pull/702>`__.
+
 * Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not erase aliased ``FixedOffset`` imports.
+
+  `PR #703 <https://github.com/adamchainz/django-upgrade/pull/703>`__.
 
 * Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not rewrite files containing ``FixedOffset`` references it cannot rewrite, such as bare references and calls with ``*`` or ``**`` unpacking, which were previously left behind as ``NameError``\s.
 
+  `PR #719 <https://github.com/adamchainz/django-upgrade/pull/719>`__.
+
 * Fix :ref:`utils_timezone <utils_timezone>` fixer to ignore aliased ``utc`` imports, which previously made it erase the import and rewrite unrelated ``utc`` names.
+
+  `PR #720 <https://github.com/adamchainz/django-upgrade/pull/720>`__.
 
 * Fix :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixer to leave a ``pass`` statement when removing the only test in a class or other block.
 
+  `PR #704 <https://github.com/adamchainz/django-upgrade/pull/704>`__.
+
 * Fix :ref:`versioned_branches <versioned_branches>` fixer to preserve indentation when removing single-line ``if`` suites.
 
+  `PR #705 <https://github.com/adamchainz/django-upgrade/pull/705>`__.
+
 * Fix :ref:`admin_allow_tags <admin_allow_tags>` fixer to only remove assignments at module or class level, not e.g. ``self.allow_tags`` assignments in methods.
+
+  `PR #706 <https://github.com/adamchainz/django-upgrade/pull/706>`__.
 
 * Fix fixers that erase statements to handle statements sharing a line with another statement, separated by a semicolon.
   Previously the leftover semicolon made the file invalid syntax.
 
+  `PR #707 <https://github.com/adamchainz/django-upgrade/pull/707>`__.
+
 * Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not remove the ``get_connection`` import when bare, non-call references remain.
+
+  `PR #708 <https://github.com/adamchainz/django-upgrade/pull/708>`__.
 
 * Fix :ref:`mail_get_connection <mail_get_connection>` fixer handling of ``send_mail()`` and similar calls on modules other than ``django.core.mail``.
 
+  `PR #709 <https://github.com/adamchainz/django-upgrade/pull/709>`__.
+
 * Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing unescaped dots, which match any character.
+
+  `PR #710 <https://github.com/adamchainz/django-upgrade/pull/710>`__.
 
 * Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing literal angle brackets, which ``path()`` would interpret as parameter syntax.
 
+  `PR #715 <https://github.com/adamchainz/django-upgrade/pull/715>`__.
+
 * Fix :ref:`settings_database_postgresql <settings_database_postgresql>` fixer to not corrupt implicitly concatenated ``ENGINE`` strings.
+
+  `PR #711 <https://github.com/adamchainz/django-upgrade/pull/711>`__.
 
 * Fix :ref:`settings_storages <settings_storages>` fixer to handle implicitly concatenated setting strings, which were previously truncated.
 
+  `PR #712 <https://github.com/adamchainz/django-upgrade/pull/712>`__.
+
 * Fix :ref:`settings_storages <settings_storages>` fixer to not rewrite settings that are referenced elsewhere in the module, which previously left ``NameError``\s behind.
+
+  `PR #724 <https://github.com/adamchainz/django-upgrade/pull/724>`__.
 
 * Fix :ref:`admin_register <admin_register>` fixer to skip ``register()`` calls with an empty sequence of models, which were previously rewritten to ``@admin.register()``, an error.
 
+  `PR #713 <https://github.com/adamchainz/django-upgrade/pull/713>`__.
+
 * Fix :ref:`admin_register <admin_register>` fixer to skip rewriting when a registered model is defined or imported after the admin class, since the decorator would reference the name before its definition.
 
-* Fix :ref:`admin_decorators <admin_decorators>` fixer to skip attribute assignments whose value references names bound after the function, since hoisting such values into a decorator would make them ``NameError``\s.
+  `PR #725 <https://github.com/adamchainz/django-upgrade/pull/725>`__.
 
-* Support Python 3.15.
+* Fix :ref:`admin_decorators <admin_decorators_action>` fixer to skip attribute assignments whose value references names bound after the function, since hoisting such values into a decorator would make them ``NameError``\s.
+
+  `PR #726 <https://github.com/adamchainz/django-upgrade/pull/726>`__.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.
   This makes builds with uv about nine times faster, since uv runs the backend natively, without creating a build environment or spawning a Python process.
   Additionally, source distributions no longer include test files, which setuptools previously included incompletely, missing the files needed to actually run them.
+
+  `PR #679 <https://github.com/adamchainz/django-upgrade/pull/679>`__.
 
 1.31.1 (2026-06-26)
 -------------------

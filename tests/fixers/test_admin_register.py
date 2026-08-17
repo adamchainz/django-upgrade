@@ -63,6 +63,100 @@ def test_empty_list_not_supported():
     )
 
 
+def test_model_defined_after_admin_class():
+    # the decorator would reference MyModel before it is defined
+    check_noop(
+        """\
+        from django.contrib import admin
+        from django.db import models
+
+        class MyAdmin(admin.ModelAdmin):
+            pass
+
+        class MyModel(models.Model):
+            pass
+
+        admin.site.register(MyModel, MyAdmin)
+        """,
+    )
+
+
+def test_model_imported_after_admin_class():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class MyAdmin(admin.ModelAdmin):
+            pass
+
+        from myapp.models import MyModel
+
+        admin.site.register(MyModel, MyAdmin)
+        """,
+    )
+
+
+def test_module_imported_after_admin_class():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class MyAdmin(admin.ModelAdmin):
+            pass
+
+        import MyModel.thing
+
+        admin.site.register(MyModel, MyAdmin)
+        """,
+    )
+
+
+def test_module_imported_as_after_admin_class():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class MyAdmin(admin.ModelAdmin):
+            pass
+
+        import myapp.models as MyModel
+
+        admin.site.register(MyModel, MyAdmin)
+        """,
+    )
+
+
+def test_duplicate_import_from_names():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class MyAdmin(admin.ModelAdmin):
+            pass
+
+        from myapp.models import MyModel
+        from myapp.other import MyModel, Other
+
+        admin.site.register(MyModel, MyAdmin)
+        """,
+    )
+
+
+def test_duplicate_import_names():
+    check_noop(
+        """\
+        from django.contrib import admin
+
+        class MyAdmin(admin.ModelAdmin):
+            pass
+
+        import MyModel.one, MyModel.two
+
+        admin.site.register(MyModel, MyAdmin)
+        """,
+    )
+
+
 def test_imported_custom_admin():
     check_noop(
         """\

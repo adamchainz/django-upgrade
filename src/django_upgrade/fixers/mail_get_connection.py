@@ -63,8 +63,8 @@ def visit_ImportFrom(
     ):
         module = parents[0]
         assert isinstance(module, ast.Module)
-        has_args, standalone_no_arg = _direct_get_connection_usage(module)
-        if has_args == 0:
+        unrewritable, standalone_no_arg = _direct_get_connection_usage(module)
+        if unrewritable == 0:
             if standalone_no_arg > 0:
                 name_map: dict[str, str] = {GET_CONNECTION: MAILERS}
             else:
@@ -112,8 +112,8 @@ def visit_Call(
     ):
         module = parents[0]
         assert isinstance(module, ast.Module)
-        has_args, _ = _direct_get_connection_usage(module)
-        if has_args == 0:
+        unrewritable, _ = _direct_get_connection_usage(module)
+        if unrewritable == 0:
             yield (
                 ast_start_offset(node),
                 partial(
@@ -177,10 +177,11 @@ def _direct_get_connection_usage(
     module: ast.Module,
 ) -> tuple[int, int]:
     """
-    Walk the module counting usages of get_connection() via direct import
-    (Name('get_connection') calls).
+    Walk the module counting usages of get_connection via direct import
+    (Name('get_connection') references).
 
-    Returns (has_args_count, standalone_no_arg_count).
+    Returns (unrewritable_count, standalone_no_arg_count).
+    'unrewritable' counts calls with arguments and bare (non-call) references.
     'standalone' means not used as an inline connection= kwarg in a mail function.
     """
     try:
@@ -188,7 +189,7 @@ def _direct_get_connection_usage(
     except KeyError:
         pass
 
-    has_args = 0
+    unrewritable = 0
     standalone_no_arg = 0
 
     stack: list[tuple[ast.AST, tuple[ast.AST, ...]]] = [(module, ())]
@@ -200,14 +201,25 @@ def _direct_get_connection_usage(
             and node.func.id == GET_CONNECTION
         ):
             if len(node.args) > 0 or len(node.keywords) > 0:
-                has_args += 1
+                unrewritable += 1
             elif not _is_inline_connection_kwarg(parents):
                 standalone_no_arg += 1
+        elif (
+            isinstance(node, ast.Name)
+            and node.id == GET_CONNECTION
+            and not (
+                parents
+                and isinstance(parents[-1], ast.Call)
+                and parents[-1].func is node
+            )
+        ):
+            # Bare reference, e.g. assigned to a variable
+            unrewritable += 1
         subparents = parents + (node,)
         for child in ast.iter_child_nodes(node):
             stack.append((child, subparents))
 
-    result = has_args, standalone_no_arg
+    result = unrewritable, standalone_no_arg
     _direct_get_connection_usage_cache[module] = result
     return result
 

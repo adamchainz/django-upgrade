@@ -63,6 +63,8 @@ Unreleased
 
 * Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing unescaped dots, which match any character.
 
+* Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing literal angle brackets, which ``path()`` would interpret as parameter syntax.
+
 * Fix :ref:`settings_database_postgresql <settings_database_postgresql>` fixer to not corrupt implicitly concatenated ``ENGINE`` strings.
 
 * Fix :ref:`settings_storages <settings_storages>` fixer to handle implicitly concatenated setting strings, which were previously truncated.

@@ -244,6 +244,7 @@ def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
     remaining = regex_path.removeprefix("^")
     remaining = remaining.removesuffix("$")
     path = ""
+    literals = []
     while "(?P<" in remaining:
         prefix, rest = remaining.split("(?P<", 1)
         group, remaining = rest.split(")", 1)
@@ -255,14 +256,19 @@ def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
         except KeyError:
             return None
 
+        literals.append(prefix)
         path += prefix
         path += f"<{converter}:{group_name}>"
 
+    literals.append(remaining)
     path += remaining
 
-    if not re.fullmatch(r"(?:[a-zA-Z0-9_\-/<>:]|\\\.)*", path):
+    if not all(
+        re.fullmatch(r"(?:[a-zA-Z0-9_\-/:]|\\\.)*", literal) for literal in literals
+    ):
         # path still contains regex special characters, including unescaped
-        # dots, which match any character
+        # dots, which match any character, or angle brackets, which have
+        # meaning in path() route syntax
         return None
 
     path = re.sub(r"\\\.", ".", path)  # unescape literal dots

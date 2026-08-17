@@ -561,6 +561,27 @@ def test_re_path_unescaped_dot_not_rewritten():
     )
 
 
+def test_re_path_literal_angle_brackets_not_rewritten():
+    # angle brackets are literal in a regex but parameter syntax in a route
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        re_path(r"^shop/<id>/$", views.shop)
+        """,
+    )
+
+
+def test_re_path_literal_angle_brackets_converter_like_not_rewritten():
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        re_path(r"^docs/<int:pk>/$", views.docs)
+        """,
+    )
+
+
 def test_re_path_int_converter_1():
     check_transformed(
         """\

@@ -84,6 +84,8 @@ Unreleased
 
 * Fix :ref:`settings_storages <settings_storages>` fixer to handle implicitly concatenated setting strings, which were previously truncated.
 
+* Fix :ref:`settings_storages <settings_storages>` fixer to not rewrite settings that are referenced elsewhere in the module, which previously left ``NameError``\s behind.
+
 * Fix :ref:`admin_register <admin_register>` fixer to skip ``register()`` calls with an empty sequence of models, which were previously rewritten to ``@admin.register()``, an error.
 
 * Support Python 3.15.

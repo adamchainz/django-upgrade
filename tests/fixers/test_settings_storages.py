@@ -278,3 +278,23 @@ def test_star_import_extended_module_path():
         """,
         filename="settings.py",
     )
+
+
+def test_setting_referenced_elsewhere():
+    check_noop(
+        """\
+        DEFAULT_FILE_STORAGE = "example.storages.MyStorage"
+        THUMBNAIL_STORAGE = DEFAULT_FILE_STORAGE
+        """,
+        filename="settings.py",
+    )
+
+
+def test_setting_augmented_assignment():
+    check_noop(
+        """\
+        STATICFILES_STORAGE = "example.storages.MyStorage"
+        STATICFILES_STORAGE += ".x"
+        """,
+        filename="settings.py",
+    )

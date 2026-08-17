@@ -412,6 +412,62 @@ class TestActionFunctions:
 
 
 class TestDisplayFunctions:
+    def test_module_value_defined_after_function(self):
+        # DESCRIPTION cannot be hoisted above the function
+        check_noop(
+            """\
+            from django.contrib import admin
+
+            def upper_case_name(obj):
+                ...
+
+            DESCRIPTION = "Name"
+
+            upper_case_name.short_description = DESCRIPTION
+            """,
+        )
+
+    def test_class_value_defined_after_function(self):
+        check_noop(
+            """\
+            from django.contrib import admin
+
+            class BookAdmin(admin.ModelAdmin):
+                def is_published(self, obj):
+                    ...
+
+                DESCRIPTION = "Is Published?"
+
+                is_published.short_description = DESCRIPTION
+            """,
+        )
+
+    def test_module_value_defined_before_function(self):
+        check_transformed(
+            """\
+            from django.contrib import admin
+
+            DESCRIPTION = "Name"
+
+            def upper_case_name(obj):
+                ...
+
+            upper_case_name.short_description = DESCRIPTION
+            """,
+            """\
+            from django.contrib import admin
+
+            DESCRIPTION = "Name"
+
+            @admin.display(
+                description=DESCRIPTION
+            )
+            def upper_case_name(obj):
+                ...
+
+            """,
+        )
+
     def test_module_unknown_attribute(self):
         check_noop(
             """\

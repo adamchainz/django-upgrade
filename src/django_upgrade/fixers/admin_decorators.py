@@ -101,7 +101,29 @@ def visit_Module_or_ClassDef(
         or "admin" in state.from_imports["django.contrib.gis"]
     )
 
+    # First lines at which names are bound in this block, to detect values
+    # that cannot be hoisted above the function they are assigned on
+    defined_lines: dict[str, int] = {}
+
     for subnode in ast.iter_child_nodes(node):
+        if isinstance(subnode, (ast.AsyncFunctionDef, ast.ClassDef, ast.FunctionDef)):
+            defined_lines.setdefault(subnode.name, subnode.lineno)
+        elif isinstance(subnode, ast.ImportFrom):
+            for alias in subnode.names:
+                defined_lines.setdefault(
+                    alias.asname if alias.asname else alias.name, subnode.lineno
+                )
+        elif isinstance(subnode, ast.Import):
+            for alias in subnode.names:
+                defined_lines.setdefault(
+                    (alias.asname if alias.asname else alias.name.partition(".")[0]),
+                    subnode.lineno,
+                )
+        elif isinstance(subnode, ast.Assign):
+            for target_node in subnode.targets:
+                if isinstance(target_node, ast.Name):
+                    defined_lines.setdefault(target_node.id, subnode.lineno)
+
         # coverage bug
         # https://github.com/nedbat/coveragepy/issues/1333
         if (  # pragma: no cover
@@ -137,6 +159,16 @@ def visit_Module_or_ClassDef(
             and isinstance(target.value, ast.Name)
             and target.value.id in funcs
             and target.attr in NAME_MAPS[funcs[target.value.id].decorator]
+            # The value will be hoisted into a decorator above the function,
+            # so it must not reference names bound after the function.
+            and not any(
+                isinstance(value_node, ast.Name)
+                and (
+                    defined_lines.get(value_node.id, funcs[target.value.id].node.lineno)
+                    > funcs[target.value.id].node.lineno
+                )
+                for value_node in ast.walk(subnode.value)
+            )
         ):
             names = NAME_MAPS[funcs[target.value.id].decorator]
             new_name = names[target.attr]

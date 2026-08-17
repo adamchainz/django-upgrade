@@ -54,6 +54,8 @@ Unreleased
 
 * Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not erase aliased ``FixedOffset`` imports.
 
+* Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not rewrite files containing ``FixedOffset`` references it cannot rewrite, such as bare references and calls with ``*`` or ``**`` unpacking, which were previously left behind as ``NameError``\s.
+
 * Fix :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixer to leave a ``pass`` statement when removing the only test in a class or other block.
 
 * Fix :ref:`versioned_branches <versioned_branches>` fixer to preserve indentation when removing single-line ``if`` suites.

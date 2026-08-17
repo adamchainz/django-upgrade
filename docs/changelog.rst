@@ -90,6 +90,8 @@ Unreleased
 
 * Fix :ref:`admin_register <admin_register>` fixer to skip rewriting when a registered model is defined or imported after the admin class, since the decorator would reference the name before its definition.
 
+* Fix :ref:`admin_decorators <admin_decorators>` fixer to skip attribute assignments whose value references names bound after the function, since hoisting such values into a decorator would make them ``NameError``\s.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

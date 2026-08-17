@@ -210,14 +210,17 @@ def visit_Call(
                 and (
                     site_name == ""
                     or (
-                        (
-                            site_defined_line := get_site_defined_line(
-                                parents[0], site_name
-                            )
-                        )
+                        (site_defined_line := get_defined_line(parents[0], site_name))
                         is not None
                         and site_defined_line < admin_details.lineno
                     )
+                )
+                # The decorator would reference model names above the admin
+                # class, so they must not be defined after it.
+                and not any(
+                    (model_line := get_defined_line(parents[0], name)) is not None
+                    and model_line > admin_details.lineno
+                    for name in model_names
                 )
             ):
                 admin_details.model_names_per_site.setdefault(site_name, set()).update(
@@ -286,14 +289,14 @@ def remove_register(
     erase_node(tokens, i, node=node)
 
 
-site_definitions: MutableMapping[ast.Module, dict[str, int | None]] = (
+module_definitions: MutableMapping[ast.Module, dict[str, int | None]] = (
     WeakKeyDictionary()
 )
 
 
-def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
+def get_defined_line(module: ast.AST, target_name: str) -> int | None:
     assert isinstance(module, ast.Module)
-    lines = site_definitions.get(module, None)
+    lines = module_definitions.get(module, None)
     if lines is None:
         lines = {}
         for node in module.body:
@@ -304,8 +307,22 @@ def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
                     else:
                         name = alias.name
 
-                    if name.endswith("site") and name not in lines:
+                    if name not in lines:
                         lines[name] = node.lineno
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.asname is not None:
+                        name = alias.asname
+                    else:
+                        name = alias.name.partition(".")[0]
+
+                    if name not in lines:
+                        lines[name] = node.lineno
+            elif isinstance(
+                node, (ast.AsyncFunctionDef, ast.ClassDef, ast.FunctionDef)
+            ):
+                if node.name not in lines:
+                    lines[node.name] = node.lineno
             elif (
                 isinstance(node, ast.Assign)
                 and len(node.targets) == 1
@@ -314,5 +331,5 @@ def get_site_defined_line(module: ast.AST, site_name: str) -> int | None:
             ):
                 lines[name] = node.lineno
 
-        site_definitions[module] = lines
-    return lines.get(site_name)
+        module_definitions[module] = lines
+    return lines.get(target_name)

@@ -88,6 +88,8 @@ Unreleased
 
 * Fix :ref:`admin_register <admin_register>` fixer to skip ``register()`` calls with an empty sequence of models, which were previously rewritten to ``@admin.register()``, an error.
 
+* Fix :ref:`admin_register <admin_register>` fixer to skip rewriting when a registered model is defined or imported after the admin class, since the decorator would reference the name before its definition.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

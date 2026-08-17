@@ -10,6 +10,10 @@ Unreleased
 * Fix fixers to detect ``from`` imports wherever they are in the file.
   Previously, usages before the import statement, such as in functions defined earlier in the file, were not rewritten, whilst the import itself was, leading to broken code.
 
+* Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not erase the ``get_connection`` import when it is passed as ``connection=`` to a non-Django function named like a mail send function.
+
+* Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not introduce the ``mailers`` name when it is already bound to something else in the module.
+
 1.32.0 (2026-08-18)
 -------------------
 

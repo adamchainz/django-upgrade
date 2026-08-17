@@ -18,7 +18,7 @@ from tokenize_rt import Offset, Token
 from django_upgrade.ast import (
     ast_start_offset,
     is_passing_comparison,
-    is_sole_statement_in_block,
+    plan_statement_erasure,
 )
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import Block
@@ -46,7 +46,7 @@ def visit_If(
         needs_pass = (
             pass_fail == "fail"
             and not node.orelse
-            and is_sole_statement_in_block(node, parents[-1])
+            and plan_statement_erasure(node, parents[-1])
         )
         yield (
             ast_start_offset(node),

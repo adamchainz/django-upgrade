@@ -475,3 +475,27 @@ def test_current_version_gte_single_tuple():
         foo()
         """,
     )
+
+
+def test_removed_if_sole_statement_in_else_block():
+    check_transformed(
+        """\
+        import django
+
+        def f():
+            if something():
+                do_thing()
+            else:
+                if django.VERSION < (1, 8):
+                    old_thing()
+        """,
+        """\
+        import django
+
+        def f():
+            if something():
+                do_thing()
+            else:
+                pass
+        """,
+    )

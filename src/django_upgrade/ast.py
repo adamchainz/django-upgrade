@@ -64,14 +64,29 @@ def is_rewritable_import_from(node: ast.ImportFrom) -> bool:
     return node.level == 0 and not (len(node.names) == 1 and node.names[0].name == "*")
 
 
-def is_sole_statement_in_block(node: ast.stmt, parent: ast.AST) -> bool:
+_planned_erasures: WeakKeyDictionary[ast.AST, set[ast.stmt]] = WeakKeyDictionary()
+
+
+def plan_statement_erasure(node: ast.stmt, parent: ast.AST) -> bool:
+    """
+    Record that a fixer plans to erase the given statement from its parent’s
+    block and return whether it is the sole remaining statement there,
+    accounting for statements that fixers already plan to erase. When this
+    returns True, the caller must keep the block non-empty, by leaving the
+    statement in place or replacing it with a pass statement.
+
+    Module-level statements can always be erased, returning False.
+    """
     if isinstance(parent, ast.Module):
         return False
     for attr in ("body", "orelse", "finalbody"):
-        body = getattr(parent, attr, [])
-        if len(body) == 1 and body[0] is node:
-            return True
-    return False
+        body = getattr(parent, attr, None)
+        if isinstance(body, list) and any(stmt is node for stmt in body):
+            planned = _planned_erasures.setdefault(parent, set())
+            sole = all(stmt is node or stmt in planned for stmt in body)
+            planned.add(node)
+            return sole
+    raise AssertionError(f"Could not find {node!r} in {parent!r}")  # pragma: no cover
 
 
 TEST_CLIENT_REQUEST_METHODS = frozenset(

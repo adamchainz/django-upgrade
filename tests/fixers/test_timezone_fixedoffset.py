@@ -173,29 +173,48 @@ def test_call_with_extra_arg_rewritten():
 
 
 def test_call_with_star_args_not_rewritten():
-    # Leave *args form broken with ImportError
-    check_transformed(
+    check_noop(
         """\
         from django.utils.timezone import FixedOffset
-        FixedOffset(*(120,))
-        """,
-        """\
-        from datetime import timedelta, timezone
         FixedOffset(*(120,))
         """,
     )
 
 
 def test_call_with_star_star_args_not_rewritten():
-    # Leave **kwargs form broken with ImportError
-    check_transformed(
+    check_noop(
         """\
         from django.utils.timezone import FixedOffset
         FixedOffset(**{'offset': 120})
         """,
+    )
+
+
+def test_bare_reference_not_rewritten():
+    check_noop(
         """\
-        from datetime import timedelta, timezone
-        FixedOffset(**{'offset': 120})
+        from django.utils.timezone import FixedOffset
+        TZ_FACTORY = FixedOffset
+        """,
+    )
+
+
+def test_bare_reference_blocks_call_rewrite():
+    check_noop(
+        """\
+        from django.utils.timezone import FixedOffset
+        TZ_FACTORY = FixedOffset
+        tz = FixedOffset(120)
+        """,
+    )
+
+
+def test_bare_reference_after_call():
+    check_noop(
+        """\
+        from django.utils.timezone import FixedOffset
+        tz = FixedOffset(120)
+        TZ_FACTORY = FixedOffset
         """,
     )
 

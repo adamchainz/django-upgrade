@@ -8,6 +8,8 @@ Unreleased
 * Fix fixers to detect ``from`` imports wherever they are in the file.
   Previously, usages before the import statement, such as in functions defined earlier in the file, were not rewritten, whilst the import itself was, leading to broken code.
 
+* Fix crash when two fixers rewrite names in the same import statement, such as :ref:`timezone_fixedoffset <timezone_fixedoffset>` and :ref:`utils_timezone <utils_timezone>` with ``from django.utils.timezone import FixedOffset, utc``.
+
 1.32.0 (2026-08-18)
 -------------------
 

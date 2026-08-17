@@ -300,3 +300,25 @@ def test_transform_with_null_is_function():
         """,
         filename="models/blog.py",
     )
+
+
+def test_transform_comment_only_parens():
+    check_transformed(
+        """\
+        from django.db import models
+
+
+        class M(models.Model):
+            f = models.NullBooleanField(  # comment
+            )
+        """,
+        """\
+        from django.db import models
+
+
+        class M(models.Model):
+            f = models.BooleanField(  # comment
+            null=True)
+        """,
+        filename="models/blog.py",
+    )

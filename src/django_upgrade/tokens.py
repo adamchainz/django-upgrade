@@ -4,7 +4,7 @@ import ast
 import re
 from collections import defaultdict
 
-from tokenize_rt import NON_CODING_TOKENS, UNIMPORTANT_WS, Token, tokens_to_src
+from tokenize_rt import NON_CODING_TOKENS, UNIMPORTANT_WS, Token
 
 # Token name aliases
 CODE = "CODE"  # Token name meaning 'replaced by us'
@@ -147,8 +147,12 @@ def parse_call_args(
             stack.append(i)
         elif token.src == BRACES[tokens[stack[-1]].src]:
             stack.pop()
-            # if we're at the end, append that argument
-            if not stack and tokens_to_src(tokens[arg_start:i]).strip():
+            # if we're at the end, append that argument, unless it contains
+            # no code tokens, e.g. only a comment
+            if not stack and any(
+                tokens[k].name not in CALL_ARGUMENT_PREFIX_TOKENS
+                for k in range(arg_start, i)
+            ):
                 args.append((arg_start, i))
 
         i += 1

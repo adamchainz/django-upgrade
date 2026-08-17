@@ -20,6 +20,8 @@ Unreleased
 
 * Fix :ref:`null_boolean_field <null_boolean_field>` fixer to add a missing comma before ``null=True`` when the final argument contains commas within brackets.
 
+* Fix fixers that modify call arguments to not treat a comment inside otherwise empty parentheses as an argument, which made the :ref:`null_boolean_field <null_boolean_field>` fixer produce invalid syntax.
+
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to avoid a double comma when the existing ``headers=`` dict has a trailing comma.
 
 * Fix :ref:`request_headers <request_headers>` fixer to not rewrite writes to ``request.META``, such as augmented assignments, since ``request.headers`` is immutable.

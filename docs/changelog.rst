@@ -27,6 +27,9 @@ Unreleased
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to insert converted headers at the start of an existing ``headers=`` dict.
   Django gives ``headers=`` entries precedence over ``HTTP_`` arguments, and the last duplicate key wins in a dict literal, so appending converted entries at the end previously flipped which value took effect.
 
+* Fix :ref:`testcase_databases <testcase_databases>` fixer to rewrite ``multi_db = False`` to ``databases = ["default"]`` rather than ``databases = []``.
+  Django treated ``multi_db = False`` as allowing the default database, so the previous rewrite blocked all database queries in such tests.
+
 * Fix :ref:`request_headers <request_headers>` fixer to not rewrite writes to ``request.META``, such as augmented assignments, since ``request.headers`` is immutable.
 
 * Fix :ref:`request_headers <request_headers>` fixer crash on ``in`` comparisons with a parenthesized string.

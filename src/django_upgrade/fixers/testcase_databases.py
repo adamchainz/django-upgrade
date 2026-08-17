@@ -36,19 +36,21 @@ def visit_Assign(
         and isinstance(node.value, ast.Constant)
         and isinstance(node.value.value, bool)
     ):
+        if node.value.value:
+            new_value = '"__all__"'
+        elif node.targets[0].id == "multi_db":
+            # multi_db = False meant the default database was still available
+            new_value = '["default"]'
+        else:
+            new_value = "[]"
         yield (
             ast_start_offset(node),
-            partial(replace_assignment, node=node, value=node.value.value),
+            partial(replace_assignment, node=node, new_value=new_value),
         )
 
 
 def replace_assignment(
-    tokens: list[Token], i: int, *, node: ast.Assign, value: bool
+    tokens: list[Token], i: int, *, node: ast.Assign, new_value: str
 ) -> None:
-    new_src = "databases = "
-    if value:
-        new_src += '"__all__"'
-    else:
-        new_src += "[]"
     j = find_last_token(tokens, i, node=node)
-    tokens[i : j + 1] = [Token(name=CODE, src=new_src)]
+    tokens[i : j + 1] = [Token(name=CODE, src=f"databases = {new_value}")]

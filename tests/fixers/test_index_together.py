@@ -281,6 +281,26 @@ def test_tuple_single_indexes_present():
     )
 
 
+def test_indexes_present_empty_tuple():
+    check_transformed(
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                index_together = [["bill", "tail"]]
+                indexes = ()
+        """,
+        """\
+        from django.db import models
+
+        class Duck(models.Model):
+            class Meta:
+                indexes = (models.Index(fields=["bill", "tail"]),)
+        """,
+    )
+
+
 def test_mixed_indexes_present():
     check_transformed(
         """\

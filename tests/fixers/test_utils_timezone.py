@@ -32,6 +32,19 @@ def test_unmatched_import_name():
     )
 
 
+def test_aliased_import():
+    check_noop(
+        """\
+        from django.utils.timezone import utc as UTC
+
+        def f(dt_obj, utc):
+            if utc:
+                return dt_obj.astimezone(UTC)
+            return dt_obj
+        """,
+    )
+
+
 def test_import_used_otherwise():
     check_noop(
         """\

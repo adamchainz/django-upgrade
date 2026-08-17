@@ -14,6 +14,8 @@ Unreleased
 
 * Fix :ref:`index_together <index_together>` fixer to add a missing comma when extending a multiline ``indexes`` list that has no trailing comma.
 
+* Fix :ref:`index_together <index_together>` fixer to keep an empty ``indexes`` tuple a tuple when extending it with a single index.
+
 * Fix :ref:`null_boolean_field <null_boolean_field>` fixer to add a missing comma before ``null=True`` when the final argument contains commas within brackets.
 
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to avoid a double comma when the existing ``headers=`` dict has a trailing comma.

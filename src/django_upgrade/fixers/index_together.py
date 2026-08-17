@@ -195,6 +195,9 @@ def extend_indexes(
     assert isinstance(indexes.value, (ast.List, ast.Tuple))  # type checked above
     closing_punctuation = find_last_token(tokens, i, node=indexes.value)
     if len(indexes.value.elts) == 0:
+        if isinstance(indexes.value, ast.Tuple):
+            # keep a single-element tuple a tuple
+            index_src += ","
         insert(tokens, closing_punctuation, new_src=index_src)
         return
 

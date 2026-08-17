@@ -88,6 +88,16 @@ def test_direct_import_unrelated():
     )
 
 
+def test_direct_import_bare_reference():
+    check_noop(
+        """\
+        from django.core.mail import get_connection
+
+        conn_factory = get_connection
+        """,
+    )
+
+
 def test_direct_import_aliased():
     check_noop(
         """\

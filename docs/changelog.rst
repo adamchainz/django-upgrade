@@ -55,6 +55,8 @@ Unreleased
 * Fix fixers that erase statements to handle statements sharing a line with another statement, separated by a semicolon.
   Previously the leftover semicolon made the file invalid syntax.
 
+* Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not remove the ``get_connection`` import when bare, non-call references remain.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

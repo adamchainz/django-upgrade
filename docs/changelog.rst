@@ -71,6 +71,10 @@ Unreleased
 
 * Fix :ref:`mail_get_connection <mail_get_connection>` fixer handling of ``send_mail()`` and similar calls on modules other than ``django.core.mail``.
 
+* Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not erase the ``get_connection`` import when it is passed as ``connection=`` to a non-Django function named like a mail send function.
+
+* Fix :ref:`mail_get_connection <mail_get_connection>` fixer to not introduce the ``mailers`` name when it is already bound to something else in the module.
+
 * Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing unescaped dots, which match any character.
 
 * Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing literal angle brackets, which ``path()`` would interpret as parameter syntax.

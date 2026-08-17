@@ -404,3 +404,42 @@ def test_send_mail_direct_import_all_functions():
         mail_managers("s", "m")
         """,
     )
+
+
+def test_local_send_mail_connection_kwarg():
+    # send_mail here is a local function, not Django's, so the inline kwarg
+    # is treated as a standalone usage
+    check_transformed(
+        """\
+        from django.core.mail import get_connection
+
+
+        def send_mail(subject, connection):
+            connection.send_messages([])
+
+
+        send_mail("hi", connection=get_connection())
+        """,
+        """\
+        from django.core.mail import mailers
+
+
+        def send_mail(subject, connection):
+            connection.send_messages([])
+
+
+        send_mail("hi", connection=mailers.default)
+        """,
+    )
+
+
+def test_mailers_name_bound_elsewhere():
+    check_noop(
+        """\
+        from django.core.mail import get_connection
+
+        mailers = load_custom_mailers()
+
+        conn = get_connection()
+        """,
+    )

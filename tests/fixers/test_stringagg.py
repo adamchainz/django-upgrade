@@ -343,3 +343,38 @@ def test_existing_value_import():
         StringAgg("name", delimiter=Value(", "))
         """,
     )
+
+
+def test_bare_reference_not_rewritten():
+    check_noop(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+
+        MyAgg = StringAgg
+        """,
+    )
+
+
+def test_subclass_not_rewritten():
+    check_noop(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+
+
+        class OrderedStringAgg(StringAgg):
+            pass
+        """,
+    )
+
+
+def test_bare_reference_blocks_call_rewrite():
+    check_noop(
+        """\
+        from django.contrib.postgres.aggregates import StringAgg
+        from django.db.models import Value
+
+        MyAgg = StringAgg
+
+        StringAgg("field", Value(", "))
+        """,
+    )

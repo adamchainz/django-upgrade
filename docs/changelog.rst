@@ -50,6 +50,8 @@ Unreleased
 
 * Fix :ref:`stringagg <stringagg>` fixer to correctly wrap implicitly concatenated delimiter strings in ``Value()``.
 
+* Fix :ref:`stringagg <stringagg>` fixer to not move the ``StringAgg`` import when the file contains bare references to the name, such as alias assignments or subclass definitions, since the ``django.db.models`` version handles plain string delimiters differently.
+
 * Fix :ref:`utils_translation <utils_translation>`, :ref:`utils_encoding <utils_encoding>`, and :ref:`transaction_savepoint <transaction_savepoint>` fixers to not erase aliased imports when the new name is also imported.
 
 * Fix :ref:`timezone_fixedoffset <timezone_fixedoffset>` fixer to not erase aliased ``FixedOffset`` imports.

@@ -53,6 +53,27 @@ def visit_ImportFrom(
         )
 
 
+@fixer.register(ast.Name)
+def visit_Name(
+    state: State,
+    node: ast.Name,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if node.id == "StringAgg" and (
+        node.id in state.from_imports["django.contrib.postgres.aggregates"]
+        or node.id in state.from_imports["django.contrib.postgres.aggregates.general"]
+    ):
+        parent = parents[-1]
+        if not (isinstance(parent, ast.Call) and parent.func is node):
+            # Bare reference, such as an alias assignment or base class.
+            # django.db.models.StringAgg handles plain string delimiters
+            # differently, so we cannot be sure moving the import is safe.
+            module = parents[0]
+            assert isinstance(module, ast.Module)
+            do_rewrite[module] = False
+    return ()
+
+
 @fixer.register(ast.Call)
 def visit_Call(
     state: State,

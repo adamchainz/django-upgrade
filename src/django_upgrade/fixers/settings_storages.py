@@ -72,6 +72,26 @@ def visit_ImportFrom(
     return ()
 
 
+@fixer.register(ast.Name)
+def visit_Name(
+    state: State,
+    node: ast.Name,
+    parents: tuple[ast.AST, ...],
+) -> Iterable[tuple[Offset, TokenFunc]]:
+    if node.id in NAME_MAP:
+        parent = parents[-1]
+        if not (
+            isinstance(parent, ast.Assign)
+            and len(parent.targets) == 1
+            and parent.targets[0] is node
+        ):
+            # Reference outside a rewritable assignment, which erasing the
+            # setting would leave a NameError.
+            details = settings_details.setdefault(state, SettingsDetails())
+            details.all_rewritable = False
+    return ()
+
+
 @fixer.register(ast.Assign)
 def visit_Assign(
     state: State,

@@ -14,7 +14,7 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import STRING, erase_node, find, insert
+from django_upgrade.tokens import STRING, erase_node, find, insert, str_repr_matching
 
 fixer = Fixer(
     __name__,
@@ -39,7 +39,7 @@ class SettingsDetails:
     __slots__ = (
         "all_rewritable",
         "nodes",
-        "value_tokens",
+        "value_srcs",
         "rewritten",
         "settings_star_import",
     )
@@ -47,7 +47,7 @@ class SettingsDetails:
     def __init__(self) -> None:
         self.all_rewritable = True
         self.nodes: dict[str, ast.Assign] = {}
-        self.value_tokens: dict[str, Token] = {}
+        self.value_srcs: dict[str, str] = {}
         self.rewritten: dict[str, bool] = {}
         self.settings_star_import = False
 
@@ -117,7 +117,14 @@ def replace_storages(
     if not details.all_rewritable:
         return
 
-    details.value_tokens[name] = tokens[find(tokens, i, name=STRING)]
+    # Take the value from the AST, since it may be an implicitly concatenated
+    # string spanning several tokens, matching the first token's quote style.
+    assert isinstance(node.value, ast.Constant)
+    assert isinstance(node.value.value, str)
+    value_token = tokens[find(tokens, i, name=STRING)]
+    details.value_srcs[name] = str_repr_matching(
+        node.value.value, match_quotes=value_token.src
+    )
     details.rewritten[name] = True
 
     erase_node(tokens, i, node=node)
@@ -128,13 +135,13 @@ def replace_storages(
             src_fragments.append("    **STORAGES,")
 
         for name in NAME_MAP:
-            if name in details.value_tokens:
+            if name in details.value_srcs:
                 new_name = NAME_MAP[name]
-                value_token = details.value_tokens[name]
+                value_src = details.value_srcs[name]
                 src_fragments.extend(
                     [
                         f'    "{new_name}": {{',
-                        f'        "BACKEND": {value_token.src},',
+                        f'        "BACKEND": {value_src},',
                         "    },",
                     ]
                 )

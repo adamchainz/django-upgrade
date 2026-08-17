@@ -121,6 +121,28 @@ def test_default_only():
     )
 
 
+def test_default_only_implicit_str_concat():
+    check_transformed(
+        """\
+        DEFAULT_FILE_STORAGE = (
+            "example."
+            "backend"
+        )
+        """,
+        """\
+        STORAGES = {
+            "default": {
+                "BACKEND": "example.backend",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
+        """,
+        filename="settings.py",
+    )
+
+
 def test_static_only():
     check_transformed(
         """\

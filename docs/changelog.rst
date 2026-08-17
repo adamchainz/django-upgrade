@@ -63,6 +63,8 @@ Unreleased
 
 * Fix :ref:`settings_database_postgresql <settings_database_postgresql>` fixer to not corrupt implicitly concatenated ``ENGINE`` strings.
 
+* Fix :ref:`settings_storages <settings_storages>` fixer to handle implicitly concatenated setting strings, which were previously truncated.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

@@ -209,3 +209,21 @@ def test_class_success_inheritance():
         """,
         filename="myapp/settings/base.py",
     )
+
+
+def test_two_fixers_do_not_empty_class():
+    # use_l10n and default_auto_field each erase one statement; the last
+    # one must stay to keep the class body valid
+    tools.check_transformed(
+        """\
+        class Prod:
+            USE_L10N = True
+            DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+        """,
+        """\
+        class Prod:
+            DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+        """,
+        settings=Settings(target_version=(6, 0)),
+        filename="myapp/settings.py",
+    )

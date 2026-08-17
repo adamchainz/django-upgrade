@@ -833,3 +833,34 @@ def test_pytest_mark_skipif_always_skip_decorator_below():
         import django
         """,
     )
+
+
+def test_all_tests_removed_leaves_pass():
+    check_transformed(
+        """\
+        import unittest
+
+        import django
+
+
+        class MyTests(unittest.TestCase):
+            @unittest.skipIf(django.VERSION >= (4, 1), "Old Django only")
+            def test_a(self):
+                pass
+
+            @unittest.skipIf(django.VERSION >= (4, 1), "Old Django only")
+            def test_b(self):
+                pass
+        """,
+        """\
+        import unittest
+
+        import django
+
+
+        class MyTests(unittest.TestCase):
+
+            pass
+        """,
+        filename="tests.py",
+    )

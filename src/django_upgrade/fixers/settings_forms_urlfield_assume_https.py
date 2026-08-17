@@ -11,7 +11,7 @@ from functools import partial
 
 from tokenize_rt import Offset
 
-from django_upgrade.ast import ast_start_offset
+from django_upgrade.ast import ast_start_offset, plan_statement_erasure
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import erase_node
 
@@ -38,8 +38,8 @@ def visit_Assign(
             isinstance(parents[-1], ast.Module)
             or (
                 isinstance(parents[-1], ast.ClassDef)
-                and len(parents[-1].body) > 1
                 and isinstance(parents[-2], ast.Module)
+                and not plan_statement_erasure(node, parents[-1])
             )
         )
     ):

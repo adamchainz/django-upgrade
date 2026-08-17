@@ -24,6 +24,9 @@ Unreleased
 
 * Fix :ref:`test_http_headers <test_http_headers>` fixer to avoid a double comma when the existing ``headers=`` dict has a trailing comma.
 
+* Fix :ref:`test_http_headers <test_http_headers>` fixer to insert converted headers at the start of an existing ``headers=`` dict.
+  Django gives ``headers=`` entries precedence over ``HTTP_`` arguments, and the last duplicate key wins in a dict literal, so appending converted entries at the end previously flipped which value took effect.
+
 * Fix :ref:`request_headers <request_headers>` fixer to not rewrite writes to ``request.META``, such as augmented assignments, since ``request.headers`` is immutable.
 
 * Fix :ref:`request_headers <request_headers>` fixer crash on ``in`` comparisons with a parenthesized string.

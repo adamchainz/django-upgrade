@@ -213,7 +213,7 @@ def test_instantiation_multiple_surrounding_existing():
         """,
         """\
         from django.test import Client
-        Client(headers={"b": "2", "a": "1", "c": "3"}, )
+        Client(headers={"a": "1", "c": "3", "b": "2"}, )
         """,
         filename="tests.py",
     )
@@ -227,7 +227,7 @@ def test_instantiation_existing_trailing_comma():
         """,
         """\
         from django.test import Client
-        Client(headers={"b": "2", "a": "1"}, )
+        Client(headers={"a": "1", "b": "2",}, )
         """,
         filename="tests.py",
     )
@@ -247,9 +247,9 @@ def test_instantiation_existing_multiline_trailing_comma():
         """\
         from django.test import Client
         Client(
-            headers={
+            headers={"a": "1",
                 "b": "2",
-             "a": "1"},
+            },
         )
         """,
         filename="tests.py",
@@ -264,7 +264,7 @@ def test_instantiation_multiple_before_existing():
         """,
         """\
         from django.test import Client
-        Client(headers={"c": "3", "a": "1", "b": "2"})
+        Client(headers={"a": "1", "b": "2", "c": "3"})
         """,
         filename="tests.py",
     )
@@ -278,7 +278,7 @@ def test_instantiation_multiple_after_existing():
         """,
         """\
         from django.test import Client
-        Client(headers={"c": "3", "a": "1", "b": "2"}, )
+        Client(headers={"a": "1", "b": "2", "c": "3"}, )
         """,
         filename="tests.py",
     )
@@ -326,9 +326,9 @@ def test_instantiation_existing_comment():
         """\
         from django.test import Client
         Client(
-            headers={
+            headers={"a": "1"
                 # todo: add headers
-            "a": "1"}
+            }
         )
         """,
         filename="tests.py",
@@ -555,6 +555,22 @@ def test_client_expression_multiline():
         self.client.get("/", headers={"host": (
             name + tld
         )})
+        """,
+        filename="tests.py",
+    )
+
+
+def test_instantiation_existing_same_header_wins():
+    # headers= takes precedence over HTTP_ kwargs in Django, and the last
+    # duplicate key wins in a dict literal, so existing entries stay last
+    check_transformed(
+        """\
+        from django.test import Client
+        Client(HTTP_ACCEPT="text/html", headers={"accept": "application/json"})
+        """,
+        """\
+        from django.test import Client
+        Client(headers={"accept": "text/html", "accept": "application/json"})
         """,
         filename="tests.py",
     )

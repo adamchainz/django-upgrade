@@ -58,6 +58,26 @@ def test_not_format():
     )
 
 
+def test_parenthesized_arg_not_rewritten():
+    check_noop(
+        """\
+        from django.utils.html import format_html
+
+        format_html(("{}".format(x)))
+        """,
+    )
+
+
+def test_parenthesized_string_not_rewritten():
+    check_noop(
+        """\
+        from django.utils.html import format_html
+
+        format_html(("{}").format(x))
+        """,
+    )
+
+
 def test_pos_arg_single():
     check_transformed(
         """\

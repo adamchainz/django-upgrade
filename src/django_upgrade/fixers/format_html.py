@@ -15,7 +15,14 @@ from tokenize_rt import Offset, Token
 
 from django_upgrade.ast import ast_start_offset
 from django_upgrade.data import Fixer, State, TokenFunc
-from django_upgrade.tokens import OP, alone_on_line, find, find_last_token, insert
+from django_upgrade.tokens import (
+    CALL_ARGUMENT_PREFIX_TOKENS,
+    OP,
+    alone_on_line,
+    find,
+    find_last_token,
+    insert,
+)
 
 fixer = Fixer(
     __name__,
@@ -52,6 +59,15 @@ def rewrite_str_format(
     *,
     node: ast.Call,
 ) -> None:
+    call_open = find(tokens, i, name=OP, src="(")
+    j = call_open + 1
+    while tokens[j].name in CALL_ARGUMENT_PREFIX_TOKENS:
+        j += 1
+    if tokens[j].name == OP and tokens[j].src == "(":
+        # Parenthesized argument: removing the .format() call would turn the
+        # parentheses into a tuple.
+        return
+
     open_start = find(tokens, i, name=OP, src=".")
     open_end = find(tokens, open_start, name=OP, src="(")
 

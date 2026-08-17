@@ -260,10 +260,11 @@ def convert_path_syntax(regex_path: str, include_called: bool) -> str | None:
 
     path += remaining
 
-    path = re.sub(r"\\\.", ".", path)  # unescape literal dots
-
-    if not re.fullmatch(r"[a-zA-Z0-9_\-./<>:]*", path):
-        # path still contains regex special characters
+    if not re.fullmatch(r"(?:[a-zA-Z0-9_\-/<>:]|\\\.)*", path):
+        # path still contains regex special characters, including unescaped
+        # dots, which match any character
         return None
+
+    path = re.sub(r"\\\.", ".", path)  # unescape literal dots
 
     return path

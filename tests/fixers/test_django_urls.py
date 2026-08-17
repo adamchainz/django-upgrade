@@ -551,6 +551,16 @@ def test_re_path_dot():
     )
 
 
+def test_re_path_unescaped_dot_not_rewritten():
+    check_noop(
+        """\
+        from django.urls import re_path
+
+        re_path(r"^about.html$", views.about_json)
+        """,
+    )
+
+
 def test_re_path_int_converter_1():
     check_transformed(
         """\

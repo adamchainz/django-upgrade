@@ -59,6 +59,8 @@ Unreleased
 
 * Fix :ref:`mail_get_connection <mail_get_connection>` fixer handling of ``send_mail()`` and similar calls on modules other than ``django.core.mail``.
 
+* Fix :ref:`django_urls <django_urls>` fixer to not convert regular expressions containing unescaped dots, which match any character.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.

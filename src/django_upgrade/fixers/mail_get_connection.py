@@ -163,6 +163,8 @@ def _is_inline_connection_kwarg(parents: tuple[ast.AST, ...]) -> bool:
             or (
                 isinstance(parents[-2].func, ast.Attribute)
                 and parents[-2].func.attr in MAIL_SEND_FUNCTIONS
+                and isinstance(parents[-2].func.value, ast.Name)
+                and parents[-2].func.value.id == MAIL_NAME
             )
         )
     )

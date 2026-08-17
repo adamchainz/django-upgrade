@@ -98,6 +98,25 @@ def test_direct_import_bare_reference():
     )
 
 
+def test_direct_import_non_django_send_mail():
+    check_transformed(
+        """\
+        from django.core.mail import get_connection
+
+        import mymailer
+
+        mymailer.send_mail(connection=get_connection())
+        """,
+        """\
+        from django.core.mail import mailers
+
+        import mymailer
+
+        mymailer.send_mail(connection=mailers.default)
+        """,
+    )
+
+
 def test_direct_import_aliased():
     check_noop(
         """\

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import urllib.request
 
 import pytest
 
@@ -101,6 +102,36 @@ class TestRunCommand:
             ],
         ]
 
+    def test_changes_rust(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "1.88"\n')
+        (tmp_path / "Cargo.lock").write_text("")
+        dirty_results = iter([False, True])
+        monkeypatch.setattr(
+            gitutils, "uncommitted_changes", lambda: next(dirty_results)
+        )
+        monkeypatch.setattr(gitutils, "default_branch", lambda: "main")
+        monkeypatch.setattr(gitutils, "branch_exists", lambda name: False)
+        toolchain_upgrades = []
+        monkeypatch.setattr(
+            upgrade_dependencies,
+            "upgrade_rust_toolchain",
+            lambda: toolchain_upgrades.append(True),
+        )
+        commands = []
+        monkeypatch.setattr(
+            upgrade_dependencies,
+            "run",
+            lambda command, **kwargs: commands.append(command),
+        )
+        monkeypatch.setattr(time, "sleep", lambda seconds: None)
+
+        result = main(["upgrade-dependencies"])
+
+        assert result == 0
+        assert toolchain_upgrades == [True]
+        assert ["cargo", "update"] in commands
+
 
 class TestUpgradeRustToolchain:
     @pytest.fixture(autouse=True)
@@ -146,3 +177,53 @@ class TestUpgradeRustToolchain:
         assert cargo.read_text() == (
             '[package]\nname = "example"\nrust-version = "1.88"\n'
         )
+
+    def test_toolchain_already_latest(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        toolchain = tmp_path / "rust-toolchain.toml"
+        toolchain.write_text('[toolchain]\nchannel = "1.90"\n')
+
+        upgrade_dependencies.upgrade_rust_toolchain()
+
+        assert toolchain.read_text() == '[toolchain]\nchannel = "1.90"\n'
+
+    def test_unpublished_package_msrv_already_latest(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        toolchain = tmp_path / "rust-toolchain.toml"
+        toolchain.write_text('[toolchain]\nchannel = "1.88"\n')
+        cargo = tmp_path / "Cargo.toml"
+        cargo.write_text(
+            '[package]\nname = "example"\npublish = false\nrust-version = "1.90"\n'
+        )
+
+        upgrade_dependencies.upgrade_rust_toolchain()
+
+        assert cargo.read_text() == (
+            '[package]\nname = "example"\npublish = false\nrust-version = "1.90"\n'
+        )
+
+
+class TestFetchLatestRustVersion:
+    def test_success(self, monkeypatch):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return None
+
+            def read(self):
+                return b"1.90.0\n"
+
+        urls = []
+
+        def fake_urlopen(url):
+            urls.append(url)
+            return FakeResponse()
+
+        monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+
+        result = upgrade_dependencies.fetch_latest_rust_version()
+
+        assert result == "1.90.0"
+        assert urls == [upgrade_dependencies.RUST_VERSION_URL]

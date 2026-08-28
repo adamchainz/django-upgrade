@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import subprocess
+import sys
+
 import pytest
 
+from repo_tool import __main__  # noqa: F401
 from repo_tool.main import main
 
 
@@ -17,6 +21,16 @@ def test_unknown_command():
         main(["unknown-command"])
 
     assert excinfo.value.code == 2
+
+
+def test_main_module_subprocess():
+    proc = subprocess.run(
+        [sys.executable, "-m", "repo_tool", "--help"],
+        check=True,
+        capture_output=True,
+    )
+
+    assert proc.stdout.startswith(b"usage: repo-tool ")
 
 
 def test_version(capsys):

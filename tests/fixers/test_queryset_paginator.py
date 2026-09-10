@@ -33,6 +33,25 @@ def test_paginator_module_imported():
     )
 
 
+def test_use_before_import():
+    check_transformed(
+        """\
+        def get_paginator():
+            return QuerySetPaginator([], 1)
+
+
+        from django.core.paginator import QuerySetPaginator
+        """,
+        """\
+        def get_paginator():
+            return Paginator([], 1)
+
+
+        from django.core.paginator import Paginator
+        """,
+    )
+
+
 def test_success():
     check_transformed(
         """\

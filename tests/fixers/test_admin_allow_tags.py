@@ -124,3 +124,33 @@ def test_basic_gis():
 
         """,
     )
+
+
+def test_two_assignments_do_not_empty_class():
+    check_transformed(
+        """\
+        from django.contrib import admin
+
+        def a(obj):
+            ...
+
+        def b(obj):
+            ...
+
+        class Holder:
+            a.allow_tags = True
+            b.allow_tags = True
+        """,
+        """\
+        from django.contrib import admin
+
+        def a(obj):
+            ...
+
+        def b(obj):
+            ...
+
+        class Holder:
+            b.allow_tags = True
+        """,
+    )

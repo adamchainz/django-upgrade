@@ -2,6 +2,17 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Fix fixers to detect ``from`` imports wherever they are in the file.
+  Previously, usages before the import statement, such as in functions defined earlier in the file, were not rewritten, whilst the import itself was, leading to broken code.
+
+* Fix crash when two fixers rewrite names in the same import statement, such as :ref:`timezone_fixedoffset <timezone_fixedoffset>` and :ref:`utils_timezone <utils_timezone>` with ``from django.utils.timezone import FixedOffset, utc``.
+
+* Fix fixers that erase statements to coordinate, so erasing several statements from one class body, whether by one fixer or several, cannot empty it and make the file invalid syntax.
+  Affected the :ref:`admin_allow_tags <admin_allow_tags>`, :ref:`default_auto_field <default_auto_field>`, :ref:`settings_forms_urlfield_assume_https <settings_forms_urlfield_assume_https>`, :ref:`use_l10n <use_l10n>`, :ref:`versioned_branches <versioned_branches>`, and :ref:`versioned_test_skip_decorators <versioned_test_skip_decorators>` fixers.
+
 1.32.0 (2026-08-18)
 -------------------
 

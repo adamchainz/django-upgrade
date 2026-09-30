@@ -377,4 +377,24 @@ def test_bare_reference_blocks_call_rewrite():
 
         StringAgg("field", Value(", "))
         """,
+
+def test_bit_aggregates_in_same_import():
+    # compatibility_imports and stringagg both edit the same import
+    check_transformed(
+        """\
+        from django.db.models import Value
+        from django.contrib.postgres.aggregates import BitAnd, StringAgg
+
+        x = StringAgg("name", Value(", "))
+        y = BitAnd("f")
+        """,
+        """\
+        from django.db.models import Value
+        from django.db.models import BitAnd
+        from django.db.models import StringAgg
+
+        x = StringAgg("name", Value(", "))
+        y = BitAnd("f")
+        """,
+        settings=Settings(target_version=(6, 1)),
     )

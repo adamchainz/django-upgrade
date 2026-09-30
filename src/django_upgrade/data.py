@@ -118,15 +118,9 @@ def visit(
     )
     ast_funcs = get_ast_funcs(state, settings)
 
-    nodes: list[tuple[ast.AST, tuple[ast.AST, ...]]] = [(tree, ())]
-    ret = defaultdict(list)
-    while nodes:
-        node, parents = nodes.pop()
-
-        for ast_func in ast_funcs[type(node)]:
-            for offset, token_func in ast_func(state, node, parents):
-                ret[offset].append(token_func)
-
+    # Pre-populate tracked imports so fixers see them even when a usage
+    # appears earlier in the file than the import statement.
+    for node in ast.walk(tree):
         if (
             isinstance(node, ast.ImportFrom)
             and node.level == 0
@@ -143,6 +137,15 @@ def visit(
                 for name in node.names
                 if name.asname is None and name.name != "*"
             )
+
+    nodes: list[tuple[ast.AST, tuple[ast.AST, ...]]] = [(tree, ())]
+    ret = defaultdict(list)
+    while nodes:
+        node, parents = nodes.pop()
+
+        for ast_func in ast_funcs[type(node)]:
+            for offset, token_func in ast_func(state, node, parents):
+                ret[offset].append(token_func)
 
         subparents = parents + (node,)
         for name in reversed(node._fields):

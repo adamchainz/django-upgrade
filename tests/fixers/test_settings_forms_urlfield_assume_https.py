@@ -193,3 +193,18 @@ def test_class_success_with_inheritance():
         """,
         filename="myapp/settings/base.py",
     )
+
+
+def test_duplicate_assignments_do_not_empty_class():
+    check_transformed(
+        """\
+        class Prod:
+            FORMS_URLFIELD_ASSUME_HTTPS = True
+            FORMS_URLFIELD_ASSUME_HTTPS = True
+        """,
+        """\
+        class Prod:
+            FORMS_URLFIELD_ASSUME_HTTPS = True
+        """,
+        filename="myapp/settings.py",
+    )

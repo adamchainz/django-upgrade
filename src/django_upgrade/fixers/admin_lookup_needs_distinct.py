@@ -49,13 +49,13 @@ def visit_ImportFrom(
             )
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=RENAMES)
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (name := node.id) in RENAMES and name in state.from_imports[MODULE]:
+    if (name := node.id) in state.from_imports[MODULE]:
         new_name = RENAMES[name]
         yield (
             ast_start_offset(node),

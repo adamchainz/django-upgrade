@@ -53,13 +53,13 @@ def visit_ImportFrom(
         )
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=("StringAgg",))
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if node.id == "StringAgg" and (
+    if (
         node.id in state.from_imports["django.contrib.postgres.aggregates"]
         or node.id in state.from_imports["django.contrib.postgres.aggregates.general"]
     ):
@@ -74,20 +74,16 @@ def visit_Name(
     return ()
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("StringAgg",))
 def visit_Call(
     state: State,
     node: ast.Call,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        isinstance(node.func, ast.Name)
-        and node.func.id == "StringAgg"
-        and (
-            node.func.id in state.from_imports["django.contrib.postgres.aggregates"]
-            or node.func.id
-            in state.from_imports["django.contrib.postgres.aggregates.general"]
-        )
+    if isinstance(node.func, ast.Name) and (
+        node.func.id in state.from_imports["django.contrib.postgres.aggregates"]
+        or node.func.id
+        in state.from_imports["django.contrib.postgres.aggregates.general"]
     ):
         module = parents[0]
         assert isinstance(module, ast.Module)

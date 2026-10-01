@@ -14,7 +14,11 @@ from typing import cast
 
 from tokenize_rt import UNIMPORTANT_WS, Offset, Token
 
-from django_upgrade.ast import ast_start_offset, looks_like_test_client_call
+from django_upgrade.ast import (
+    TEST_CLIENT_REQUEST_METHODS,
+    ast_start_offset,
+    looks_like_test_client_call,
+)
 from django_upgrade.data import Fixer, State, TokenFunc
 from django_upgrade.tokens import (
     COMMENT,
@@ -37,7 +41,16 @@ HEADERS_KWARG = "headers"
 HTTP_PREFIX = "HTTP_"
 
 
-@fixer.register(ast.Call)
+@fixer.register(
+    ast.Call,
+    names=(
+        "AsyncClient",
+        "AsyncRequestFactory",
+        "Client",
+        "RequestFactory",
+        *TEST_CLIENT_REQUEST_METHODS,
+    ),
+)
 def visit_Call(
     state: State,
     node: ast.Call,

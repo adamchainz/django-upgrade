@@ -24,7 +24,7 @@ MODULE = "django.utils.crypto"
 NAME = "get_random_string"
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(NAME,))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -32,14 +32,9 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (
-            (
-                isinstance(node.func, ast.Name)
-                and NAME in state.from_imports[MODULE]
-                and node.func.id == NAME
-            )
+            (isinstance(node.func, ast.Name) and NAME in state.from_imports[MODULE])
             or (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr == NAME
                 and "crypto" in state.from_imports["django.utils"]
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "crypto"

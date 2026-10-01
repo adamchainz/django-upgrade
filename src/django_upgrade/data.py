@@ -4,9 +4,9 @@ import ast
 import pkgutil
 import re
 from collections import defaultdict
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Collection, Iterable
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar
 
 from tokenize_rt import Offset, Token
 
@@ -92,20 +92,6 @@ ASTFunc = Callable[
     [State, AST_T, tuple[ast.AST, ...]], Iterable[tuple[Offset, TokenFunc]]
 ]
 
-if TYPE_CHECKING:
-    from typing import Protocol
-else:
-    Protocol = object
-
-
-class ASTCallbackMapping(Protocol):
-    def __getitem__(self, tp: type[AST_T]) -> list[ASTFunc[AST_T]]:  # pragma: no cover
-        ...
-
-    def items(self) -> Iterable[tuple[Any, Any]]:  # pragma: no cover
-        ...
-
-
 # Fields that never contain child nodes we want to visit: plain values, or
 # expression contexts (Load, Store, Del), which no fixer looks at.
 _SKIP_FIELDS = frozenset(
@@ -135,7 +121,7 @@ def visit(
         filename=filename,
         from_imports=defaultdict(set),
     )
-    ast_funcs = get_ast_funcs(state, settings)
+    dispatch = get_ast_funcs(state, settings)
 
     nodes: list[tuple[ast.AST, tuple[ast.AST, ...]]] = [(tree, ())]
     ret = defaultdict(list)
@@ -143,9 +129,25 @@ def visit(
         node, parents = nodes.pop()
         node_type = type(node)
 
-        for ast_func in ast_funcs[node_type]:
-            for offset, token_func in ast_func(state, node, parents):
-                ret[offset].append(token_func)
+        if (type_dispatch := dispatch.get(node_type)) is not None:
+            unfiltered_funcs, funcs_by_name = type_dispatch
+            ast_funcs = unfiltered_funcs
+            if funcs_by_name:
+                if isinstance(node, ast.Call):
+                    func = node.func
+                    if isinstance(func, ast.Name):
+                        ast_funcs = funcs_by_name.get(func.id, unfiltered_funcs)
+                    elif isinstance(func, ast.Attribute):
+                        ast_funcs = funcs_by_name.get(func.attr, unfiltered_funcs)
+                elif isinstance(node, ast.Name):
+                    ast_funcs = funcs_by_name.get(node.id, unfiltered_funcs)
+                else:
+                    assert isinstance(node, ast.Attribute)
+                    ast_funcs = funcs_by_name.get(node.attr, unfiltered_funcs)
+
+            for ast_func in ast_funcs:
+                for offset, token_func in ast_func(state, node, parents):
+                    ret[offset].append(token_func)
 
         if (
             isinstance(node, ast.ImportFrom)
@@ -177,6 +179,15 @@ def visit(
     return ret
 
 
+# A registered callback, and the names it is filtered to, if any.
+Registration = tuple[ASTFunc[Any], frozenset[str] | None]
+
+# Node types that support filtering callbacks by name, with register(names=...).
+# The name is the called function's name for Call nodes (func.id or func.attr),
+# the identifier for Name nodes, and the attribute name for Attribute nodes.
+NAMED_TYPES = frozenset((ast.Call, ast.Name, ast.Attribute))
+
+
 class Fixer:
     __slots__ = (
         "name",
@@ -193,16 +204,34 @@ class Fixer:
     ) -> None:
         self.name = module_name.rpartition(".")[2]
         self.min_version = min_version
-        self.ast_funcs: ASTCallbackMapping = defaultdict(list)
+        self.ast_funcs: defaultdict[type[ast.AST], list[Registration]] = defaultdict(
+            list
+        )
         self.condition = condition
 
         FIXERS[self.name] = self
 
     def register(
-        self, type_: type[AST_T]
+        self,
+        type_: type[AST_T],
+        *,
+        names: Collection[str] | None = None,
     ) -> Callable[[ASTFunc[AST_T]], ASTFunc[AST_T]]:
+        """
+        Register a function to be called for nodes of the given type. If
+        names is given, only call it for nodes with one of those names - see
+        NAMED_TYPES.
+        """
+        if names is not None:
+            if type_ not in NAMED_TYPES:
+                raise TypeError(f"Cannot filter {type_.__name__} nodes by name.")
+            if isinstance(names, str):
+                raise TypeError("names must be a collection of strings, not a str.")
+
         def decorator(func: ASTFunc[AST_T]) -> ASTFunc[AST_T]:
-            self.ast_funcs[type_].append(func)
+            self.ast_funcs[type_].append(
+                (func, None if names is None else frozenset(names))
+            )
             return func
 
         return decorator
@@ -222,14 +251,52 @@ def _import_fixers() -> None:
 _import_fixers()
 
 
-def get_ast_funcs(state: State, settings: Settings) -> ASTCallbackMapping:
-    ast_funcs: ASTCallbackMapping = defaultdict(list)
-    for fixer in FIXERS.values():
-        if fixer.name not in settings.enabled_fixers:
-            continue
-        if fixer.min_version <= state.settings.target_version and (
-            fixer.condition is None or fixer.condition(state)
-        ):
-            for type_, type_funcs in fixer.ast_funcs.items():
-                ast_funcs[type_].extend(type_funcs)
-    return ast_funcs
+# For each node type: the callbacks registered without names, and a mapping
+# from each registered name to all callbacks for nodes with that name. The
+# latter include the unfiltered callbacks, in registration order, so visit()
+# only has to pick one tuple.
+TypeDispatch = tuple[
+    tuple[ASTFunc[Any], ...],
+    dict[str, tuple[ASTFunc[Any], ...]],
+]
+Dispatch = dict[type[ast.AST], TypeDispatch]
+
+_dispatch_cache: dict[tuple[Fixer, ...], Dispatch] = {}
+
+
+def get_ast_funcs(state: State, settings: Settings) -> Dispatch:
+    enabled = tuple(
+        fixer
+        for fixer in FIXERS.values()
+        if fixer.name in settings.enabled_fixers
+        and fixer.min_version <= state.settings.target_version
+        and (fixer.condition is None or fixer.condition(state))
+    )
+    try:
+        return _dispatch_cache[enabled]
+    except KeyError:
+        pass
+
+    registered: defaultdict[type[ast.AST], list[Registration]] = defaultdict(list)
+    for fixer in enabled:
+        for type_, type_funcs in fixer.ast_funcs.items():
+            registered[type_].extend(type_funcs)
+
+    dispatch: Dispatch = {}
+    for type_, type_funcs in registered.items():
+        all_names: set[str] = set()
+        for _, names in type_funcs:
+            if names is not None:
+                all_names.update(names)
+        dispatch[type_] = (
+            tuple(func for func, names in type_funcs if names is None),
+            {
+                name: tuple(
+                    func for func, names in type_funcs if names is None or name in names
+                )
+                for name in all_names
+            },
+        )
+
+    _dispatch_cache[enabled] = dispatch
+    return dispatch

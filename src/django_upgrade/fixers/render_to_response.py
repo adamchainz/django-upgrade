@@ -60,7 +60,7 @@ def visit_ImportFrom(
         )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(OLD_NAME,))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -68,7 +68,6 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Name)
-        and node.func.id == OLD_NAME
         and OLD_NAME in state.from_imports[MODULE]
         and NEW_NAME not in get_module_names(cast(ast.Module, parents[0]))
         and _all_render_to_response_calls_rewritable(parents[0])

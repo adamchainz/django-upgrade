@@ -39,20 +39,20 @@ def visit_ImportFrom(
         )
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=NAMES)
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (name := node.id) in NAMES and name in state.from_imports[MODULE]:
+    if (name := node.id) in state.from_imports[MODULE]:
         yield (
             ast_start_offset(node),
             partial(find_and_replace_name, name=name, new=NAMES[name]),
         )
 
 
-@fixer.register(ast.Attribute)
+@fixer.register(ast.Attribute, names=NAMES)
 def visit_Attribute(
     state: State,
     node: ast.Attribute,
@@ -60,8 +60,7 @@ def visit_Attribute(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     name = node.attr
     if (
-        name in NAMES
-        and isinstance(node.value, ast.Name)
+        isinstance(node.value, ast.Name)
         and node.value.id == "paginator"
         and "paginator" in state.from_imports["django.core"]
     ):

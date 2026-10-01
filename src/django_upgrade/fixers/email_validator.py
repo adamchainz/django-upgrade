@@ -25,7 +25,7 @@ NAME = "EmailValidator"
 KWARGS = {"whitelist": "allowlist"}
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(NAME,))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -33,14 +33,9 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         (
-            (
-                isinstance(node.func, ast.Name)
-                and NAME in state.from_imports[MODULE]
-                and node.func.id == NAME
-            )
+            (isinstance(node.func, ast.Name) and NAME in state.from_imports[MODULE])
             or (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr == NAME
                 and "validators" in state.from_imports["django.core"]
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "validators"

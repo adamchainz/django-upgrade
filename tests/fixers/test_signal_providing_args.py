@@ -190,3 +190,11 @@ def test_kwarg_with_all_extras():
         )
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        Signal(providing_args=["documented", "arguments"])
+        """,
+    )

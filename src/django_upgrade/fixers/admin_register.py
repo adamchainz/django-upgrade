@@ -142,7 +142,7 @@ def update_class_def(
     insert(tokens, j, new_src=new_src)
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("register", "unregister"))
 def visit_Call(
     state: State,
     node: ast.Call,

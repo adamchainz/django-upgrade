@@ -30,7 +30,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("format_html",))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -39,7 +39,6 @@ def visit_Call(
     if (
         "format_html" in state.from_imports["django.utils.html"]
         and isinstance(node.func, ast.Name)
-        and node.func.id == "format_html"
         # Template only
         and len(node.args) == 1
         and len(node.keywords) == 0

@@ -10,6 +10,9 @@ Unreleased
 
 * Speed up the AST traversal by skipping fields that never contain nodes for fixers, such as expression contexts, yielding a further performance improvement of 3-7% on the same projects.
 
+* Only call fixers for function calls, names, and attributes with names they handle, yielding a further performance improvement of 23-29% on the same projects.
+  Combined with the above changes, django-upgrade is now 27-38% faster on these projects.
+
 1.32.0 (2026-08-18)
 -------------------
 

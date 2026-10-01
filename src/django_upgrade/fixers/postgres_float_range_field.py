@@ -50,15 +50,14 @@ def visit_ImportFrom(
         )
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=NAME_MAP)
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (name := node.id) in NAME_MAP and any(
-        name in state.from_imports[m] for m in MODULES
-    ):
+    name = node.id
+    if any(name in state.from_imports[m] for m in MODULES):
         yield (
             ast_start_offset(node),
             partial(find_and_replace_name, name=name, new=NAME_MAP[name]),

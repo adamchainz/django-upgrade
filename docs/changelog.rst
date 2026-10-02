@@ -8,10 +8,16 @@ Unreleased
 * Reduce garbage collection frequency while fixing files, yielding a performance improvement of 2-7%, depending on Python version.
   Measured on the source code of Django, Saleor, Wagtail, and Zulip, with no changes to make, the median speedups were ~7% on Python 3.11, ~3% on Python 3.13, and ~2% on Python 3.14, with no change in peak memory usage.
 
+  `PR #735 <https://github.com/adamchainz/django-upgrade/pull/735>`__.
+
 * Speed up the AST traversal by skipping fields that never contain nodes for fixers, such as expression contexts, yielding a further performance improvement of 3-7% on the same projects.
+
+  `PR #736 <https://github.com/adamchainz/django-upgrade/pull/736>`__.
 
 * Only call fixers for function calls, names, and attributes with names they handle, yielding a further performance improvement of 23-29% on the same projects.
   Combined with the above changes, django-upgrade is now 27-38% faster on these projects.
+
+  `PR #737 <https://github.com/adamchainz/django-upgrade/pull/737>`__.
 
 1.32.0 (2026-08-18)
 -------------------

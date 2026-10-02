@@ -106,6 +106,25 @@ class ASTCallbackMapping(Protocol):
         ...
 
 
+# Fields that never contain child nodes we want to visit: plain values, or
+# expression contexts (Load, Store, Del), which no fixer looks at.
+_SKIP_FIELDS = frozenset(
+    ("ctx", "id", "attr", "arg", "asname", "module", "level", "kind")
+)
+
+
+class _ChildFields(dict[type[ast.AST], tuple[str, ...]]):
+    def __missing__(self, type_: type[ast.AST]) -> tuple[str, ...]:
+        fields = tuple(
+            name for name in reversed(type_._fields) if name not in _SKIP_FIELDS
+        )
+        self[type_] = fields
+        return fields
+
+
+_child_fields = _ChildFields()
+
+
 def visit(
     tree: ast.Module,
     settings: Settings,
@@ -122,8 +141,9 @@ def visit(
     ret = defaultdict(list)
     while nodes:
         node, parents = nodes.pop()
+        node_type = type(node)
 
-        for ast_func in ast_funcs[type(node)]:
+        for ast_func in ast_funcs[node_type]:
             for offset, token_func in ast_func(state, node, parents):
                 ret[offset].append(token_func)
 
@@ -145,7 +165,7 @@ def visit(
             )
 
         subparents = parents + (node,)
-        for name in reversed(node._fields):
+        for name in _child_fields[node_type]:
             value = getattr(node, name)
 
             if isinstance(value, ast.AST):

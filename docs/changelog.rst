@@ -8,6 +8,8 @@ Unreleased
 * Reduce garbage collection frequency while fixing files, yielding a performance improvement of 2-7%, depending on Python version.
   Measured on the source code of Django, Saleor, Wagtail, and Zulip, with no changes to make, the median speedups were ~7% on Python 3.11, ~3% on Python 3.13, and ~2% on Python 3.14, with no change in peak memory usage.
 
+* Speed up the AST traversal by skipping fields that never contain nodes for fixers, such as expression contexts, yielding a further performance improvement of 3-7% on the same projects.
+
 1.32.0 (2026-08-18)
 -------------------
 

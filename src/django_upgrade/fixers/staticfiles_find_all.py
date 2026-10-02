@@ -21,7 +21,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("find",))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -31,12 +31,10 @@ def visit_Call(
         (
             (
                 isinstance(node.func, ast.Name)
-                and node.func.id == "find"
                 and "find" in state.from_imports["django.contrib.staticfiles"]
             )
             or (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr == "find"
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "finders"
                 and "finders" in state.from_imports["django.contrib.staticfiles"]

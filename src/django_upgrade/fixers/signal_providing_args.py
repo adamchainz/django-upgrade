@@ -31,19 +31,14 @@ MODULE = "django.dispatch"
 NAME = "Signal"
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(NAME,))
 def visit_Call(
     state: State,
     node: ast.Call,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        isinstance(node.func, ast.Name)
-        and NAME in state.from_imports[MODULE]
-        and node.func.id == NAME
-    ) or (
+    if (isinstance(node.func, ast.Name) and NAME in state.from_imports[MODULE]) or (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr == NAME
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "dispatch"
         and "dispatch" in state.from_imports["django"]

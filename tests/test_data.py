@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import ast
 import re
 from collections import defaultdict
+from collections.abc import Generator, Iterable
 from pathlib import Path
 
 import pytest
+from tokenize_rt import Offset
 
-from django_upgrade.data import FIXERS, Settings, State
+from django_upgrade.data import FIXERS, Fixer, Settings, State, TokenFunc, visit
 
 settings = Settings(target_version=(4, 0))
 
@@ -263,3 +266,73 @@ def test_all_fixers_are_documented() -> None:
 
     undocumented = names - docs
     assert not undocumented
+
+
+@pytest.fixture
+def test_fixer() -> Generator[Fixer]:
+    fixer = Fixer("tests.test_fixer", min_version=(0, 0))
+    try:
+        yield fixer
+    finally:
+        del FIXERS[fixer.name]
+
+
+def test_register_names_unsupported_type(test_fixer: Fixer) -> None:
+    with pytest.raises(TypeError) as excinfo:
+        test_fixer.register(ast.Assign, names=("x",))
+
+    assert str(excinfo.value) == "Cannot filter Assign nodes by name."
+
+
+def test_register_names_str(test_fixer: Fixer) -> None:
+    with pytest.raises(TypeError) as excinfo:
+        test_fixer.register(ast.Name, names="x")
+
+    assert str(excinfo.value) == "names must be a collection of strings, not a str."
+
+
+def test_register_names(test_fixer: Fixer) -> None:
+    calls: list[tuple[str, str]] = []
+
+    def record(label: str, node: ast.AST) -> Iterable[tuple[Offset, TokenFunc]]:
+        calls.append((label, ast.unparse(node)))
+        return ()
+
+    @test_fixer.register(ast.Call)
+    def any_call(
+        state: State, node: ast.Call, parents: tuple[ast.AST, ...]
+    ) -> Iterable[tuple[Offset, TokenFunc]]:
+        return record("any_call", node)
+
+    @test_fixer.register(ast.Call, names=("foo", "baz"))
+    def named_call(
+        state: State, node: ast.Call, parents: tuple[ast.AST, ...]
+    ) -> Iterable[tuple[Offset, TokenFunc]]:
+        return record("named_call", node)
+
+    @test_fixer.register(ast.Name, names=("y",))
+    def named_name(
+        state: State, node: ast.Name, parents: tuple[ast.AST, ...]
+    ) -> Iterable[tuple[Offset, TokenFunc]]:
+        return record("named_name", node)
+
+    @test_fixer.register(ast.Attribute, names=("bar",))
+    def named_attribute(
+        state: State, node: ast.Attribute, parents: tuple[ast.AST, ...]
+    ) -> Iterable[tuple[Offset, TokenFunc]]:
+        return record("named_attribute", node)
+
+    tree = ast.parse("foo(x)\nx.baz(y)\nx.bar\nqux()\nf()()\n")
+    visit(tree, Settings(target_version=(0, 0), only_fixers={"test_fixer"}), "t.py")
+
+    assert calls == [
+        ("any_call", "foo(x)"),
+        ("named_call", "foo(x)"),
+        ("any_call", "x.baz(y)"),
+        ("named_call", "x.baz(y)"),
+        ("named_name", "y"),
+        ("named_attribute", "x.bar"),
+        ("any_call", "qux()"),
+        ("any_call", "f()()"),
+        ("any_call", "f()"),
+    ]

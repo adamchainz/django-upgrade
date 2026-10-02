@@ -21,7 +21,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("ArrayAgg", "JSONBAgg", "StringAgg"))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -31,7 +31,6 @@ def visit_Call(
         (
             (
                 isinstance(node.func, ast.Name)
-                and node.func.id in ("ArrayAgg", "JSONBAgg", "StringAgg")
                 and (
                     node.func.id
                     in state.from_imports["django.contrib.postgres.aggregates"]
@@ -41,14 +40,12 @@ def visit_Call(
             )
             or (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr in ("ArrayAgg", "JSONBAgg", "StringAgg")
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "aggregates"
                 and "aggregates" in state.from_imports["django.contrib.postgres"]
             )
             or (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr in ("ArrayAgg", "JSONBAgg", "StringAgg")
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "general"
                 and "general"

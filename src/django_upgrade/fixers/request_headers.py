@@ -43,7 +43,7 @@ def visit_Subscript(
         )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("get",))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -51,7 +51,6 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr == "get"
         and is_request_or_self_request_meta(node.func.value)
         and len(node.args) >= 1
         and isinstance(node.args[0], ast.Constant)

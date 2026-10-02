@@ -29,7 +29,7 @@ NAMES = {
 }
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=NAMES)
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -37,10 +37,10 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(func := node.func, ast.Attribute)
-        and (name := func.attr) in NAMES
         and isinstance(func.value, ast.Name)
         and func.value.id == "self"
     ):
+        name = func.attr
         yield (
             ast_start_offset(func),
             partial(find_and_replace_name, name=name, new=NAMES[name]),

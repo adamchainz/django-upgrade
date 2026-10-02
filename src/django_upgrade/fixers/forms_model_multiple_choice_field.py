@@ -20,7 +20,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("ModelMultipleChoiceField",))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -30,14 +30,12 @@ def visit_Call(
         (
             (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr == "ModelMultipleChoiceField"
                 and "forms" in state.from_imports["django"]
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "forms"
             )
             or (
                 isinstance(node.func, ast.Name)
-                and node.func.id == "ModelMultipleChoiceField"
                 and node.func.id in state.from_imports["django.forms"]
             )
         )

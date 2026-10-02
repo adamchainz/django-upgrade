@@ -67,3 +67,11 @@ def test_indented():
             html.unescape("input string")
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        unescape_entities("input string")
+        """,
+    )

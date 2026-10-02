@@ -68,3 +68,19 @@ def test_success_aliased():
         from django.core.paginator import Paginator as P
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        QuerySetPaginator(qs, 10)
+        """,
+    )
+
+
+def test_noop_attribute_not_paginator():
+    check_noop(
+        """\
+        pagination.QuerySetPaginator(qs, 10)
+        """,
+    )

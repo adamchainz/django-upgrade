@@ -54,13 +54,13 @@ def fix_import(tokens: list[Token], i: int, *, node: ast.ImportFrom) -> None:
     insert(tokens, j, new_src=f"{indent}import html\n")
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=(OLD_NAME,))
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if node.id == OLD_NAME and OLD_NAME in state.from_imports[MODULE]:
+    if OLD_NAME in state.from_imports[MODULE]:
         yield (
             ast_start_offset(node),
             partial(find_and_replace_name, name=OLD_NAME, new="html.unescape"),

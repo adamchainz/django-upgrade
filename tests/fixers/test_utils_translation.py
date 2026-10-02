@@ -86,3 +86,19 @@ def test_success_alias_new_name_also_imported():
         _("yada")
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        ugettext("hello")
+        """,
+    )
+
+
+def test_noop_attribute_not_translation():
+    check_noop(
+        """\
+        other.ugettext("hello")
+        """,
+    )

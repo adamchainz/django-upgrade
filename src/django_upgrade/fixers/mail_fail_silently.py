@@ -49,7 +49,7 @@ EMAIL_MESSAGE_CLASSES = frozenset(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(*MAIL_SEND_FUNCTIONS, "send"))
 def visit_Call(
     state: State,
     node: ast.Call,

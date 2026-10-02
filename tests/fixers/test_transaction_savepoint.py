@@ -95,3 +95,11 @@ def test_attribute_access():
         transaction.savepoint_create("name")
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        savepoint()
+        """,
+    )

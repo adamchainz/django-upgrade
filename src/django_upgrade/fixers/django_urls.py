@@ -141,7 +141,7 @@ def update_django_urls_import(
         )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("url", "re_path", "include"))
 def visit_Call(
     state: State,
     node: ast.Call,

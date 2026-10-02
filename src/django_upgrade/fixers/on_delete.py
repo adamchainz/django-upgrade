@@ -62,7 +62,7 @@ def update_django_models_import(
         )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=RELATION_FIELD_NAMES)
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -72,14 +72,12 @@ def visit_Call(
         (
             (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr in RELATION_FIELD_NAMES
                 and (models_imported := "models" in state.from_imports["django.db"])
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "models"
             )
             or (
                 isinstance(node.func, ast.Name)
-                and node.func.id in RELATION_FIELD_NAMES
                 and node.func.id in state.from_imports["django.db.models"]
                 and (models_imported := False) is False  # force walrus
             )

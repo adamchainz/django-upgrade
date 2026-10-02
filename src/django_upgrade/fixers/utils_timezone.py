@@ -32,34 +32,27 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=("utc",))
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        node.id == "utc"
-        and (
-            (details := get_import_details(state, parents[0])).old_utc_import
-            is not None
-        )
-        and details.datetime_module is not None
-    ):
+    details = get_import_details(state, parents[0])
+    if details.old_utc_import is not None and details.datetime_module is not None:
         yield from maybe_rewrite_imports(details, erase=True)
         new_src = f"{details.datetime_module}.timezone.utc"
         yield ast_start_offset(node), partial(replace, src=new_src)
 
 
-@fixer.register(ast.Attribute)
+@fixer.register(ast.Attribute, names=("utc",))
 def visit_Attribute(
     state: State,
     node: ast.Attribute,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
-        node.attr == "utc"
-        and isinstance(node.value, ast.Name)
+        isinstance(node.value, ast.Name)
         and node.value.id == "timezone"
         and "timezone" in state.from_imports["django.utils"]
         and (details := get_import_details(state, parents[0])).datetime_module

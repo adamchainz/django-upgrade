@@ -33,7 +33,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("assertFormError", "assertFormsetError"))
 def visit_Call(
     state: State,
     node: ast.Call,

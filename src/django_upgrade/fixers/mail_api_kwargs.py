@@ -82,7 +82,7 @@ API_CONFIGS = {
 MESSAGE_MODULE_NAMES = frozenset({"EmailMessage", "EmailMultiAlternatives"})
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=API_CONFIGS)
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -93,10 +93,7 @@ def visit_Call(
         (
             isinstance(node.func, ast.Name)
             and (
-                (
-                    (func_name := node.func.id) in API_CONFIGS
-                    and func_name in state.from_imports["django.core.mail"]
-                )
+                (func_name := node.func.id) in state.from_imports["django.core.mail"]
                 or (
                     func_name in MESSAGE_MODULE_NAMES
                     and func_name in state.from_imports["django.core.mail.message"]

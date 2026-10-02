@@ -84,7 +84,7 @@ def visit_ImportFrom(
         )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("NullBooleanField",))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -93,11 +93,9 @@ def visit_Call(
     if (
         isinstance(node.func, ast.Name)
         and "NullBooleanField" in state.from_imports["django.db.models"]
-        and node.func.id == "NullBooleanField"
         and _all_nullbooleanfield_name_usages_are_calls(parents[0])
     ) or (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr == "NullBooleanField"
         and "models" in state.from_imports["django.db"]
         and isinstance(node.func.value, ast.Name)
         and node.func.value.id == "models"

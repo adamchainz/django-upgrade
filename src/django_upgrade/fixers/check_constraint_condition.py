@@ -21,7 +21,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("CheckConstraint",))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -31,7 +31,6 @@ def visit_Call(
         (
             (
                 isinstance(node.func, ast.Name)
-                and node.func.id == "CheckConstraint"
                 and (
                     "CheckConstraint" in state.from_imports["django.db.models"]
                     or "CheckConstraint"
@@ -40,7 +39,6 @@ def visit_Call(
             )
             or (
                 isinstance(node.func, ast.Attribute)
-                and node.func.attr == "CheckConstraint"
                 and isinstance(node.func.value, ast.Name)
                 and node.func.value.id == "models"
                 and (

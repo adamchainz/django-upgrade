@@ -92,23 +92,19 @@ def fix_import(
         )
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=(*RENAMES, *URLLIB_NAMES))
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (name := node.id) in state.from_imports[MODULE]:
-        new_name: str | None
         if name in RENAMES:
             new_name = RENAMES[name]
-        elif name in URLLIB_NAMES:
-            new_name = URLLIB_NAMES[name]
         else:
-            new_name = None
+            new_name = URLLIB_NAMES[name]
 
-        if new_name is not None:
-            yield (
-                ast_start_offset(node),
-                partial(find_and_replace_name, name=name, new=new_name),
-            )
+        yield (
+            ast_start_offset(node),
+            partial(find_and_replace_name, name=name, new=new_name),
+        )

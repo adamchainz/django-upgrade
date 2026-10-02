@@ -73,3 +73,19 @@ def test_success_alias():
         ft("yada")
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        force_text(value)
+        """,
+    )
+
+
+def test_noop_attribute_not_encoding():
+    check_noop(
+        """\
+        other.force_text(value)
+        """,
+    )

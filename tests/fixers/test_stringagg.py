@@ -378,3 +378,19 @@ def test_bare_reference_blocks_call_rewrite():
         StringAgg("field", Value(", "))
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        Agg = StringAgg
+        """,
+    )
+
+
+def test_noop_call_not_imported():
+    check_noop(
+        """\
+        StringAgg("name", delimiter=",")
+        """,
+    )

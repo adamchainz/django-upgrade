@@ -105,3 +105,12 @@ def test_assertQuerysetEqual_transformed():
         """,
         filename="tests.py",
     )
+
+
+def test_noop_not_self():
+    check_noop(
+        """\
+        other.assertQuerysetEqual(qs, [])
+        """,
+        filename="tests.py",
+    )

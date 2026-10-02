@@ -71,13 +71,13 @@ def get_offset_arg(node: ast.Call) -> ast.expr | ast.keyword | None:
     return next((k for k in node.keywords if k.arg == "offset"), None)
 
 
-@fixer.register(ast.Name)
+@fixer.register(ast.Name, names=(OLD_NAME,))
 def visit_Name(
     state: State,
     node: ast.Name,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if node.id == OLD_NAME and OLD_NAME in state.from_imports[MODULE]:
+    if OLD_NAME in state.from_imports[MODULE]:
         parent = parents[-1]
         if not (
             isinstance(parent, ast.Call)
@@ -93,17 +93,13 @@ def visit_Name(
     return ()
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(OLD_NAME,))
 def visit_Call(
     state: State,
     node: ast.Call,
     parents: tuple[ast.AST, ...],
 ) -> Iterable[tuple[Offset, TokenFunc]]:
-    if (
-        OLD_NAME in state.from_imports[MODULE]
-        and isinstance(node.func, ast.Name)
-        and node.func.id == OLD_NAME
-    ):
+    if OLD_NAME in state.from_imports[MODULE] and isinstance(node.func, ast.Name):
         arg = get_offset_arg(node)
         if arg is not None:
             module = parents[0]

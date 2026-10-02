@@ -23,7 +23,7 @@ fixer = Fixer(
 )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=("is_anonymous", "is_authenticated"))
 def visit_Call(
     state: State,
     node: ast.Call,
@@ -31,7 +31,6 @@ def visit_Call(
 ) -> Iterable[tuple[Offset, TokenFunc]]:
     if (
         isinstance(node.func, ast.Attribute)
-        and node.func.attr in ("is_anonymous", "is_authenticated")
         and len(node.args) == 0
         and len(node.keywords) == 0
         and is_request_or_self_request_user(node.func.value)

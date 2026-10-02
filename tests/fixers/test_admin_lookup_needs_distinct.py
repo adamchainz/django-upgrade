@@ -48,3 +48,11 @@ def test_with_alias():
         v = lnd("x")
         """,
     )
+
+
+def test_noop_name_not_imported():
+    check_noop(
+        """\
+        lookup_needs_distinct(opts, lookup_path)
+        """,
+    )

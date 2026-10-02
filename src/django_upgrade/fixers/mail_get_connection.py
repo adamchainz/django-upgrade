@@ -75,7 +75,7 @@ def visit_ImportFrom(
             )
 
 
-@fixer.register(ast.Call)
+@fixer.register(ast.Call, names=(*MAIL_SEND_FUNCTIONS, GET_CONNECTION))
 def visit_Call(
     state: State,
     node: ast.Call,

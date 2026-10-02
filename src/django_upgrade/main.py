@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import re
 import sys
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
+from contextlib import contextmanager
 from importlib import metadata
 from typing import Any, cast
 
@@ -98,15 +100,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
 
     ret = 0
-    for filename in args.filenames:
-        ret |= fix_file(
-            filename,
-            settings,
-            exit_zero_even_if_changed=args.exit_zero_even_if_changed,
-            check=args.check,
-        )
+    with gc_threshold(250_000):
+        for filename in args.filenames:
+            ret |= fix_file(
+                filename,
+                settings,
+                exit_zero_even_if_changed=args.exit_zero_even_if_changed,
+                check=args.check,
+            )
 
     return ret
+
+
+@contextmanager
+def gc_threshold(threshold0: int) -> Generator[None]:
+    """
+    Temporarily collect less often: we allocate many short-lived AST nodes and
+    tokens that don't form reference cycles.
+    """
+    old = gc.get_threshold()
+    gc.set_threshold(threshold0, *old[1:])
+    try:
+        yield
+    finally:
+        gc.set_threshold(*old)
 
 
 def fixer_type(string: str) -> str:

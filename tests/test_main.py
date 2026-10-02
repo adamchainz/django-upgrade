@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gc
 import io
 import re
 import subprocess
@@ -11,7 +12,12 @@ import pytest
 from tokenize_rt import UNIMPORTANT_WS, src_to_tokens
 
 from django_upgrade import __main__  # noqa: F401
-from django_upgrade.main import fixup_dedent_tokens, get_target_version, main
+from django_upgrade.main import (
+    fixup_dedent_tokens,
+    gc_threshold,
+    get_target_version,
+    main,
+)
 from django_upgrade.tokens import DEDENT
 from tests.compat import chdir
 
@@ -88,6 +94,34 @@ def test_main_file(tmp_path, capsys):
     out, err = capsys.readouterr()
     assert err == f"Rewriting {path}\n"
     assert path.read_text() == "from django.core.paginator import Paginator\n"
+
+
+def test_main_restores_gc_threshold(tmp_path):
+    path = tmp_path / "example.py"
+    path.write_text("x = 1\n")
+    before = gc.get_threshold()
+
+    main([str(path)])
+
+    assert gc.get_threshold() == before
+
+
+def test_gc_threshold():
+    before = gc.get_threshold()
+
+    with gc_threshold(12_345):
+        assert gc.get_threshold() == (12_345, *before[1:])
+
+    assert gc.get_threshold() == before
+
+
+def test_gc_threshold_exception():
+    before = gc.get_threshold()
+
+    with pytest.raises(ValueError), gc_threshold(12_345):
+        raise ValueError()
+
+    assert gc.get_threshold() == before
 
 
 def test_main_check(tmp_path, capsys):

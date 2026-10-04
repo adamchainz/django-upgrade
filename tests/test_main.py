@@ -5,6 +5,7 @@ import io
 import re
 import subprocess
 import sys
+from contextlib import chdir
 from textwrap import dedent
 from unittest import mock
 
@@ -19,7 +20,6 @@ from django_upgrade.main import (
     main,
 )
 from django_upgrade.tokens import DEDENT
-from tests.compat import chdir
 
 
 def test_main_no_files(capsys):
@@ -214,7 +214,6 @@ def test_get_target_version_auto_no_pyproject_toml(tmp_path, capsys):
     assert err == ""
 
 
-@pytest.mark.skipif(sys.version_info < (3, 11), reason="Python 3.11+")
 @pytest.mark.parametrize(
     "deps_line,expected",
     [
@@ -248,7 +247,6 @@ dependencies = [
     )
 
 
-@pytest.mark.skipif(sys.version_info < (3, 11), reason="Python 3.11+")
 @pytest.mark.parametrize(
     "deps_line",
     [

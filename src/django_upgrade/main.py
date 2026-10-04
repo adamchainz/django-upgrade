@@ -4,6 +4,7 @@ import argparse
 import gc
 import re
 import sys
+import tomllib
 from collections.abc import Generator, Sequence
 from contextlib import contextmanager
 from importlib import metadata
@@ -153,11 +154,6 @@ def get_target_version(string: str) -> tuple[int, int]:
             tuple(int(x) for x in string.split(".", 1)),
         )
 
-    if sys.version_info < (3, 11):
-        return default
-
-    import tomllib
-
     try:
         with open("pyproject.toml", "rb") as fp:
             config = tomllib.load(fp)
@@ -303,4 +299,4 @@ def fixup_dedent_tokens(tokens: list[Token]) -> None:
     """
     for i, token in enumerate(tokens):
         if token.name == UNIMPORTANT_WS and tokens[i + 1].name == DEDENT:
-            tokens[i], tokens[i + 1] = tokens[i + 1], tokens[i]
+            tokens[i], tokens[i + 1] = tokens[i + 1], token

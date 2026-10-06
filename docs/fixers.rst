@@ -220,6 +220,27 @@ Renames the deprecated ``savepoint`` function in ``django.db.transaction`` to ``
     +from django.db import transaction
     +transaction.savepoint_create("name")
 
+Django 7.0
+----------
+
+`Release Notes <https://docs.djangoproject.com/en/7.0/releases/7.0/>`__
+
+.. _settings_use_blank_choice_dash:
+
+``USE_BLANK_CHOICE_DASH`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``settings_use_blank_choice_dash``
+
+Removes the transitional setting ``USE_BLANK_CHOICE_DASH`` from settings files, as it no longer has any effect.
+
+Settings files are heuristically detected as modules with the whole word "settings" somewhere in their path.
+For example ``myproject/settings.py`` or ``myproject/settings/production.py``.
+
+.. code-block:: diff
+
+    -USE_BLANK_CHOICE_DASH = True
+
 Django 6.0
 ----------
 

@@ -220,6 +220,30 @@ Renames the deprecated ``savepoint`` function in ``django.db.transaction`` to ``
     +from django.db import transaction
     +transaction.savepoint_create("name")
 
+.. _hmac_algorithm:
+
+``salted_hmac()`` and ``base64_hmac()`` algorithm argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Name:** ``hmac_algorithm``
+
+Adds an explicit ``algorithm="sha1"`` to calls to ``salted_hmac()`` and ``base64_hmac()``, since the default will change from ``"sha1"`` to ``"sha256"`` in Django 2028, per `this change <https://docs.djangoproject.com/en/6.1/releases/6.1/#:~:text=The%20default%20value%20of%20the%20algorithm%20argument>`__.
+Calls that already pass ``algorithm`` are left alone, as are calls with ``**`` unpacking, which may pass it.
+
+.. code-block:: diff
+
+    from django.utils.crypto import salted_hmac
+
+   -salted_hmac("my-salt", value)
+   +salted_hmac("my-salt", value, algorithm="sha1")
+
+    # or
+
+    from django.core import signing
+
+   -signing.base64_hmac("my-salt", value, key)
+   +signing.base64_hmac("my-salt", value, key, algorithm="sha1")
+
 Django 6.0
 ----------
 

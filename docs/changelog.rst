@@ -7,6 +7,11 @@ Unreleased
 
 * Drop Python 3.10 support.
 
+* Add Django 6.1+ fixer :ref:`hmac_algorithm <hmac_algorithm>` to pass an explicit ``algorithm="sha1"`` to ``salted_hmac()`` and ``base64_hmac()`` calls, since the default will change from ``"sha1"`` to ``"sha256"`` in Django 2028.
+
+  `PR #740 <https://github.com/adamchainz/django-upgrade/pull/740>`__.
+  Thanks to derblub for the report in `Issue #733 <https://github.com/adamchainz/django-upgrade/issues/733>`__.
+
 1.33.0 (2026-10-02)
 -------------------
 

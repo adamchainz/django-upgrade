@@ -58,15 +58,9 @@ Like the above, it requires comparisons of the form:
 
 Supports these test skip decorators:
 
-* |unittest.skipIf|__
+* :func:`@unittest.skipIf <unittest.skipIf>`
 
-  .. |unittest.skipIf| replace:: ``@unittest.skipIf``
-  __ https://docs.python.org/3/library/unittest.html#unittest.skipIf
-
-* |unittest.skipUnless|__
-
-  .. |unittest.skipUnless| replace:: ``@unittest.skipUnless``
-  __ https://docs.python.org/3/library/unittest.html#unittest.skipUnless
+* :func:`@unittest.skipUnless <unittest.skipUnless>`
 
 * |pytest.mark.skipif|__
 

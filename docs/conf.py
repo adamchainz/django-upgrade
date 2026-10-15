@@ -37,6 +37,7 @@ release = version
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
 ]
@@ -87,3 +88,9 @@ latex_documents = [
         "manual",
     ),
 ]
+
+# -- Options for Intersphinx -------------------------------------------
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+}

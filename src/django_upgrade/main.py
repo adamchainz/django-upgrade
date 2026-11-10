@@ -159,6 +159,10 @@ def get_target_version(string: str) -> tuple[int, int]:
             config = tomllib.load(fp)
     except FileNotFoundError:
         return default
+    except tomllib.TOMLDecodeError:
+        # A malformed pyproject.toml should not crash the run; fall back
+        # to the default target version, like a missing file does.
+        return default
 
     deps = config.get("project", {}).get("dependencies", [])
     for dep in deps:

@@ -214,6 +214,17 @@ def test_get_target_version_auto_no_pyproject_toml(tmp_path, capsys):
     assert err == ""
 
 
+def test_get_target_version_auto_invalid_pyproject_toml(tmp_path, capsys):
+    (tmp_path / "pyproject.toml").write_text("[project\ndependencies = [broken")
+
+    with chdir(tmp_path):
+        assert get_target_version("auto") == (2, 2)
+
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
+
+
 @pytest.mark.parametrize(
     "deps_line,expected",
     [
